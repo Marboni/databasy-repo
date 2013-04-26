@@ -8,11 +8,8 @@ MODELS_MODULE_PREFIX = 'databasyrepo.models.'
 class Serializable(dict):
     def __init__(self, **kwargs):
         super(Serializable, self).__init__()
-        try:
-            #noinspection PyUnresolvedReferences
-            self['_type'] = self.serial_code()
-        except KeyError:
-            raise ValueError('Unable to serialized: SERIAL_CODE not defined.')
+
+        self['_code'] = self.code()
 
         self._init_fields()
         for f_name, f_value in kwargs.iteritems():
@@ -24,7 +21,7 @@ class Serializable(dict):
             self[f_name] = init_value
 
     @classmethod
-    def serial_code(cls):
+    def code(cls):
         full_name = '%s.%s' % (cls.__module__, cls.__name__)
         if full_name.startswith(MODELS_MODULE_PREFIX):
             return full_name[len(MODELS_MODULE_PREFIX):]
@@ -49,7 +46,7 @@ class Serializable(dict):
         try:
             return self[field]
         except KeyError:
-            raise ValueError('Field "%s" not exists in object of type %s.' % (field, self.get('_type', 'N/A')))
+            raise ValueError('Field "%s" not exists in object of type %s.' % (field, self.get('_code', 'N/A')))
 
     def __delitem__(self, name):
         raise ValueError('Operation is prohibited.')
@@ -118,7 +115,7 @@ class Serializable(dict):
                 return True
             elif isinstance(element, NodeRef):
                 try:
-                    register.get(element.val('ref_type'), type)
+                    register.get(element.val('ref_code'), type)
                     return True
                 except ValueError:
                     return False
@@ -143,7 +140,7 @@ def deserialize(serialized_object, superclass=None):
     elif not isinstance(serialized_object, dict):
         raise TypeError('Serialized object must be dict or string.')
 
-    type = raw_value(serialized_object, '_type')
+    type = raw_value(serialized_object, '_code')
     try:
         from databasyrepo.models.register import register
         obj_class = register.get(type, superclass)
@@ -152,13 +149,6 @@ def deserialize(serialized_object, superclass=None):
     node = obj_class()
     node.deserialize(serialized_object)
     return node
-
-
-def deserialize_command(serialized_command):
-    from databasyrepo.models.core.commands import Command
-
-    return deserialize(serialized_command, Command)
-
 
 def raw_value(serialized_parent, field):
     try:

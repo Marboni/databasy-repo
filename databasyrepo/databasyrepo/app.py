@@ -5,6 +5,7 @@ import os
 from socketio.server import SocketIOServer
 import sys
 from databasyrepo import config, mg
+from databasyrepo.models.pool import ModelsPool
 
 def load_modules(app):
     try:
@@ -38,6 +39,8 @@ def configure_logging(app):
         ))
         app.logger.addHandler(stderr_handler)
 
+def create_models_pool(app):
+    app.pool = ModelsPool()
 
 def create_app():
     app = Flask('databasyrepo')
@@ -46,6 +49,7 @@ def create_app():
     load_modules(app)
     wrap_into_middlewares(app)
     configure_logging(app)
+    create_models_pool(app)
     return app
 
 if __name__ == '__main__':

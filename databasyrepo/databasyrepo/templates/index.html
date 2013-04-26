@@ -3,63 +3,46 @@
 <head>
     <title>Chat</title>
     <script type="text/javascript" src="/static/js/jquery.min.js"></script>
+    <script type="text/javascript" src="/static/js/json2.js"></script>
     <script type="text/javascript" src="/static/js/socket.io.min.js"></script>
     <script type="text/javascript">
         $(function() {
-            var socket = io.connect();
+            var socket = io.connect('http://localhost:5000/models');
 
             $(window).bind("beforeunload", function() {
                 socket.disconnect();
             });
 
             socket.on('connect', function () {
-                $('#chat').append('<p><i>Connected</i></p>');
+                message('System', 'Connected');
+                socket.emit('connect', 1, 1);
             });
-
-            socket.on('announcement', function (msg) {
-                $('#chat').append('<p><i>' + msg + '</p></i>');
-            });
-
-            socket.on('msg_to_room', message);
 
             socket.on('reconnect', function () {
-                $('#chat').remove();
-                message('System', 'Reconnected to the server');
+                message('System', 'Reconnected.')
             });
 
             socket.on('reconnecting', function () {
-                message('System', 'Attempting to re-connect to the server');
+                message('System', 'Reconnecting...')
             });
 
             socket.on('error', function (e) {
-                message('System', e ? e : 'A unknown error occurred');
+                alert(e);
+            });
+
+            socket.on('reload', function(model) {
+                var model_repr = JSON.stringify(model, 4);
+                $('#model').append('<p>' + model_repr + '</p>');
             });
 
             function message (from, msg) {
-                $('#chat').append('<p><b>' + from + ':</b> <i>' + msg + '</i></p>');
-            }
-
-            var username = prompt('Username:');
-            socket.emit('username', username);
-
-            $('#msgForm').submit(function () {
-                var messageInput = $('#message');
-                socket.emit('user message', messageInput.val());
-                message('me', messageInput.val());
-                clear();
-                return false;
-            });
-
-            function clear () {
-                $('#message').val('').focus();
+                $('#status').append('<p><b>' + from + ':</b> <i>' + msg + '</i></p>');
             }
         })
     </script>
 </head>
 <body>
-<div id="chat"></div>
-<form id="msgForm">
-    <input id="message" type="text" name="message">
-</form>
+<div id="model"></div>
+<div id="status"></div>
 </body>
 </html>

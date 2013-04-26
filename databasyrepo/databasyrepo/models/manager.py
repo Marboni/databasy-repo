@@ -4,67 +4,64 @@ from databasyrepo.models.core import serializing
 from databasyrepo.models.core.errors import ModelNotFound
 from databasyrepo.models.core.models import Model
 from databasyrepo.models.register import register
-from databasyrepo.utils.commons import ExpireCounter, current_time_ms
 
 __author__ = 'Marboni'
 
 class ModelManager(object):
-    # How long user will be considered as active after his last ping.
-    USER_ACTIVITY_TIME = 5
-
     def __init__(self):
         super(ModelManager, self).__init__()
-        self._touch_time = None
-        self._active_users = ExpireCounter(self.USER_ACTIVITY_TIME)
         self._lock = threading.Lock()
+        self._active_users = []
 
     def _check_model(self):
         if not self._model:
             raise ValueError('Manager has no model.')
 
-    def _touch(self, user_id):
-        self._touch_time = current_time_ms()
-        self._active_users.add(user_id)
-
-    def create(self, type, model_id, user_id):
+    def create(self, model_id, user_id):
         with self._lock:
-            model_class = register.get(type, Model)
-            self._model = model_class.create(model_id, user_id)
-            self._touch(user_id)
+            serial = self.serial_by_id(model_id)
+            # TODO Handle case when model not found.
+            model_class = register.get(serial, Model)
+            conn = mg()
+            self._model = model_class.create(model_id, user_id, conn)
 
     @staticmethod
-    def retrieve_model(model_id, parent_model_uid=None):
-        serialized_model = mg().models.find_one({'model_id': model_id, 'parent_model_uid': parent_model_uid})
+    def serial_by_id(model_id):
+        # TODO Should take it from some source.
+        from databasyrepo.models.postgres.models import PostgresModel
+        return PostgresModel.code()
+
+    @staticmethod
+    def retrieve_model(model_id, conn):
+        serialized_model = conn.models.find_one({'model_id': model_id})
         if not serialized_model:
             raise ModelNotFound(model_id)
-        return serializing.deserialize(serialized_model)
+        model = serializing.deserialize(serialized_model)
+        return model
 
-    def load(self, model_id, user_id, parent_model_uid=None):
+    def load(self, model_id):
         with self._lock:
-            self._model = self.retrieve_model(model_id, parent_model_uid)
-            self._touch(user_id)
+            conn = mg()
+            self._model = self.retrieve_model(model_id, conn)
 
-    def active_users(self, user_id):
-        self._touch(user_id)
-        return set(self._active_users.events)
-
-    def diff(self, version, user_id):
+    def register_user(self, uid):
         with self._lock:
-            self._check_model()
-            diff = self._model.diff(version)
-            self._touch(user_id)
-            return diff
+            self._active_users.append(uid)
+
+    def unregister_user(self, uid):
+        with self._lock:
+            self._active_users.remove(uid)
+
+    def in_use(self):
+        with self._lock:
+            return bool(self._active_users)
 
     def execute_command(self, command, user_id):
         with self._lock:
             self._check_model()
             actions = self._model.execute_command(command, user_id)
-            self._touch(user_id)
             return actions
 
-    def expired(self, ttl):
-        """ Returns whether this manager is expired based on TTL specified in seconds.
-        """
+    def serialize(self):
         with self._lock:
-            self._check_model()
-            return self._touch_time < (current_time_ms() - ttl * 1000)
+            return self._model.serialize_for_client()

@@ -11,8 +11,3 @@ class ModelNotFound(Exception):
         super(ModelNotFound, self).__init__('Model with ID %s not found.')
         self.model_id = model_id
 
-class IllegalClientModelVersion(Exception):
-    pass
-
-class Conflict(Exception):
-    pass

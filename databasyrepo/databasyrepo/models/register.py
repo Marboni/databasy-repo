@@ -6,7 +6,6 @@ __author__ = 'Marboni'
 MODULES = [
     'core',
     'postgres',
-    'test'
 ]
 
 for module_name in MODULES:
@@ -21,7 +20,7 @@ class Register(object):
         super(Register, self).__init__()
         self._codes_and_classes = {}
         for subclass in commons.itersubclasses(Serializable):
-            self._codes_and_classes[subclass.serial_code()] = subclass
+            self._codes_and_classes[subclass.code()] = subclass
         self._by_types = {}
 
     def get(self, serial_code, superclass=None):

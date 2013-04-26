@@ -4,18 +4,14 @@ from databasyrepo.models.core.serializing import Serializable
 __author__ = 'Marboni'
 
 class Node(Serializable):
-    STATIC = {}
-
     def __init__(self, id=None):
         super(Node, self).__init__()
-        for static_field, static_value in self.STATIC.iteritems():
-            self[static_field] = static_value
         self.set('_id', id or str(uuid4()))
 
     def fields(self):
         return {
             '_id': basestring,
-        }
+            }
 
     @property
     def id(self):
@@ -67,7 +63,7 @@ class Node(Serializable):
 
     def ref(self):
         #noinspection PyUnresolvedReferences
-        return NodeRef(ref_id=self.id, ref_type=self.serial_code())
+        return NodeRef(ref_id=self.id, ref_type=self.code())
 
 class NodeRef(Serializable):
     def fields(self):
@@ -82,8 +78,9 @@ class NodeRef(Serializable):
 
     def ref_node(self, model):
         node = model.node(self.ref_id)
-        node_code = node.serial_code()
+        node_code = node.code()
         if node_code != self['ref_type']:
             raise ValueError('Node type (%s) not equal to the type in node reference (%s).' % (node_code, self['ref_type']))
         return node
+
 
