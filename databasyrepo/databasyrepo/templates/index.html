@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Chat</title>
+    <script type="text/javascript" src="/static/js/jquery.min.js"></script>
+    <script type="text/javascript" src="/static/js/socket.io.min.js"></script>
+    <script type="text/javascript">
+        $(function() {
+            var socket = io.connect();
+
+            $(window).bind("beforeunload", function() {
+                socket.disconnect();
+            });
+
+            socket.on('connect', function () {
+                $('#chat').append('<p><i>Connected</i></p>');
+            });
+
+            socket.on('announcement', function (msg) {
+                $('#chat').append('<p><i>' + msg + '</p></i>');
+            });
+
+            socket.on('msg_to_room', message);
+
+            socket.on('reconnect', function () {
+                $('#chat').remove();
+                message('System', 'Reconnected to the server');
+            });
+
+            socket.on('reconnecting', function () {
+                message('System', 'Attempting to re-connect to the server');
+            });
+
+            socket.on('error', function (e) {
+                message('System', e ? e : 'A unknown error occurred');
+            });
+
+            function message (from, msg) {
+                $('#chat').append('<p><b>' + from + ':</b> <i>' + msg + '</i></p>');
+            }
+
+            var username = prompt('Username:');
+            socket.emit('username', username);
+
+            $('#msgForm').submit(function () {
+                var messageInput = $('#message');
+                socket.emit('user message', messageInput.val());
+                message('me', messageInput.val());
+                clear();
+                return false;
+            });
+
+            function clear () {
+                $('#message').val('').focus();
+            }
+        })
+    </script>
+</head>
+<body>
+<div id="chat"></div>
+<form id="msgForm">
+    <input id="message" type="text" name="message">
+</form>
+</body>
+</html>
