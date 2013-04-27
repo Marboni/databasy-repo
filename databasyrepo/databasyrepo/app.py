@@ -53,6 +53,6 @@ def create_app():
     return app
 
 if __name__ == '__main__':
-    print 'Server is listening on port 5000.'
+    print 'Server is listening on port 8000.'
     app = create_app()
-    SocketIOServer(('', 5000), app, resource="socket.io").serve_forever()
+    SocketIOServer(('', 8000), app, resource="socket.io").serve_forever()

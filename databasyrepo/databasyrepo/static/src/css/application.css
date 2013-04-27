@@ -1,0 +1,11 @@
+#contentPanel {
+    padding: 0 !important;
+    border: none !important;
+    overflow: hidden;
+    color: #00ce00
+}
+
+#canvas {
+    padding: 0 !important;
+    background: transparent url(background.png) !important;
+}
