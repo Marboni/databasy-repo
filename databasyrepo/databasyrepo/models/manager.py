@@ -12,6 +12,7 @@ class ModelManager(object):
         super(ModelManager, self).__init__()
         self._lock = threading.Lock()
         self._active_users = []
+        self._editor = None
 
     def _check_model(self):
         if not self._model:
@@ -19,16 +20,17 @@ class ModelManager(object):
 
     def create(self, model_id, user_id):
         with self._lock:
-            serial = self.serial_by_id(model_id)
+            serial = self.code_by_id(model_id)
             # TODO Handle case when model not found.
             model_class = register.get(serial, Model)
             conn = mg()
             self._model = model_class.create(model_id, user_id, conn)
 
     @staticmethod
-    def serial_by_id(model_id):
+    def code_by_id(model_id):
         # TODO Should take it from some source.
         from databasyrepo.models.postgres.models import PostgresModel
+
         return PostgresModel.code()
 
     @staticmethod
@@ -50,11 +52,26 @@ class ModelManager(object):
 
     def unregister_user(self, uid):
         with self._lock:
-            self._active_users.remove(uid)
+            try:
+                self._active_users.remove(uid)
+            except ValueError:
+                pass
 
     def in_use(self):
         with self._lock:
             return bool(self._active_users)
+
+    def current_editor(self):
+        return self._editor
+
+    def set_editor(self, user_id=None):
+        with self._lock:
+            self._check_model()
+            if user_id:
+                if user_id in self._active_users:
+                    self._editor = user_id
+                else:
+                    raise ValueError('Unable to make user #%s editor - it\'s not an active user of the model.')
 
     def execute_command(self, command, user_id):
         with self._lock:

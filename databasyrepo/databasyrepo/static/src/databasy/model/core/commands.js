@@ -1,0 +1,67 @@
+databasy.model.core.commands.Command = databasy.model.core.serializing.Serializable.extend({
+    init:function (values) {
+        this._super();
+        for (var field in values) {
+            if (values.hasOwnProperty(field)) {
+                this.set(field, values[field]);
+            }
+        }
+    },
+    fields:function () {
+        return this._super().concat(
+            "source_version"
+        )
+    },
+    do:function (executor) {
+        throw new Error('Not implemented');
+    }
+});
+
+databasy.model.core.commands.CreateTable = databasy.model.core.commands.Command.extend({
+    fields:function () {
+        return this._super().concat(
+            'name',
+            'canvas_id',
+            'position'
+        )
+    },
+    do:function (executor) {
+        var core = databasy.model.core;
+
+        var table = core.elements.Table();
+        executor.execute(core.actions.Register({node:table}));
+        executor.execute(core.actions.AppendItem({field:'tables', item:table}));
+        executor.execute(core.actions.Set({node_id:table.id(), field:'name', value:this.val('name')}));
+
+        core.commands.CreateTableRepr({
+            canvas_id:this.val('canvas_id'), table_id:table.id(), position:this.val('position')
+        }).do(executor);
+    }
+}, {
+    CODE:"core.commands.CreateTable"
+});
+
+
+databasy.model.core.commands.CreateTableRepr = databasy.model.core.commands.Command.extend({
+    fields:function () {
+        return this._super().concat(
+            'canvas_id',
+            'table_id',
+            'position'
+        )
+    },
+    do:function (executor) {
+        var core = databasy.model.core;
+
+        var table = executor.model.node(this.val('table_id'), core.elements.Table);
+        var canvas = executor.model.node(this.val('canvas_id'), core.reprs.Canvas);
+
+        var table_repr = new core.reprs.TableRepr();
+        executor.execute(core.actions.Register({node:table_repr}));
+        executor.execute(core.actions.AppendItem({node_id:canvas.id(), field:'reprs', item:table_repr}));
+        executor.execute(core.actions.Set({node_id:table_repr.id(), field:'table', value:table}));
+        executor.execute(core.actions.Set({node_id:table_repr.id(), field:'position', value:this.val('position')}));
+    }
+}, {
+    CODE:"core.commands.CreateTableRepr"
+});

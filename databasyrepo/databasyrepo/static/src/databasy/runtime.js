@@ -27,17 +27,21 @@ databasy.runtime.register = new (Class.extend({
     }
 }))();
 
-databasy.runtime.Socket = Class.extend({
+databasy.runtime.ModelHandler = Class.extend({
     init: function(model_id) {
+        this.model_id = model_id;
+        this._init_socket();
+        this.reload();
+    },
+    _init_socket:function() {
         this.socket = io.connect('/models');
         var that = this;
 
-        $(window).bind("beforeunload", function() {
+        $(window).bind('beforeunload', function() {
             that.socket.disconnect();
         });
 
         this.socket.on('connect', function () {
-            that.socket.emit('connect', model_id, 1);
         });
 
         this.socket.on('reconnect', function () {
@@ -46,13 +50,25 @@ databasy.runtime.Socket = Class.extend({
         this.socket.on('reconnecting', function () {
         });
 
-        this.socket.on('reload', function(model) {
-            var model_repr = JSON.stringify(model, 4);
-            $('#canvas').append('<p>' + model_repr + '</p>');
-        });
-
         this.socket.on('error', function (e) {
-            alert(e);
+            alert(e.message);
         });
+    },
+    reload:function() {
+        var user_id = new Date().getTime() / 1000;
+        this.socket.emit('reload', this.model_id, user_id);
+
+        var that = this;
+        this.socket.on('reload', function(serialized_model, current_editor) {
+            that._init_model(serialized_model);
+            that._change_editor(current_editor);
+        });
+    },
+    _init_model:function(serialized_model) {
+        this._model = databasy.model.core.serializing.Serializable.deserialize(serialized_model);
+        $('#canvas').append('<pre>' + this._model.serialize() + '</pre>');
+    },
+    _change_editor:function(editor) {
+
     }
 });

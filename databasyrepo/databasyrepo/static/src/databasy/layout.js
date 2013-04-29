@@ -5,7 +5,7 @@
         spacing_open:5,
         spacing_closed:5
     };
-    $('body').layout({
+    var layout = $('#container').layout({
         applyDefaultStyles: true,
         defaults: defaults,
         north: {
@@ -37,4 +37,5 @@
             }
         }
     });
+    return layout;
 })();

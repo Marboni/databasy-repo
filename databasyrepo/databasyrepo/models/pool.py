@@ -72,6 +72,8 @@ class ModelsPool(object):
 
     def disconnect(self, model_id, user_id):
         mm = self._get(model_id)
+        if not mm:
+            return
         mm.unregister_user(user_id)
         if not mm.in_use():
             self._lock.acquire_write()

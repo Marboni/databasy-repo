@@ -48,6 +48,13 @@ class Serializable(dict):
         except KeyError:
             raise ValueError('Field "%s" not exists in object of type %s.' % (field, self.get('_code', 'N/A')))
 
+    def val_as_node(self, field, model):
+        val = self.val(field)
+        if isinstance(val, list):
+            return [node_ref.ref_node(model) for node_ref in val]
+        else:
+            return val.ref_node(model)
+
     def __delitem__(self, name):
         raise ValueError('Operation is prohibited.')
 

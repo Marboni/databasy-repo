@@ -3,9 +3,18 @@ var databasy = {
         core: {
             serializing: {},
             models: {},
-            nodes: {}
+            nodes: {},
+            elements: {},
+            actions: {},
+            reprs: {},
+            checkers: {},
+            datatypes: {},
+            commands: {}
+        },
+        postgres: {
+            models: {}
         }
     },
-    runtime: {
-    }
+    runtime: {},
+    layout: {}
 };

@@ -11,7 +11,7 @@ class Config(object):
     SITE_NAME = 'Databasy.com'
 
     MODULES = {
-        '': 'databasyrepo.api.general',
+        '/models': 'databasyrepo.api.models',
         '/socket.io': 'databasyrepo.api.socket',
     }
 

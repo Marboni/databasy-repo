@@ -5,7 +5,7 @@
 /**
  * @class draw2d.util.spline.Spline
  * 
- *  An abstract class defining a general spline object.
+ *  An abstract class defining a models spline object.
  */
 draw2d.util.spline.Spline = Class.extend({
 

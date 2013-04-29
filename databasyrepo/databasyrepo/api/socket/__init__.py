@@ -30,7 +30,7 @@ class ModelsNamespace(BaseNamespace):
     def log(self, message):
         self.context.app.logger.info("[%s] %s" % (self.socket.sessid, message))
 
-    def on_connect(self, user_id, model_id):
+    def on_reload(self, model_id, user_id):
         user_id = long(user_id)
         model_id = long(model_id)
 
@@ -38,7 +38,7 @@ class ModelsNamespace(BaseNamespace):
         self.session['model_id'] = model_id
         mm = self.context.app.pool.connect(model_id, user_id)
         self.log('[uid:%s] Connected to model %s.' % (user_id, model_id))
-        self.emit('reload', mm.serialize())
+        self.emit('reload', mm.serialize(), mm.current_editor())
 
     def recv_disconnect(self):
         user_id = self.session['user_id']
@@ -46,7 +46,6 @@ class ModelsNamespace(BaseNamespace):
         self.context.app.pool.disconnect(model_id, user_id)
         self.disconnect(silent=True)
         self.log('[uid:%s] Disconnected from model %s.' % (user_id, model_id))
-        return True
 
     def disconnect(self, *args, **kwargs):
         if self.context:

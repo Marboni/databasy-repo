@@ -4,7 +4,7 @@
  ****************************************/
 /**
  * @class draw2d.io.Reader
- * Template class for general import of a document into the canvas.
+ * Template class for models import of a document into the canvas.
  * 
  * @author andreas Herz
  */

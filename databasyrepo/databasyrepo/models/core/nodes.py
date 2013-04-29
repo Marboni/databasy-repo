@@ -26,13 +26,6 @@ class Node(Serializable):
         else:
             setter(value)
 
-    def val_as_node(self, field, model):
-        val = self.val(field)
-        if isinstance(val, list):
-            return [node_ref.ref_node(model) for node_ref in val]
-        else:
-            return val.ref_node(model)
-
     def insert_item(self, field, index, item):
         lst = self._iter_val(field)
         lst.insert(index, item)
@@ -63,13 +56,13 @@ class Node(Serializable):
 
     def ref(self):
         #noinspection PyUnresolvedReferences
-        return NodeRef(ref_id=self.id, ref_type=self.code())
+        return NodeRef(ref_id=self.id, ref_code=self.code())
 
 class NodeRef(Serializable):
     def fields(self):
         return {
             'ref_id': basestring,
-            'ref_type': basestring
+            'ref_code': basestring
         }
 
     @property
@@ -79,8 +72,8 @@ class NodeRef(Serializable):
     def ref_node(self, model):
         node = model.node(self.ref_id)
         node_code = node.code()
-        if node_code != self['ref_type']:
-            raise ValueError('Node type (%s) not equal to the type in node reference (%s).' % (node_code, self['ref_type']))
+        if node_code != self['ref_code']:
+            raise ValueError('Node type (%s) not equal to the type in node reference (%s).' % (node_code, self['ref_code']))
         return node
 
 

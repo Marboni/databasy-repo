@@ -1,6 +1,5 @@
-from fabric.context_managers import lcd, cd
-from fabric.decorators import hosts
-from fabric.operations import local, sudo, run
+from fabric.context_managers import lcd
+from fabric.operations import local
 import os
 
 __author__ = 'Marboni'
