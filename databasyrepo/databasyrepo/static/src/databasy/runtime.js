@@ -54,19 +54,26 @@ databasy.runtime.ModelHandler = Class.extend({
             alert(e.message);
         });
     },
+    show:function() {
+        $('#busy').hide();
+    },
+    hide:function() {
+        $('#busy').show();
+    },
     reload:function() {
-        var user_id = new Date().getTime() / 1000;
+        var user_id = new Date().getTime();
         this.socket.emit('reload', this.model_id, user_id);
 
         var that = this;
         this.socket.on('reload', function(serialized_model, current_editor) {
             that._init_model(serialized_model);
             that._change_editor(current_editor);
+            that.show();
         });
     },
     _init_model:function(serialized_model) {
         this._model = databasy.model.core.serializing.Serializable.deserialize(serialized_model);
-        $('#canvas').append('<pre>' + this._model.serialize() + '</pre>');
+        $('#canvas').append('<pre>' + JSON.stringify(this._model.serialize(), null, 4) + '</pre>');
     },
     _change_editor:function(editor) {
 

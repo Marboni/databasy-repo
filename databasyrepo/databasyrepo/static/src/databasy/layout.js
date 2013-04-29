@@ -5,7 +5,7 @@
         spacing_open:5,
         spacing_closed:5
     };
-    var layout = $('#container').layout({
+    var layout = $('body').layout({
         applyDefaultStyles: true,
         defaults: defaults,
         north: {

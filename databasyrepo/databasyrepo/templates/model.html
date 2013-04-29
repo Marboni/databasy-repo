@@ -18,6 +18,8 @@
 
 <script type="text/javascript">
 $(function () {
+    $('#busy').show();
+
     $LAB
             .script("/static/libs/class-extend.js")
             .script("/static/libs/json2.js")
@@ -37,7 +39,7 @@ $(function () {
             .script("/static/libs/draw2d_2.3.3/lib/canvg.js")
             .script("/static/libs/draw2d_2.3.3/src/draw2d.js")
 
-            // ============ DRAW2D FOR DEVELOPMENT ============
+        // ============ DRAW2D FOR DEVELOPMENT ============
             .script("/static/libs/draw2d_2.3.3/src_dev/util/Color.js")
             .script("/static/libs/draw2d_2.3.3/src_dev/util/Color.js")
             .script("/static/libs/draw2d_2.3.3/src_dev/util/ArrayList.js")
@@ -424,16 +426,15 @@ $(function () {
 </script>
 </head>
 <body>
-<div id="container">
-    <div id="menuPanel"></div>
-    <div id="chatPanel"></div>
-    <div id="propertyPanel"></div>
-    <div id="contentPanel">
-        <div id="toolbox"></div>
-        <div id="canvas"
-             onselectstart="javascript:/*IE8 hack*/return false"
-             style="width:1500px; height:1500px;-webkit-tap-highlight-color: rgba(0,0,0,0); ">
-        </div>
+<div id="busy"></div>
+<div id="menuPanel"></div>
+<div id="chatPanel"></div>
+<div id="propertyPanel"></div>
+<div id="contentPanel">
+    <div id="toolbox"></div>
+    <div id="canvas"
+         onselectstart="javascript:/*IE8 hack*/return false"
+         style="width:1500px; height:1500px;-webkit-tap-highlight-color: rgba(0,0,0,0); ">
     </div>
 </div>
 </body>

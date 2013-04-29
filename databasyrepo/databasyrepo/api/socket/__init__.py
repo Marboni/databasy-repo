@@ -16,6 +16,7 @@ def socketio(remaining):
         app.logger.error("Exception while handling socket.io connection", exc_info=True)
     return Response()
 
+
 class ModelsNamespace(BaseNamespace):
     def __init__(self, environ, ns_name, request=None):
         self.context = None
@@ -41,13 +42,17 @@ class ModelsNamespace(BaseNamespace):
         self.emit('reload', mm.serialize(), mm.current_editor())
 
     def recv_disconnect(self):
-        user_id = self.session['user_id']
-        model_id = self.session['model_id']
-        self.context.app.pool.disconnect(model_id, user_id)
-        self.disconnect(silent=True)
-        self.log('[uid:%s] Disconnected from model %s.' % (user_id, model_id))
+        if 'user_id' in self.session:
+            user_id = self.session['user_id']
+            model_id = self.session['model_id']
+            self.context.app.pool.disconnect(model_id, user_id)
+            self.disconnect(silent=True)
+            self.log('[uid:%s] Disconnected from model %s.' % (user_id, model_id))
 
     def disconnect(self, *args, **kwargs):
         if self.context:
-            self.context.pop()
+            try:
+                self.context.pop()
+            except:
+                return
         super(ModelsNamespace, self).disconnect(*args, **kwargs)
