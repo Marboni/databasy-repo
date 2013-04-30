@@ -1,4 +1,4 @@
-(function () {
+databasy.ui.layout.createLayout = function () {
     var defaults = {
         resizable:false,
         closable:false,
@@ -38,4 +38,4 @@
         }
     });
     return layout;
-})();
+};

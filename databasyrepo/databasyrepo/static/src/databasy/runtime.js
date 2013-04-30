@@ -61,6 +61,8 @@ databasy.runtime.ModelHandler = Class.extend({
         $('#busy').show();
     },
     reload:function() {
+        this.layout = databasy.ui.layout.createLayout();
+
         var user_id = new Date().getTime();
         this.socket.emit('reload', this.model_id, user_id);
 
@@ -68,6 +70,7 @@ databasy.runtime.ModelHandler = Class.extend({
         this.socket.on('reload', function(serialized_model, current_editor) {
             that._init_model(serialized_model);
             that._change_editor(current_editor);
+            that.repaint();
             that.show();
         });
     },
@@ -77,5 +80,9 @@ databasy.runtime.ModelHandler = Class.extend({
     },
     _change_editor:function(editor) {
 
+    },
+    repaint:function() {
+        var default_canvas_node = this._model.val_as_node('canvases', this._model)[0];
+        // TODO
     }
 });

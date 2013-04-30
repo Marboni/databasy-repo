@@ -23,8 +23,9 @@ class ModelManager(object):
             serial = self.code_by_id(model_id)
             # TODO Handle case when model not found.
             model_class = register.get(serial, Model)
-            conn = mg()
-            self._model = model_class.create(model_id, user_id, conn)
+            self._model = model_class.create(model_id, user_id)
+            self._model.inject_connection(mg())
+            self._model.save()
 
     @staticmethod
     def code_by_id(model_id):
@@ -39,12 +40,12 @@ class ModelManager(object):
         if not serialized_model:
             raise ModelNotFound(model_id)
         model = serializing.deserialize(serialized_model)
+        model.inject_connection(conn)
         return model
 
     def load(self, model_id):
         with self._lock:
-            conn = mg()
-            self._model = self.retrieve_model(model_id, conn)
+            self._model = self.retrieve_model(model_id, mg())
 
     def register_user(self, uid):
         with self._lock:

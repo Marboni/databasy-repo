@@ -7,14 +7,6 @@ databasy.model.core.nodes.Node = databasy.model.core.serializing.Serializable.ex
     id:function () {
         return this.val('_id');
     },
-    set:function (field, value) {
-        var setter_name = 'set_' % field;
-        if (this[setter_name] === undefined) {
-            this._super(field, value);
-        } else {
-            this[setter_name](value);
-        }
-    },
     insert_item:function (field, index, item) {
         var lst = this._iter_val(field);
         lst.splice(index, 0, item);

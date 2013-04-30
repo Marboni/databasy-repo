@@ -43,8 +43,13 @@ databasy.model.core.serializing.Serializable = Class.extend({
                 return ref_or_obj(value, model);
             }
         },
-        set:function (key, value) {
-            this.f[key] = value;
+        set:function (f_name, f_value) {
+            var setter_name = 'set_' + f_name;
+            if (this[setter_name] === undefined) {
+                this.f[f_name] = f_value;
+            } else {
+                this[setter_name](f_value);
+            }
         },
         _serialized_value:function(value) {
             if (value instanceof databasy.model.core.serializing.Serializable) {

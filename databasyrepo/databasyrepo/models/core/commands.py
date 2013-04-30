@@ -54,6 +54,42 @@ class Command(Serializable):
     def do(self, executor):
         raise NotImplementedError
 
+
+class HistoryCommand(Command):
+    def require_checks(self):
+        return False
+
+    def validate_predicates(self, model):
+        super(HistoryCommand, self).validate_predicates(model)
+        client_version = self['source_version']
+        server_version = model.version
+        if client_version != server_version:
+            raise IllegalCommand('Client model version %s not equals to server model version %s.' % (client_version, server_version))
+
+
+class Undo(HistoryCommand):
+    def validate_predicates(self, model):
+        super(Undo, self).validate_predicates(model)
+        if not model.revision_stack.can_undo():
+            raise IllegalCommand('Nothing to undo.')
+
+    def do(self, executor):
+        actions = executor.model.revision_stack.undo()
+        for action in actions:
+            executor.execute(action)
+
+
+class Redo(HistoryCommand):
+    def validate_predicates(self, model):
+        super(Redo, self).validate_predicates(model)
+        if not model.revision_stack.can_redo():
+            raise IllegalCommand('Nothing to redo.')
+
+    def do(self, executor):
+        actions = executor.model.revision_stack.redo()
+        for action in actions:
+            executor.execute(action)
+
 class CreateTable(Command):
     def fields(self):
         fields = super(CreateTable, self).fields()

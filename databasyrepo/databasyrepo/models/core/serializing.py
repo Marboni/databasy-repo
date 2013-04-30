@@ -32,15 +32,22 @@ class Serializable(dict):
     def fields(self):
         raise NotImplementedError('%s not implemented method fields().' % type(self))
 
+
     def set(self, f_name, f_value):
-        fields = self.fields()
-        f_type = fields.get(f_name)
-        if not f_type:
-            raise ValueError('Field "%s" not exists. Available fields: %s.' % (f_name, fields.keys()))
-        if not self.check_type(f_name, f_value):
-            raise ValueError(
-                'Unable to set value of type %s to field "%s" of type %s.' % (type(f_value), f_name, f_type))
-        self[f_name] = f_value
+        setter_name = 'set_%s' % f_name
+        try:
+            setter = getattr(self, setter_name)
+        except AttributeError:
+            fields = self.fields()
+            f_type = fields.get(f_name)
+            if not f_type:
+                raise ValueError('Field "%s" not exists. Available fields: %s.' % (f_name, fields.keys()))
+            if not self.check_type(f_name, f_value):
+                raise ValueError(
+                    'Unable to set value of type %s to field "%s" of type %s.' % (type(f_value), f_name, f_type))
+            self[f_name] = f_value
+        else:
+            setter(f_value)
 
     def val(self, field):
         try:

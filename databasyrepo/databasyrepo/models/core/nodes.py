@@ -17,15 +17,6 @@ class Node(Serializable):
     def id(self):
         return self.val('_id')
 
-    def set(self, field, value):
-        setter_name = 'set_%s' % field
-        try:
-            setter = getattr(self, setter_name)
-        except AttributeError:
-            super(Node, self).set(field, value)
-        else:
-            setter(value)
-
     def insert_item(self, field, index, item):
         lst = self._iter_val(field)
         lst.insert(index, item)

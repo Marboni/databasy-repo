@@ -16,5 +16,9 @@ var databasy = {
         }
     },
     runtime: {},
-    layout: {}
+    ui: {
+        layout: {},
+        locators: {},
+        shapes: {}
+    }
 };
