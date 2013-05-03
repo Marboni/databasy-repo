@@ -412,11 +412,14 @@ $(function () {
             .script("/static/src/databasy/model/postgres/models.js")
 
             .script("/static/src/databasy/ui/layout.js")
+            .script("/static/src/databasy/ui/locators.js")
+            .script("/static/src/databasy/ui/shapes.js")
+
             .script("/static/src/databasy/runtime.js")
 
             .wait(function () {
                 try {
-                    new databasy.runtime.ModelHandler({{ model_id }});
+                    new databasy.runtime.ModelManager({{ model_id }});
                 }
                 catch (error) {
                     console.log(error);

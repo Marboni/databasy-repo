@@ -1,7 +1,7 @@
 databasy.model.core.serializing.Serializable = Class.extend({
         init:function (params) {
             this.f = {};
-            this.f["_code"] = this.constructor.CODE;
+            this.f['_code'] = this.constructor.CODE;
             var fields = this.fields();
             for (var i = 0; i < fields.length; i++) {
                 this.f[fields[i]] = undefined;
@@ -13,6 +13,9 @@ databasy.model.core.serializing.Serializable = Class.extend({
                     }
                 }
             }
+        },
+        code:function() {
+            return this.constructor.CODE;
         },
         fields:function () {
             return [];
@@ -83,6 +86,9 @@ databasy.model.core.serializing.Serializable = Class.extend({
                     this.set(field, val);
                 }
             }
+        },
+        toString:function() {
+            return JSON.stringify(this.serialize());
         }
     },
     {
@@ -93,7 +99,7 @@ databasy.model.core.serializing.Serializable = Class.extend({
                     var type = value['_code'];
                     var register = databasy.runtime.register;
                     if (register.exists(type)) {
-                        var ObjClass = register.byType(type);
+                        var ObjClass = register.by_key(type);
                         var obj = new ObjClass();
                         obj.deserialize(value);
                         value = obj;

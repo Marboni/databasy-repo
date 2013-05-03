@@ -6,7 +6,7 @@ databasy.model.core.reprs.Canvas = databasy.model.core.nodes.Node.extend({
         )
     }
 }, {
-    CODE:"core.reprs.Canvas"
+    CODE:'core.reprs.Canvas'
 });
 
 databasy.model.core.reprs.Repr = databasy.model.core.nodes.Node.extend({});
@@ -19,5 +19,5 @@ databasy.model.core.reprs.TableRepr = databasy.model.core.reprs.Repr.extend({
         )
     }
 }, {
-    CODE:"core.reprs.TableRepr"
+    CODE:'core.reprs.TableRepr'
 });
