@@ -1,5 +1,5 @@
 from databasyrepo.mg import mg
-from databasyrepo.models.core.commands import CreateTable, Undo, Redo
+from databasyrepo.models.core.commands import *
 from databasyrepo.models.core.elements import Table
 from databasyrepo.models.core.errors import IllegalCommand
 from databasyrepo.models.core.models import Model
@@ -84,3 +84,22 @@ class CommandTest(ODMTest):
         execute_command(model, Redo)
         # v4 = v2 - Model with table.
         self.assertEqual(nodes_v2, model.val('nodes'))
+
+
+    def test_move_table_repr(self):
+        model = create_model()
+        canvas = default_canvas(model)
+
+        execute_command(model, CreateTable,
+            name='Table',
+            canvas_id=canvas.id,
+            position = [1, 1]
+        )
+
+        table_repr = query_node(model, _code=TableRepr.code())
+        execute_command(model, MoveTableRepr,
+            table_repr_id=table_repr.id,
+            new_position=[10,10]
+        )
+
+        self.assertEqual([10, 10], table_repr.val('position'))

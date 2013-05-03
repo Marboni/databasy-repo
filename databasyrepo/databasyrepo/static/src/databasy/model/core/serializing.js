@@ -79,13 +79,16 @@ databasy.model.core.serializing.Serializable = Class.extend({
             }
             return serialized;
         },
-        deserialize:function (serializedObject) {
+        deserialize:function (serialized_object) {
             for (var field in this.f) {
                 if (this.f.hasOwnProperty(field)) {
-                    var val = databasy.model.core.serializing.Serializable.deserialize(serializedObject[field]);
+                    var val = databasy.model.core.serializing.Serializable.deserialize(serialized_object[field]);
                     this.set(field, val);
                 }
             }
+        },
+        copy:function() {
+            return this.constructor.deserialize(this);
         },
         toString:function() {
             return JSON.stringify(this.serialize());
@@ -98,14 +101,10 @@ databasy.model.core.serializing.Serializable = Class.extend({
                     // Value is object.
                     var type = value['_code'];
                     var register = databasy.runtime.register;
-                    if (register.exists(type)) {
-                        var ObjClass = register.by_key(type);
-                        var obj = new ObjClass();
-                        obj.deserialize(value);
-                        value = obj;
-                    } else {
-                        value = "NA";
-                    }
+                    var ObjClass = register.by_key(type);
+                    var obj = new ObjClass();
+                    obj.deserialize(value);
+                    value = obj;
                 }
                 return value;
             };

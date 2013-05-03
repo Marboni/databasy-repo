@@ -9,7 +9,8 @@ var databasy = {
             reprs: {},
             checkers: {},
             datatypes: {},
-            commands: {}
+            commands: {},
+            events: {}
         },
         postgres: {
             models: {}

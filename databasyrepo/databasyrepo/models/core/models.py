@@ -1,4 +1,4 @@
-from databasyrepo.models.core.commands import Undo, Redo, CreateTable, CreateTableRepr
+from databasyrepo.models.core.commands import Undo, Redo, CreateTable, MoveTableRepr
 from databasyrepo.models.core.events import Event
 from databasyrepo.models.core.nodes import Node
 from databasyrepo.models.core.reprs import Canvas
@@ -46,6 +46,7 @@ class Model(Node):
             Redo,
 
             CreateTable,
+            MoveTableRepr
             ]
 
     def checkers(self):
@@ -147,8 +148,6 @@ class Revision(Serializable):
     def fields(self):
         return {
             'source_version': long,
-            'modifier_uid': long,
-            'modification_time': long,
             'events': [Event]
         }
 
@@ -178,7 +177,7 @@ class RevisionStack(Serializable):
             self._add_revision(revision)
 
     def add(self, user_id, events, regular=True):
-        revision = self._create_revision(events, user_id)
+        revision = self._create_revision(events)
         self._add_revision(revision)
 
         if regular:
@@ -216,16 +215,14 @@ class RevisionStack(Serializable):
         revision = self.versions_and_revisions[revision_version]
         return [event.do_action() for event in revision['events']]
 
-    def _create_revision(self, events, user_id):
+    def _create_revision(self, events):
         revision = Revision()
         revision.set('source_version', self._model.version)
-        revision.set('modifier_uid', user_id)
-        revision.set('modification_time', commons.current_time_ms())
         revision.set('events', events)
         return revision
 
     def _add_revision(self, revision):
-        self['revisions'].insert(0, revision)
+        self.val('revisions').insert(0, revision)
         self.versions_and_revisions[revision.val('source_version')] = revision
 
     def _remove_revision(self, revision):

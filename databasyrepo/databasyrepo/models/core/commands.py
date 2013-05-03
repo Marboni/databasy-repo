@@ -16,7 +16,7 @@ class Command(Serializable):
 
     def validate_predicates(self, model):
         if self.__class__ not in model.commands():
-            raise IllegalCommand('Command %s can not be executed on model %s.' % (self.code(), model.serial_code()))
+            raise IllegalCommand('Command %s can not be executed on model %s.' % (self.code(), model.code()))
 
     def validators(self, model):
         return {
@@ -148,3 +148,24 @@ class CreateTableRepr(Command):
         executor.execute(AppendItem(node_id=canvas.id, field='reprs', item=table_repr))
         executor.execute(Set(node_id=table_repr.id, field='table', value=table))
         executor.execute(Set(node_id=table_repr.id, field='position', value=self.val('position')))
+
+
+class MoveTableRepr(Command):
+    def fields(self):
+        fields = super(MoveTableRepr, self).fields()
+        fields.update({
+            'table_repr_id': basestring,
+            'new_position': [int]
+        })
+        return fields
+
+    def validators(self, model):
+        validators = super(MoveTableRepr, self).validators(model)
+        validators.update({
+            'table_repr_id': Always(NodeClass(model, TableRepr)),
+            'new_position': Always(Iterable(2, 2)),
+            })
+        return validators
+
+    def do(self, executor):
+        executor.execute(Set(self['table_repr_id'], 'position', self['new_position']))

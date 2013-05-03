@@ -9,13 +9,19 @@ databasy.model.core.commands.Command = databasy.model.core.serializing.Serializa
     },
     fields:function () {
         return this._super().concat(
-            "source_version"
+            'source_version'
         )
+    },
+    validate_predicates:function(model) {
+        if ($.inArray(this.constructor, model.commands()) == -1) {
+            throw new Error('Command ' + this.code() + ' can not be executed on model ' + model.code() + '.')
+        }
     },
     do:function (executor) {
         throw new Error('Not implemented');
     },
     execute:function(model) {
+        this.validate_predicates(model);
         var executor = databasy.model.core.actions.Executor(model);
         this.do(executor);
         if (this.require_checks()) {
@@ -55,7 +61,7 @@ databasy.model.core.commands.CreateTable = databasy.model.core.commands.Command.
         }).do(executor);
     }
 }, {
-    CODE:"core.commands.CreateTable"
+    CODE:'core.commands.CreateTable'
 });
 
 
@@ -80,5 +86,21 @@ databasy.model.core.commands.CreateTableRepr = databasy.model.core.commands.Comm
         executor.execute(core.actions.Set({node_id:table_repr.id(), field:'position', value:this.val('position')}));
     }
 }, {
-    CODE:"core.commands.CreateTableRepr"
+    CODE:'core.commands.CreateTableRepr'
+});
+
+databasy.model.core.commands.MoveTableRepr = databasy.model.core.commands.Command.extend({
+    fields:function () {
+        return this._super().concat(
+            'table_repr_id',
+            'new_position'
+        )
+    },
+    do:function (executor) {
+        var table_repr_id = this.val('table_repr_id');
+        var new_position = this.val('new_position');
+        executor.execute(databasy.model.core.actions.Set({node_id:table_repr_id, field:'position', value:new_position}));
+    }
+}, {
+    CODE:'core.commands.MoveTableRepr'
 });
