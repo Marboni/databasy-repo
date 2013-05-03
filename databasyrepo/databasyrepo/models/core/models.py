@@ -1,4 +1,4 @@
-from databasyrepo.models.core.commands import Undo, Redo
+from databasyrepo.models.core.commands import Undo, Redo, CreateTable, CreateTableRepr
 from databasyrepo.models.core.events import Event
 from databasyrepo.models.core.nodes import Node
 from databasyrepo.models.core.reprs import Canvas
@@ -26,9 +26,32 @@ class Model(Node):
 
             'nodes': [Node],
             'canvases': [Canvas],
-            'tables': [Table]
+            'tables': [Table],
+
+            'revision_stack': RevisionStack
         })
         return fields
+
+    def server_only_fields(self):
+        return {
+            'creation_time': long,
+            'creator_uid': long,
+            'modification_time': long,
+            'modifier_uid': long,
+        }
+
+    def commands(self):
+        return [
+            Undo,
+            Redo,
+
+            CreateTable,
+            ]
+
+    def checkers(self):
+        return [
+
+        ]
 
     def inject_connection(self, conn):
         self._conn = conn
@@ -40,16 +63,6 @@ class Model(Node):
     @property
     def revision_stack(self):
         return self.val('revision_stack')
-
-    def server_only_fields(self):
-        return {
-            'creation_time': long,
-            'creator_uid': long,
-            'modification_time': long,
-            'modifier_uid': long,
-
-            'revision_stack': RevisionStack
-        }
 
     @classmethod
     def create(cls, model_id, user_id):
@@ -133,7 +146,7 @@ class Model(Node):
 class Revision(Serializable):
     def fields(self):
         return {
-            'source_version': int,
+            'source_version': long,
             'modifier_uid': long,
             'modification_time': long,
             'events': [Event]
@@ -153,8 +166,8 @@ class RevisionStack(Serializable):
     def fields(self):
         return {
             'revisions': [Revision],
-            'undoable': [int],
-            'redoable': [int]
+            'undoable': [long],
+            'redoable': [long]
         }
 
     def inject_model(self, model):

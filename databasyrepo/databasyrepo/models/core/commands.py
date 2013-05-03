@@ -11,7 +11,7 @@ __author__ = 'Marboni'
 class Command(Serializable):
     def fields(self):
         return {
-            'source_version': int
+            'source_version': long
         }
 
     def validate_predicates(self, model):
@@ -119,6 +119,8 @@ class CreateTable(Command):
 
 
 class CreateTableRepr(Command):
+    """ Is not used separately, only as part of CreateTable command.
+    """
     def fields(self):
         fields = super(CreateTableRepr, self).fields()
         fields.update({

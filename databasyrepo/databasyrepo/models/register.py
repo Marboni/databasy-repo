@@ -21,22 +21,14 @@ class Register(object):
         self._codes_and_classes = {}
         for subclass in commons.itersubclasses(Serializable):
             self._codes_and_classes[subclass.code()] = subclass
-        self._by_types = {}
 
-    def get(self, serial_code, superclass=None):
+    def get(self, code, superclass=None):
         try:
-            clazz = self._codes_and_classes[serial_code]
+            clazz = self._codes_and_classes[code]
         except KeyError:
-            raise ValueError('Type %s not registered.' % serial_code)
+            raise ValueError('Type %s not registered.' % code)
         if superclass and not (superclass == clazz or issubclass(clazz, superclass)):
-            raise ValueError('Class with SERIAL_CODE %s is not subclass of %s.' % (serial_code, superclass))
+            raise ValueError('Class with code %s is not subclass of %s.' % (code, superclass))
         return clazz
-
-
-    def get_by_type(self, superclass):
-        if not self._by_types.has_key(superclass):
-            self._by_types[superclass] = [clazz for clazz in self._codes_and_classes.values()
-                                          if (superclass == clazz or issubclass(clazz, superclass))]
-        return self._by_types.get(superclass)
 
 register = Register()

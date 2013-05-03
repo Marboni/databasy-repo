@@ -13,6 +13,10 @@ databasy.model.core.models.Model = databasy.model.core.nodes.Node.extend({
             'tables'
         )
     },
+    checkers:function() {
+        return [
+        ]
+    },
     register:function (node) {
         var node_id = node.id();
         if (this.exists(node_id)) {
@@ -25,7 +29,13 @@ databasy.model.core.models.Model = databasy.model.core.nodes.Node.extend({
         var node = this.node(node_id);
         delete this._node_register[node_id];
         var nodes = this.val('nodes');
-        nodes.splice(nodes.indexOf(node), 1);
+        for (var i = 0; i < nodes.length; i++) {
+            if (nodes[i] === node) {
+                nodes.splice(i, 1);
+                return
+            }
+        }
+        throw new Error('Node ' + node_id + ' not found in the nodes list.')
     },
     node:function (node_id, cls) {
         if (!this.exists(node_id)) {

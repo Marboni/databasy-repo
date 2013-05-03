@@ -10,7 +10,9 @@ if __name__ == '__main__':
     conn.models.remove()
 
     user_id = 1L
-    model = PostgresModel.create(1L, user_id, conn)
+    model = PostgresModel.create(1L, user_id)
+    model.inject_connection(conn)
+    model.save()
 
     serialized = conn.models.find_one()
     deserialized_model = deserialize(serialized)

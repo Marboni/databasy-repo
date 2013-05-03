@@ -14,6 +14,23 @@ databasy.model.core.commands.Command = databasy.model.core.serializing.Serializa
     },
     do:function (executor) {
         throw new Error('Not implemented');
+    },
+    execute:function(model) {
+        var executor = databasy.model.core.actions.Executor(model);
+        this.do(executor);
+        if (this.require_checks()) {
+            this._check(executor);
+        }
+        return executor.events;
+    },
+    require_checks:function() {
+        return true;
+    },
+    _check:function(executor) {
+        var checkers = executor.model.checkers();
+        for (var i = 0; i < checkers.length; i++) {
+            checkers[i](executor).modify_errors();
+        }
     }
 });
 

@@ -78,6 +78,11 @@ class Serializable(dict):
                     value = node_list_value(serialized_obj, f_name)
                 else:
                     value = raw_list_value(serialized_obj, f_name)
+            if issubclass(type, long):
+                if is_obj:
+                    value = long(value)
+                else:
+                    value = [long(v) for v in value]
             try:
                 self.set(f_name, value)
             except ValueError, e:

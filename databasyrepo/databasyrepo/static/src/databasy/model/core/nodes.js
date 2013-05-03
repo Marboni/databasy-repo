@@ -23,7 +23,13 @@ databasy.model.core.nodes.Node = databasy.model.core.serializing.Serializable.ex
     },
     item_index: function(field, item) {
         var lst = this._iter_val(field);
-        lst.indexOf(item);
+        for (var i = 0; i < lst.length; i++) {
+            var list_item = lst[i];
+            if (list_item === item) {
+                return list_item;
+            }
+        }
+        throw new Error('Item not found in the list "' + field + '".')
     },
     items_count:function(field) {
         var lst = this._iter_val(field);
