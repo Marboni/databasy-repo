@@ -21,5 +21,8 @@ var databasy = {
         layout: {},
         locators: {},
         shapes: {}
+    },
+    utils: {
+        preloader: {}
     }
 };

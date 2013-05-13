@@ -25,6 +25,13 @@ databasy.model.core.models.Model = databasy.model.core.nodes.Node.extend({
         return [
         ]
     },
+    set_nodes:function (value) {
+        this.f['nodes'] = [];
+        for (var i = 0; i < value.length; i++) {
+            var node = value[i];
+            this.register(node);
+        }
+    },
     version:function () {
         return this.val('version');
     },
@@ -59,12 +66,9 @@ databasy.model.core.models.Model = databasy.model.core.nodes.Node.extend({
     exists:function (node_id) {
         return this._node_register.hasOwnProperty(node_id);
     },
-    set_nodes:function (value) {
-        this.f['nodes'] = [];
-        for (var i = 0; i < value.length; i++) {
-            var node = value[i];
-            this.register(node);
-        }
+    execute_command:function (command) {
+        var events = command.execute(this);
+        this.revision_stack().add(1, events, true); // TODO User ID
     },
     deserialize:function (serialized_object) {
         this._super(serialized_object);
@@ -80,7 +84,7 @@ databasy.model.core.models.Revision = databasy.model.core.serializing.Serializab
         )
     }
 }, {
-    CODE: 'core.models.Revision'
+    CODE:'core.models.Revision'
 });
 
 databasy.model.core.models.RevisionStack = databasy.model.core.serializing.Serializable.extend({
@@ -109,17 +113,18 @@ databasy.model.core.models.RevisionStack = databasy.model.core.serializing.Seria
             this._add_revision(revision);
 
             if (regular) {
-                this.val('undoable').unshift(self._model.version() + 1);
+                this.val('undoable').unshift(this._model.version() + 1);
                 this.set('redoable', []);
                 this._control_size();
             }
 
-            this._model.set('version', self._model.version() + 1);
+            this._model.set('version', this._model.version() + 1);
         },
         _create_revision:function (events) {
             var revision = new databasy.model.core.models.Revision();
             revision.set('source_version', this._model.version());
             revision.set('events', events);
+            return revision;
         },
         _add_revision:function (revision) {
             this.val('revisions').unshift(revision);
@@ -128,7 +133,7 @@ databasy.model.core.models.RevisionStack = databasy.model.core.serializing.Seria
         _remove_revision:function (revision) {
             var source_version = revision.val('source_version');
             delete this.versions_and_revisions[source_version];
-            var revisions = self.val('revisions');
+            var revisions = this.val('revisions');
             revisions.splice($.inArray(revision, revisions), 1);
         },
         _control_size:function () {
@@ -152,7 +157,7 @@ databasy.model.core.models.RevisionStack = databasy.model.core.serializing.Seria
         }
     },
     {
-        CODE: 'core.models.RevisionStack',
+        CODE:'core.models.RevisionStack',
         MAX_UNDO_ITEMS:20,
         MAX_HISTORY_ITEMS:20
     });

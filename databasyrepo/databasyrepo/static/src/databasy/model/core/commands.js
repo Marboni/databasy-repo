@@ -22,7 +22,7 @@ databasy.model.core.commands.Command = databasy.model.core.serializing.Serializa
     },
     execute:function(model) {
         this.validate_predicates(model);
-        var executor = databasy.model.core.actions.Executor(model);
+        var executor = new databasy.model.core.actions.Executor(model);
         this.do(executor);
         if (this.require_checks()) {
             this._check(executor);
@@ -52,9 +52,9 @@ databasy.model.core.commands.CreateTable = databasy.model.core.commands.Command.
         var core = databasy.model.core;
 
         var table = core.elements.Table();
-        executor.execute(core.actions.Register({node:table}));
-        executor.execute(core.actions.AppendItem({field:'tables', item:table}));
-        executor.execute(core.actions.Set({node_id:table.id(), field:'name', value:this.val('name')}));
+        executor.execute(new core.actions.Register({node:table}));
+        executor.execute(new core.actions.AppendItem({field:'tables', item:table}));
+        executor.execute(new core.actions.Set({node_id:table.id(), field:'name', value:this.val('name')}));
 
         core.commands.CreateTableRepr({
             canvas_id:this.val('canvas_id'), table_id:table.id(), position:this.val('position')
@@ -80,10 +80,10 @@ databasy.model.core.commands.CreateTableRepr = databasy.model.core.commands.Comm
         var canvas = executor.model.node(this.val('canvas_id'), core.reprs.Canvas);
 
         var table_repr = new core.reprs.TableRepr();
-        executor.execute(core.actions.Register({node:table_repr}));
-        executor.execute(core.actions.AppendItem({node_id:canvas.id(), field:'reprs', item:table_repr}));
-        executor.execute(core.actions.Set({node_id:table_repr.id(), field:'table', value:table}));
-        executor.execute(core.actions.Set({node_id:table_repr.id(), field:'position', value:this.val('position')}));
+        executor.execute(new core.actions.Register({node:table_repr}));
+        executor.execute(new core.actions.AppendItem({node_id:canvas.id(), field:'reprs', item:table_repr}));
+        executor.execute(new core.actions.Set({node_id:table_repr.id(), field:'table', value:table}));
+        executor.execute(new core.actions.Set({node_id:table_repr.id(), field:'position', value:this.val('position')}));
     }
 }, {
     CODE:'core.commands.CreateTableRepr'
@@ -99,7 +99,7 @@ databasy.model.core.commands.MoveTableRepr = databasy.model.core.commands.Comman
     do:function (executor) {
         var table_repr_id = this.val('table_repr_id');
         var new_position = this.val('new_position');
-        executor.execute(databasy.model.core.actions.Set({node_id:table_repr_id, field:'position', value:new_position}));
+        executor.execute(new databasy.model.core.actions.Set({node_id:table_repr_id, field:'position', value:new_position}));
     }
 }, {
     CODE:'core.commands.MoveTableRepr'

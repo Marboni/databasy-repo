@@ -55,4 +55,5 @@ def create_app():
 if __name__ == '__main__':
     print 'Server is listening on port 8000.'
     app = create_app()
-    SocketIOServer(('', 8000), app, resource="socket.io").serve_forever()
+    transports = ['xhr-multipart', 'xhr-polling', 'jsonp-polling']
+    SocketIOServer(('', 8000), app, resource='socket.io', transports=transports).serve_forever()

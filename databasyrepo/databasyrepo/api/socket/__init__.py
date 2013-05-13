@@ -1,6 +1,9 @@
 from flask import Blueprint, request, Response, current_app
+import json
 from socketio import socketio_manage
 from socketio.namespace import BaseNamespace
+from databasyrepo.models.core.commands import Command
+from databasyrepo.models.core.serializing import deserialize
 
 __author__ = 'Marboni'
 
@@ -40,6 +43,23 @@ class ModelsNamespace(BaseNamespace):
         mm = self.context.app.pool.connect(model_id, user_id)
         self.log('[uid:%s] Connected to model %s.' % (user_id, model_id))
         self.emit('reload', mm.serialize(), mm.current_editor())
+
+    def on_exec(self, command):
+        user_id = self.session['user_id']
+        model_id = self.session['model_id']
+
+        command = deserialize(command, Command)
+        command_version = command.val('source_version')
+        try:
+            mm = self.context.app.pool.get(model_id)
+            mm.execute_command(command, user_id)
+        except Exception, e:
+            self.emit('exec_fail', command_version)
+            self.log('[uid:%s] Failed to execute command: \n\n%s\nCause: %s\n' % (user_id, json.dumps(command, indent=4), e.message))
+        else:
+            self.emit('exec_success', command_version)
+            self.log('[uid:%s] Successfully executed command: \n\n%s\n' % (user_id, json.dumps(command, indent=4)))
+
 
     def recv_disconnect(self):
         if 'user_id' in self.session:

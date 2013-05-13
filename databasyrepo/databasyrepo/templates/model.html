@@ -18,17 +18,16 @@
 
 <script type="text/javascript">
 $(function () {
-    $('#busy').show();
-
     $LAB
             .script("/static/libs/class-extend.js")
             .script("/static/libs/json2.js")
 
+            .script("/static/libs/socket.io.min.js")
+
             .script("/static/libs/jquery-1.8.1.min.js")
             .script("/static/libs/jquery-ui-1.8.23.custom.min.js")
             .script("/static/libs/jquery.layout.js")
-
-            .script("/static/libs/socket.io.min.js")
+            .script("/static/libs/jquery.simplemodal.1.4.4.min.js")
 
             .script("/static/libs/draw2d_2.3.3/lib/shifty.js")
             .script("/static/libs/draw2d_2.3.3/lib/raphael.js")
@@ -398,6 +397,7 @@ $(function () {
         // ============ END DRAW2D FOR DEVELOPMENT ============
 
             .script("/static/src/databasy/packages.js")
+            .script("/static/src/databasy/utils/preloader.js")
 
             .script("/static/src/databasy/model/core/serializing.js")
             .script("/static/src/databasy/model/core/nodes.js")
@@ -420,6 +420,7 @@ $(function () {
 
             .wait(function () {
                 try {
+                    databasy.utils.preloader.openPreloader(true);
                     new databasy.runtime.ModelManager({{ model_id }});
                 }
                 catch (error) {
@@ -430,7 +431,6 @@ $(function () {
 </script>
 </head>
 <body>
-<div id="busy"></div>
 <div id="menuPanel"></div>
 <div id="chatPanel"></div>
 <div id="propertyPanel"></div>

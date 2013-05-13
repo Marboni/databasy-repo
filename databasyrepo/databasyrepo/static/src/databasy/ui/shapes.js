@@ -31,11 +31,22 @@ databasy.ui.shapes.Table = draw2d.shape.basic.Rectangle.extend({
         this.label.setFontColor("#0d0d0d");
         this.addFigure(this.label, new draw2d.layout.locator.CenterLocator(this));
     },
-    onDoubleClick:function () {
-
-    },
     draw:function (canvas) {
         var position = this.table_repr.val('position');
         canvas.addFigure(this, position[0], position[1]);
+    },
+    onDoubleClick:function () {
+
+    },
+    onDragEnd: function() {
+        var wasMoved = this.isMoving;
+        this._super();
+        if (wasMoved) {
+            var command = new databasy.model.core.commands.MoveTableRepr({
+                table_repr_id:this.table_repr.id(),
+                new_position:[this.x, this.y]
+            });
+            this.mm.execute_command(command);
+        }
     }
 });

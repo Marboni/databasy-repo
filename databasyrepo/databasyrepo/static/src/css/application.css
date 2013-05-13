@@ -1,14 +1,3 @@
-#busy {
-    position: fixed;
-    left: 50%;
-    top: 35%;
-    display: none;
-    background: transparent url("loading.gif");
-    z-index: 1000;
-    height: 64px;
-    width: 64px;
-}
-
 #contentPanel.ui-layout-pane {
     padding: 0 !important;
     border: none !important;
