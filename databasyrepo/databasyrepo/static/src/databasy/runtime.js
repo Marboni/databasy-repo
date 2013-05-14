@@ -33,6 +33,8 @@ databasy.runtime.ModelManager = Class.extend({
     init:function (model_id) {
         this.model_id = model_id;
         this.user_id = new Date().getTime();
+        this.layout = databasy.ui.layout.createLayout();
+
         this._command_queue = undefined;
         this._init_socket();
     },
@@ -63,11 +65,6 @@ databasy.runtime.ModelManager = Class.extend({
         });
     },
     reload:function () {
-        if (this.layout !== undefined) {
-            this.layout.destroy();
-        }
-        this.layout = databasy.ui.layout.createLayout();
-
         this.socket.emit('reload', this.model_id, this.user_id);
 
         var that = this;
@@ -97,7 +94,11 @@ databasy.runtime.ModelManager = Class.extend({
             var default_canvas_node = this.model.val_as_node('canvases', this.model)[0];
             var reprs = default_canvas_node.val_as_node('reprs', this.model);
 
-            var canvas = new databasy.ui.shapes.Canvas(this, 'canvas');
+            if (this.canvas === undefined) {
+                this.canvas = new databasy.ui.shapes.Canvas(this, 'canvas');
+            } else {
+                this.canvas.clear();
+            }
 
             var reprs_by_type = {};
             for (var i = 0; i < reprs.length; i++) {
@@ -107,18 +108,18 @@ databasy.runtime.ModelManager = Class.extend({
                 }
                 reprs_by_type[repr.code()].push(repr);
             }
-            this._redraw(canvas, reprs_by_type[databasy.model.core.reprs.TableRepr.CODE], databasy.ui.shapes.Table);
+            this._redraw(reprs_by_type[databasy.model.core.reprs.TableRepr.CODE], databasy.ui.shapes.Table);
         } finally {
             databasy.utils.preloader.closePreloader();
         }
     },
-    _redraw:function (canvas, reprs, shape_cls) {
+    _redraw:function (reprs, shape_cls) {
         if (reprs === undefined) {
             return;
         }
         for (var i = 0; i < reprs.length; i++) {
             var shape = new shape_cls(this, reprs[i]);
-            shape.draw(canvas);
+            shape.draw(this.canvas);
         }
     }
 }, {
