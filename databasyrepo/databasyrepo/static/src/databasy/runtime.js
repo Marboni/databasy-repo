@@ -48,7 +48,7 @@ databasy.runtime.ModelManager = Class.extend({
 
         this.socket.on('connect', function () {
             $('#canvas').append('<pre>' + 'Connected' + '</pre>');
-            that.reload();
+            that.socket.emit('enter', that.model_id, that.user_id);
         });
 
         this.socket.on('reconnect', function () {
@@ -63,12 +63,16 @@ databasy.runtime.ModelManager = Class.extend({
         this.socket.on('error', function (e) {
             $('#canvas').append('<pre>' + 'Error: ' + e.message + '</pre>');
         });
+
+        this.socket.on('enter_done', function() {
+            that.reload();
+        });
     },
     reload:function () {
-        this.socket.emit('reload', this.model_id, this.user_id);
+        this.socket.emit('reload');
 
         var that = this;
-        this.socket.on('reload', function (serialized_model, current_editor) {
+        this.socket.on('reload_done', function (serialized_model, current_editor) {
             that._init_model(serialized_model);
             that._change_editor(current_editor);
             that.redraw();
@@ -130,8 +134,8 @@ databasy.runtime.ModelManager = Class.extend({
             this._pending_commands = [];
 
             var that = this;
-            this._mm.socket.on('exec_success', function() {
-                that._on_exec_success()
+            this._mm.socket.on('exec_done', function() {
+                that._on_exec_done()
             });
             this._mm.socket.on('exec_fail', function() {
                 that._on_exec_fail()
@@ -148,7 +152,7 @@ databasy.runtime.ModelManager = Class.extend({
             this._command_in_progress = command;
             this._mm.socket.emit('exec', command.serialize());
         },
-        _on_exec_success:function() {
+        _on_exec_done:function() {
             if (this._pending_commands.length == 0) {
                 this._command_in_progress = null;
             } else {

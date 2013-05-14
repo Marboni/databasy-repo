@@ -10,7 +10,7 @@ databasy.ui.layout.createLayout = function () {
         defaults: defaults,
         north: {
             paneSelector: '#menuPanel',
-            size: 40
+            size: 60
         },
         east: {
             paneSelector: '#chatPanel',

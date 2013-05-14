@@ -34,15 +34,23 @@ class ModelsNamespace(BaseNamespace):
     def log(self, message):
         self.context.app.logger.info("[%s] %s" % (self.socket.sessid, message))
 
-    def on_reload(self, model_id, user_id):
+    def on_enter(self, model_id, user_id):
         user_id = long(user_id)
         model_id = long(model_id)
 
         self.session['user_id'] = user_id
         self.session['model_id'] = model_id
-        mm = self.context.app.pool.connect(model_id, user_id)
-        self.log('[uid:%s] Connected to model %s.' % (user_id, model_id))
-        self.emit('reload', mm.serialize(), mm.current_editor())
+        self.context.app.pool.connect(model_id, user_id)
+
+        self.emit('enter_done')
+
+    def on_reload(self):
+        user_id = self.session['user_id']
+        model_id = self.session['model_id']
+
+        mm = self.context.app.pool.get(model_id)
+        self.log('[uid:%s] Reloaded model %s.' % (user_id, model_id))
+        self.emit('reload_done', mm.serialize(), mm.current_editor())
 
     def on_exec(self, command):
         user_id = self.session['user_id']
@@ -57,7 +65,7 @@ class ModelsNamespace(BaseNamespace):
             self.emit('exec_fail', command_version)
             self.log('[uid:%s] Failed to execute command: \n\n%s\nCause: %s\n' % (user_id, json.dumps(command, indent=4), e.message))
         else:
-            self.emit('exec_success', command_version)
+            self.emit('exec_done', command_version)
             self.log('[uid:%s] Successfully executed command: \n\n%s\n' % (user_id, json.dumps(command, indent=4)))
 
 
