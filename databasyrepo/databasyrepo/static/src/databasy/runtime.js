@@ -33,7 +33,7 @@ databasy.runtime.ModelManager = Class.extend({
     init:function (model_id) {
         this.model_id = model_id;
         this.user_id = new Date().getTime();
-        this.layout = databasy.ui.layout.createLayout();
+        this.layout = new databasy.ui.layout.Layout(this);
 
         this._command_queue = undefined;
         this._init_socket();
@@ -86,7 +86,6 @@ databasy.runtime.ModelManager = Class.extend({
     _init_model:function (serialized_model) {
         this.model = databasy.model.core.serializing.Serializable.deserialize(serialized_model);
         this._command_queue = new databasy.runtime.ModelManager.CommandQueue(this);
-//        $('#canvas').append('<pre>' + JSON.stringify(this.model.serialize(), null, 4) + '</pre>');
     },
     _change_editor:function (editor) {
 
@@ -95,35 +94,20 @@ databasy.runtime.ModelManager = Class.extend({
         databasy.utils.preloader.openPreloader(false);
 
         try {
+            this.layout.clear_canvas();
+
             var default_canvas_node = this.model.val_as_node('canvases', this.model)[0];
             var reprs = default_canvas_node.val_as_node('reprs', this.model);
 
-            if (this.canvas === undefined) {
-                this.canvas = new databasy.ui.shapes.Canvas(this, 'canvas');
-            } else {
-                this.canvas.clear();
-            }
-
-            var reprs_by_type = {};
             for (var i = 0; i < reprs.length; i++) {
                 var repr = reprs[i];
-                if (!reprs_by_type.hasOwnProperty(repr.code())) {
-                    reprs_by_type[repr.code()] = [];
+                var repr_code = repr.code();
+                if (repr_code === databasy.model.core.reprs.TableRepr.CODE) {
+                    this.layout.draw_table(repr);
                 }
-                reprs_by_type[repr.code()].push(repr);
             }
-            this._redraw(reprs_by_type[databasy.model.core.reprs.TableRepr.CODE], databasy.ui.shapes.Table);
         } finally {
             databasy.utils.preloader.closePreloader();
-        }
-    },
-    _redraw:function (reprs, shape_cls) {
-        if (reprs === undefined) {
-            return;
-        }
-        for (var i = 0; i < reprs.length; i++) {
-            var shape = new shape_cls(this, reprs[i]);
-            shape.draw(this.canvas);
         }
     }
 }, {

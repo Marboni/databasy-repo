@@ -11,7 +11,6 @@ databasy.ui.shapes.Canvas = draw2d.Canvas.extend({
 
 databasy.ui.shapes.Table = draw2d.shape.basic.Rectangle.extend({
     NAME:"databasy.ui.shapes.Table",
-    REPR:databasy.model.core.reprs.TableRepr.CODE,
 
     init:function (mm, table_repr) {
         this._super(126, 30);

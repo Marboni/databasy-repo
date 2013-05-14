@@ -9,3 +9,18 @@
     padding: 0 !important;
     background: transparent url(background.png) !important;
 }
+
+#menuPanel #controlPanel {
+    float: right;
+}
+
+#menuPanel #controlButton {
+    font-size: 0.8em;
+    width: 150px;
+}
+
+#menuPanel #controlStatusMsg {
+    text-align: center;
+    font-size: 0.8em;
+    margin: 0.3em 0 0;
+}
