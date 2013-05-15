@@ -399,8 +399,11 @@ $(function () {
         // ============ END DRAW2D FOR DEVELOPMENT ============
 
             .script("/static/src/databasy/packages.js")
+
+            .script("/static/src/databasy/utils/socket.js")
             .script("/static/src/databasy/utils/preloader.js")
 
+            // Model
             .script("/static/src/databasy/model/core/serializing.js")
             .script("/static/src/databasy/model/core/nodes.js")
             .script("/static/src/databasy/model/core/checkers.js")
@@ -414,16 +417,25 @@ $(function () {
 
             .script("/static/src/databasy/model/postgres/models.js")
 
-            .script("/static/src/databasy/ui/layout.js")
-            .script("/static/src/databasy/ui/locators.js")
-            .script("/static/src/databasy/ui/shapes.js")
+            .script("/static/src/databasy/model/register.js")
+            // Model end
 
-            .script("/static/src/databasy/runtime.js")
+            // UI
+            .script("/static/src/databasy/ui/layout/Layout.js")
+
+            .script("/static/src/databasy/ui/shapes/Canvas.js")
+            .script("/static/src/databasy/ui/shapes/Table.js")
+            // UI end
+
+            .script("/static/src/databasy/gateway/Gateway.js")
+            .script("/static/src/databasy/gateway/CommandQueue.js")
+
+
 
             .wait(function () {
                 try {
                     databasy.utils.preloader.openPreloader(true);
-                    new databasy.runtime.ModelManager({{ model_id }});
+                    new databasy.gateway.Gateway({{ model_id }});
                 }
                 catch (error) {
                     console.log(error);

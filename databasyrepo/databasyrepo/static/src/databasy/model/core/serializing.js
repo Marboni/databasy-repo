@@ -100,7 +100,7 @@ databasy.model.core.serializing.Serializable = Class.extend({
                 if (value instanceof Object && value.hasOwnProperty('_code')) {
                     // Value is object.
                     var type = value['_code'];
-                    var register = databasy.runtime.register;
+                    var register = databasy.model.register.register;
                     var ObjClass = register.by_key(type);
                     var obj = new ObjClass();
                     obj.deserialize(value);

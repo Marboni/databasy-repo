@@ -1,13 +1,13 @@
 databasy.ui.layout.Layout = Class.extend({
     init:function(mm) {
         this.mm = mm;
-        this.layout = this._create_layout();
-        this.canvas = new databasy.ui.shapes.Canvas(this.mm, 'canvas');
+        this.layout = this._createLayout();
+        this.canvas = new databasy.ui.shapes.Canvas(this, 'canvas');
 
-        this.recreate_menu_panel();
-        this.set_editable(false);
+        this.recreateMenuPanel();
+        this.setEditable(false);
     },
-    _create_layout:function() {
+    _createLayout:function() {
         var defaults = {
             resizable:false,
             closable:false,
@@ -49,7 +49,7 @@ databasy.ui.layout.Layout = Class.extend({
         });
     },
 
-    recreate_menu_panel:function() {
+    recreateMenuPanel:function() {
         var menu_panel = $('#menuPanel');
         menu_panel.empty();
 
@@ -62,20 +62,19 @@ databasy.ui.layout.Layout = Class.extend({
         control_panel.append(status_p);
     },
 
-    clear_canvas: function() {
-        this.canvas.clear();
-    },
-
-    draw_table: function(repr) {
-        var shape = new databasy.ui.shapes.Table(this.mm, repr);
-        shape.draw(this.canvas);
-    },
-
-    set_editable: function(editable) {
+    setEditable: function(editable) {
         if (editable) {
 
         } else {
 
         }
+        this._editable = editable;
+    },
+
+    isEditable:function() {
+        return this._editable;
+    },
+    renderTable:function(repr) {
+        this.canvas.drawTable(repr);
     }
 });

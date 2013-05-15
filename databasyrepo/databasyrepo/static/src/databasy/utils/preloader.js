@@ -12,7 +12,7 @@ databasy.utils.preloader.openPreloader = function(hideAll) {
         opacity: opacity,
         overlayCss: {background: "#fff"},
         containerCss: {
-            background: 'transparent url("/static/src/css/databasy/loading.gif")',
+            background: 'transparent url("/static/src/css/loading.gif")',
             zIndex: 1002,
             height: 64,
             width: 64

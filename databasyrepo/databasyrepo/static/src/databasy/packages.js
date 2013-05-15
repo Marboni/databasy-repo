@@ -14,15 +14,18 @@ var databasy = {
         },
         postgres: {
             models: {}
-        }
+        },
+        register: {}
     },
-    runtime: {},
+    gateway: {},
     ui: {
         layout: {},
         locators: {},
-        shapes: {}
+        shapes: {},
+        policy: {}
     },
     utils: {
-        preloader: {}
+        preloader: {},
+        socket: {}
     }
 };
