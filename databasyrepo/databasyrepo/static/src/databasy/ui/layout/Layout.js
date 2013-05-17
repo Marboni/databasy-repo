@@ -5,7 +5,7 @@ databasy.ui.layout.Layout = Class.extend({
         this.canvas = new databasy.ui.shapes.Canvas(this, 'canvas');
 
         this.recreateMenuPanel();
-        this.setEditable(false);
+        this.setEditable(true);
     },
     _createLayout:function() {
         var defaults = {

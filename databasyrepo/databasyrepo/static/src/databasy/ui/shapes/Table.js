@@ -25,16 +25,5 @@ databasy.ui.shapes.Table = draw2d.shape.basic.Rectangle.extend({
     },
     onDoubleClick:function () {
 
-    },
-    onDragEnd:function () {
-        var wasMoved = this.isMoving;
-        this._super();
-        if (wasMoved) {
-            var command = new databasy.model.core.commands.MoveTableRepr({
-                table_repr_id:this.tableRepr.id(),
-                new_position:[this.x, this.y]
-            });
-            this.layout.mm.execute_command(command);
-        }
     }
 });
