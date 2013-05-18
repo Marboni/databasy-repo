@@ -1,13 +1,13 @@
 databasy.ui.layout.Layout = Class.extend({
-    init:function(mm) {
-        this.mm = mm;
+    init:function (gateway) {
+        this.gateway = gateway;
         this.layout = this._createLayout();
-        this.canvas = new databasy.ui.shapes.Canvas(this, 'canvas');
+        this.canvas = new databasy.ui.shapes.Canvas(gateway, 'canvas');
 
-        this.recreateMenuPanel();
-        this.setEditable(true);
+        this.reset();
     },
-    _createLayout:function() {
+
+    _createLayout:function () {
         var defaults = {
             resizable:false,
             closable:false,
@@ -49,32 +49,23 @@ databasy.ui.layout.Layout = Class.extend({
         });
     },
 
-    recreateMenuPanel:function() {
-        var menu_panel = $('#menuPanel');
-        menu_panel.empty();
-
-        var control_panel = $('<div id="controlPanel"></div>');
-        menu_panel.append(control_panel);
-
-        var edit_button = $('<a id="controlButton">Edit</a>').button();
-        var status_p = $('<p id="controlStatusMsg">Nobody is editing the model</p>');
-        control_panel.append(edit_button);
-        control_panel.append(status_p);
+    reset: function() {
+        this.recreateMenuPanel();
+        this.canvas.clear();
     },
 
-    setEditable: function(editable) {
-        if (editable) {
-
-        } else {
-
+    recreateMenuPanel:function () {
+        if (this.menuPanel === undefined) {
+            this.menuPanel = new databasy.ui.layout.MenuPanel(this.gateway);
         }
-        this._editable = editable;
+        this.menuPanel.reset();
     },
 
-    isEditable:function() {
-        return this._editable;
-    },
-    renderTable:function(repr) {
+    renderTable:function (repr) {
         this.canvas.drawTable(repr);
+    },
+
+    statusMsg:function (msg) {
+        $('#canvas').append('<pre>' + msg + '</pre>');
     }
 });

@@ -1,11 +1,13 @@
 databasy.ui.policy.TablePolicy = draw2d.policy.figure.RectangleSelectionFeedbackPolicy.extend({
-    init:function (layout) {
+    NAME:"databasy.ui.policy.TablePolicy",
+
+    init:function (gateway) {
         this._super();
-        this.layout = layout;
+        this.gateway = gateway;
     },
 
     onDragStart:function (canvas, figure) {
-        if (!this.layout.isEditable()) {
+        if (!this.gateway.userRoles.isEditor()) {
             return;
         }
         this._super(canvas, figure);
@@ -13,7 +15,7 @@ databasy.ui.policy.TablePolicy = draw2d.policy.figure.RectangleSelectionFeedback
     },
 
     onDragEnd:function (canvas, figure) {
-        if (!this.layout.isEditable()) {
+        if (!this.gateway.userRoles.isEditor()) {
             return;
         }
         this._super(canvas, figure);
@@ -24,11 +26,12 @@ databasy.ui.policy.TablePolicy = draw2d.policy.figure.RectangleSelectionFeedback
                 table_repr_id:figure.tableRepr.id(),
                 new_position:[figure.x, figure.y]
             });
-            this.layout.mm.execute_command(command);
+            this.gateway.executeCommand(command);
         }
     },
 
     adjustPosition:function (figure, x, y) {
-        return this.layout.isEditable() ? this._super(figure, x, y) : new draw2d.geo.Point(figure.getX(), figure.getY());
+        return this.gateway.userRoles.isEditor() ?
+            this._super(figure, x, y) : new draw2d.geo.Point(figure.getX(), figure.getY());
     }
 });

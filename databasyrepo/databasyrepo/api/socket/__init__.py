@@ -40,42 +40,51 @@ class ModelsNamespace(BaseNamespace):
 
         self.session['user_id'] = user_id
         self.session['model_id'] = model_id
-        self.context.app.pool.connect(model_id, user_id)
+
+        self.context.app.pool.connect(model_id, user_id, self.socket)
 
         self.emit('enter_done')
+        self.log('[uid:%s] Connected to model %s.' % (self.user_id, self.model_id))
 
-    def on_reload(self):
-        user_id = self.session['user_id']
-        model_id = self.session['model_id']
-
-        mm = self.context.app.pool.get(model_id)
-        self.log('[uid:%s] Reloaded model %s.' % (user_id, model_id))
-        self.emit('reload_done', mm.serialize(), mm.current_editor())
+    def on_load(self):
+        with self.mm.lock:
+            model = self.mm.serialize_model()
+            active_users = self.mm.serialize_user_roles()
+            self.emit('load_done', model, active_users)
+            self.log('[uid:%s] Loaded model %s.' % (self.user_id, self.model_id))
 
     def on_exec(self, command):
-        user_id = self.session['user_id']
-        model_id = self.session['model_id']
-
         command = deserialize(command, Command)
         command_version = command.val('source_version')
         try:
-            mm = self.context.app.pool.get(model_id)
-            mm.execute_command(command, user_id)
+            with self.mm.lock:
+                self.mm.execute_command(command, self.user_id)
+                self.emit('exec_done', command_version)
+                self.log('[uid:%s] Successfully executed command: \n\n%s\n' % (self.user_id, json.dumps(command, indent=4)))
         except Exception, e:
             self.emit('exec_fail', command_version)
-            self.log('[uid:%s] Failed to execute command: \n\n%s\nCause: %s\n' % (user_id, json.dumps(command, indent=4), e.message))
-        else:
-            self.emit('exec_done', command_version)
-            self.log('[uid:%s] Successfully executed command: \n\n%s\n' % (user_id, json.dumps(command, indent=4)))
+            self.log('[uid:%s] Failed to execute command: \n\n%s\nCause: %s\n' % (self.user_id, json.dumps(command, indent=4), e.message))
 
+    def on_request_control(self):
+        with self.mm.lock:
+            self.log('[uid:%s] Requesting control.')
+            if self.mm.pass_control(None, self.user_id):
+                self.log('[uid:%s] Control provided.')
+                self.emit_to_all('roles_changed', self.mm.serialize_user_roles())
+            else:
+                self.log('[uid:%s] Request rejected - other user is editing the model.')
+
+    def on_pass_control(self, new_editor):
+        with self.mm.lock:
+            self.mm.pass_control(self.user_id, new_editor)
+            self.log('[uid:%s] Control passed.')
+            self.emit_to_all('roles_changed', self.mm.serialize_user_roles())
 
     def recv_disconnect(self):
         if 'user_id' in self.session:
-            user_id = self.session['user_id']
-            model_id = self.session['model_id']
-            self.context.app.pool.disconnect(model_id, user_id)
+            self.context.app.pool.disconnect(self.model_id, self.user_id)
             self.disconnect(silent=True)
-            self.log('[uid:%s] Disconnected from model %s.' % (user_id, model_id))
+            self.log('[uid:%s] Disconnected from model %s.' % (self.user_id, self.model_id))
 
     def disconnect(self, *args, **kwargs):
         if self.context:
@@ -84,3 +93,29 @@ class ModelsNamespace(BaseNamespace):
             except:
                 return
         super(ModelsNamespace, self).disconnect(*args, **kwargs)
+
+    @property
+    def user_id(self):
+        return self.session['user_id']
+
+    @property
+    def model_id(self):
+        return self.session['model_id']
+
+    @property
+    def mm(self):
+        return self.context.app.pool.get(self.model_id)
+
+    def emit_to_all(self, event, *args):
+        self.emit_to_users(self.mm.active_users(), event, *args)
+
+    def emit_to_other(self, event, *args):
+        user_ids = self.mm.active_users() # returns copy of user IDs set.
+        user_ids.remove(self.user_id)
+        self.emit_to_users(user_ids, event, *args)
+
+    def emit_to_users(self, user_ids, event, *args):
+        pkt = dict(type='event', name=event, args=args, endpoint=self.ns_name)
+        for user_id in user_ids:
+            socket = self.mm.user_socket(user_id)
+            socket.send_packet(pkt)

@@ -7,7 +7,11 @@
 
 #canvas.ui-layout-pane {
     padding: 0 !important;
-    background: transparent url(background.png) !important;
+    background: transparent url(canvas.png) !important;
+}
+
+#canvas.ui-layout-pane.readonly {
+    background: transparent url(canvas_readonly.png) !important;
 }
 
 #menuPanel #controlPanel {

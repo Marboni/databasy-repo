@@ -17,7 +17,9 @@ var databasy = {
         },
         register: {}
     },
-    gateway: {},
+    gateway: {
+        events: {}
+    },
     ui: {
         layout: {},
         locators: {},

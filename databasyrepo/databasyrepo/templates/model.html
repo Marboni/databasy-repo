@@ -422,6 +422,7 @@ $(function () {
 
             // UI
             .script("/static/src/databasy/ui/layout/Layout.js")
+            .script("/static/src/databasy/ui/layout/MenuPanel.js")
 
             .script("/static/src/databasy/ui/policy/TablePolicy.js")
 
@@ -429,15 +430,20 @@ $(function () {
             .script("/static/src/databasy/ui/shapes/Table.js")
             // UI end
 
+            // Gateway
             .script("/static/src/databasy/gateway/Gateway.js")
             .script("/static/src/databasy/gateway/CommandQueue.js")
+            .script("/static/src/databasy/gateway/UserRoles.js")
 
-
+            .script("/static/src/databasy/gateway/events/Event.js")
+            .script("/static/src/databasy/gateway/events/UserRolesChanged.js")
+            // Gateway end
 
             .wait(function () {
                 try {
                     databasy.utils.preloader.openPreloader(true);
-                    new databasy.gateway.Gateway({{ model_id }});
+                    var userId = new Date().getTime();
+                    new databasy.gateway.Gateway({{ model_id }}, userId);
                 }
                 catch (error) {
                     console.log(error);

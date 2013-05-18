@@ -1,17 +1,21 @@
 databasy.gateway.Gateway = Class.extend({
-    init:function (modelId) {
+    init:function (modelId, userId) {
         this.modelId = modelId;
-        this.userId = new Date().getTime();
+        this.userId = userId;
 
-        this.socket = this.createSocket();
+        this._listeners = [];
 
         this.layout = new databasy.ui.layout.Layout(this);
+
+        this.socket = this.createSocket();
         this.commandQueue = new databasy.gateway.CommandQueue(this);
     },
     createSocket:function () {
         var socket = io.connect('/models');
 
-        $(window).bind('beforeunload', socket.disconnect);
+        $(window).bind('beforeunload', function() {
+            socket.disconnect();
+        });
         databasy.utils.socket.registerListeners(socket, this);
 
         return socket;
@@ -19,41 +23,55 @@ databasy.gateway.Gateway = Class.extend({
 
     // SOCKET CALLBACKS
     on_connect:function () {
-        $('#canvas').append('<pre>' + 'Connected' + '</pre>');
+        this.layout.statusMsg('Connected');
         this.socket.emit('enter', this.modelId, this.userId);
     },
     on_reconnect:function () {
-        $('#canvas').append('<pre>' + 'Reconnected' + '</pre>');
+        this.layout.statusMsg('Reconnected');
     },
     on_reconnecting:function () {
-        $('#canvas').append('<pre>' + 'Reconnecting' + '</pre>');
+        this.layout.statusMsg('Reconnecting');
         databasy.utils.preloader.openPreloader(false);
     },
     on_error:function () {
-        $('#canvas').append('<pre>' + 'Error: ' + e.message + '</pre>');
+        this.layout.statusMsg('Error: ' + e.message);
     },
     on_enter_done:function () {
-        this.socket.emit('reload');
+        this.socket.emit('load');
     },
-    on_reload_done:function (serializedModel, editor) {
+    on_load_done:function (serializedModel, roles) {
         this.initializeModel(serializedModel);
-        this.changeEditor(editor);
+        this.changeRoles(roles);
+    },
+    on_roles_changed:function (roles) {
+        this.changeRoles(roles);
     },
 
-    execute_command:function (command) {
+    executeCommand:function (command) {
         command.set('source_version', this.model.version());
-        this.model.execute_command(command);
+        this.model.execute_command(command, this.userId);
         this.commandQueue.push(command);
+    },
+
+    requestControl:function () {
+        this.userRoles.requestControl();
+        this.fire(new databasy.gateway.events.UserRolesChanged(this.userRoles));
+        this.socket.emit('request_control');
+    },
+
+    passControl:function () {
+        this.userRoles.passControl();
+        this.fire(new databasy.gateway.events.UserRolesChanged(this.userRoles));
+        this.socket.emit('pass_control', null);
     },
 
     initializeModel:function (serializedModel) {
         databasy.utils.preloader.openPreloader(false);
 
         try {
-            this.model = databasy.model.core.serializing.Serializable.deserialize(serializedModel);
+            this.reset();
 
-            this.commandQueue.reset();
-            this.layout.canvas.clear();
+            this.model = databasy.model.core.serializing.Serializable.deserialize(serializedModel);
 
             var default_canvas_node = this.model.val_as_node('canvases', this.model)[0];
             var reprs = default_canvas_node.val_as_node('reprs', this.model);
@@ -68,7 +86,31 @@ databasy.gateway.Gateway = Class.extend({
             databasy.utils.preloader.closePreloader();
         }
     },
-    changeEditor:function (editor) {
+    changeRoles:function (serializedRoles) {
+        this.userRoles = new databasy.gateway.UserRoles(this.userId, serializedRoles);
+        this.fire(new databasy.gateway.events.UserRolesChanged(this.userRoles));
+    },
 
+    fire:function(event) {
+        var listenerFunc = 'on' + event.eventName;
+        $.each(this._listeners, function(i, listener) {
+            if (listener[listenerFunc] !== undefined) {
+                listener[listenerFunc](event);
+            }
+        });
+    },
+    addListener:function(listener) {
+        if ($.inArray(this._listeners, listener) === -1) {
+            this._listeners.push(listener);
+        }
+    },
+    removeListener:function(listener) {
+        this._listeners.splice($.inArray(listener, this._listeners), 1)
+    },
+
+    reset:function() {
+        this.commandQueue.reset();
+        this.layout.reset();
+        this.userRoles = undefined;
     }
 });

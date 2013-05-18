@@ -1,20 +1,32 @@
 databasy.ui.shapes.Canvas = draw2d.Canvas.extend({
     NAME:"databasy.ui.shapes.Canvas",
 
-    init:function (layout, id) {
+    init:function (gateway, id) {
         this._super(id);
         this.setScrollArea('#' + id);
 
-        this.layout = layout;
-        this.editablePolicy = new databasy.ui.policy.TablePolicy(this.layout)
+        this.gateway = gateway;
+        this.gateway.addListener(this);
+
+        this.setEditable(false);
+    },
+
+    setEditable:function(editable) {
+        var canvasPane = $('#canvas.ui-layout-pane');
+        if (editable) {
+            canvasPane.removeClass('readonly');
+        } else {
+            canvasPane.addClass('readonly');
+        }
     },
 
     drawTable: function(repr) {
-        var shape = new databasy.ui.shapes.Table(this.layout, repr);
-        this.draw(shape);
+        var shape = new databasy.ui.shapes.Table(this, this.gateway, repr);
+        shape.draw(this);
     },
-    draw:function(shape) {
-        shape.installEditPolicy(this.editablePolicy);
-        shape.draw();
+
+    onUserRolesChanged:function(event) {
+        var editable = event.userRoles.isEditor();
+        this.setEditable(editable);
     }
 });

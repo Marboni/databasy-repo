@@ -10,22 +10,20 @@ __author__ = 'Marboni'
 class ModelManager(object):
     def __init__(self):
         super(ModelManager, self).__init__()
-        self._lock = threading.Lock()
-        self._active_users = []
-        self._editor = None
+        self.lock = threading.Lock()
+        self._user_roles = UserRoles()
 
     def _check_model(self):
         if not self._model:
             raise ValueError('Manager has no model.')
 
     def create(self, model_id, user_id):
-        with self._lock:
-            serial = self.code_by_id(model_id)
-            # TODO Handle case when model not found.
-            model_class = register.get(serial, Model)
-            self._model = model_class.create(model_id, user_id)
-            self._model.inject_connection(mg())
-            self._model.save()
+        serial = self.code_by_id(model_id)
+        # TODO Handle case when model not found.
+        model_class = register.get(serial, Model)
+        self._model = model_class.create(model_id, user_id)
+        self._model.inject_connection(mg())
+        self._model.save()
 
     @staticmethod
     def code_by_id(model_id):
@@ -44,42 +42,85 @@ class ModelManager(object):
         return model
 
     def load(self, model_id):
-        with self._lock:
-            self._model = self.retrieve_model(model_id, mg())
-
-    def register_user(self, uid):
-        with self._lock:
-            self._active_users.append(uid)
-
-    def unregister_user(self, uid):
-        with self._lock:
-            try:
-                self._active_users.remove(uid)
-            except ValueError:
-                pass
-
-    def in_use(self):
-        with self._lock:
-            return bool(self._active_users)
-
-    def current_editor(self):
-        return self._editor
-
-    def set_editor(self, user_id=None):
-        with self._lock:
-            self._check_model()
-            if user_id:
-                if user_id in self._active_users:
-                    self._editor = user_id
-                else:
-                    raise ValueError('Unable to make user #%s editor - it\'s not an active user of the model.')
+        self._model = self.retrieve_model(model_id, mg())
 
     def execute_command(self, command, user_id):
-        with self._lock:
-            self._check_model()
-            actions = self._model.execute_command(command, user_id)
-            return actions
+        self._check_model()
+        actions = self._model.execute_command(command, user_id)
+        return actions
 
-    def serialize(self):
-        with self._lock:
-            return self._model.serialize_for_client()
+    def has_active_users(self):
+        return bool(self._user_roles.active_users)
+
+    def active_users(self):
+        return list(self._user_roles.active_users)
+
+    def user_socket(self, user_id):
+        return self._user_roles.user_socket(user_id)
+
+    def add_active_user(self, user_id, socket):
+        return self._user_roles.add_active_user(user_id, socket)
+
+    def remove_active_user(self, user_id):
+        return self._user_roles.remove_active_user(user_id)
+
+    def pass_control(self, from_user, to_user):
+        return self._user_roles.pass_control(from_user, to_user)
+
+    def serialize_model(self):
+        return self._model.serialize_for_client()
+
+    def serialize_user_roles(self):
+        return dict(self._user_roles)
+
+
+class UserRoles(dict):
+    def __init__(self):
+        super(UserRoles, self).__init__()
+        self['active_users'] = []
+        self['editor'] = None
+        self.users_and_sockets = {}
+
+    @property
+    def active_users(self):
+        return self['active_users']
+
+    @property
+    def editor(self):
+        return self['editor']
+
+    def add_active_user(self, user_id, socket):
+        # If user reconnects and already exists in list of active users, just update his socket.
+        if user_id not in self.active_users:
+            self.active_users.append(user_id)
+        self.users_and_sockets[user_id] = socket
+
+    def remove_active_user(self, user_id):
+        if user_id not in self.active_users:
+            raise ValueError('User %s is not active.' % user_id)
+        self.active_users.remove(user_id)
+        del self.users_and_sockets[user_id]
+        if user_id == self.editor:
+            self.pass_control(user_id, None)
+
+    def pass_control(self, from_user, to_user):
+        if from_user and not self.is_editor(from_user):
+            raise ValueError('User %s is not an editor.' % from_user)
+        if to_user and not self.is_active(to_user):
+            raise ValueError('User %s is not active.' % to_user)
+        if not from_user and self.editor:
+            return False # User requested control not knowing that other user edits the model.
+        self['editor'] = to_user
+        return True
+
+    def is_editor(self, user_id):
+        return self.editor == user_id
+
+    def is_active(self, user_id):
+        return user_id in self.active_users
+
+    def user_socket(self, user_id):
+        try:
+            return self.users_and_sockets[user_id]
+        except KeyError:
+            raise ValueError('User %s is not active.' % user_id)

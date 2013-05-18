@@ -54,15 +54,15 @@ class ModelsPool(object):
         finally:
             self._lock.release_write()
 
-    def connect(self, model_id, user_id):
+    def connect(self, model_id, user_id, socket):
         mm = self._get(model_id)
         if not mm:
             try:
                 mm = self._load(model_id)
             except ModelNotFound:
                 mm = self._create(model_id, user_id)
-        mm.register_user(user_id)
-        return mm
+        with mm.lock:
+            mm.add_active_user(user_id, socket)
 
     def get(self, model_id):
         mm = self._get(model_id)
@@ -74,14 +74,15 @@ class ModelsPool(object):
         mm = self._get(model_id)
         if not mm:
             return
-        mm.unregister_user(user_id)
-        if not mm.in_use():
-            self._lock.acquire_write()
-            try:
-                del self._model_managers[model_id]
-            except KeyError:
-                pass
-            finally:
-                self._lock.release_write()
+        with mm.lock:
+            mm.remove_active_user(user_id)
+            if not mm.active_users():
+                self._lock.acquire_write()
+                try:
+                    del self._model_managers[model_id]
+                except KeyError:
+                    pass
+                finally:
+                    self._lock.release_write()
 
 

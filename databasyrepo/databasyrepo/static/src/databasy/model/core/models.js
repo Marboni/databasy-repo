@@ -66,9 +66,9 @@ databasy.model.core.models.Model = databasy.model.core.nodes.Node.extend({
     exists:function (node_id) {
         return this._node_register.hasOwnProperty(node_id);
     },
-    execute_command:function (command) {
+    execute_command:function (command, user_id) {
         var events = command.execute(this);
-        this.revision_stack().add(1, events, true); // TODO User ID
+        this.revision_stack().add(user_id, events, true); // TODO User ID
     },
     deserialize:function (serialized_object) {
         this._super(serialized_object);
