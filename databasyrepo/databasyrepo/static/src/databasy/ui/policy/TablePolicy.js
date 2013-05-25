@@ -33,5 +33,9 @@ databasy.ui.policy.TablePolicy = draw2d.policy.figure.RectangleSelectionFeedback
     adjustPosition:function (figure, x, y) {
         return this.gateway.userRoles.isEditor() ?
             this._super(figure, x, y) : new draw2d.geo.Point(figure.getX(), figure.getY());
+    },
+
+    adjustDimension: function(figure, width, height) {
+        return this._super(figure, figure.getWidth(), figure.getHeight());
     }
 });
