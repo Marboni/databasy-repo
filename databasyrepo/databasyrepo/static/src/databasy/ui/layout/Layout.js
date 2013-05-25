@@ -42,7 +42,7 @@ databasy.ui.layout.Layout = Class.extend({
                         size:30
                     },
                     center:{
-                        paneSelector:"#canvas"
+                        paneSelector:"#canvasWrapper"
                     }
                 }
             }
@@ -66,6 +66,6 @@ databasy.ui.layout.Layout = Class.extend({
     },
 
     statusMsg:function (msg) {
-        $('#canvas').append('<pre>' + msg + '</pre>');
+        $('#chatPanel').append('<pre>' + msg + '</pre>');
     }
 });

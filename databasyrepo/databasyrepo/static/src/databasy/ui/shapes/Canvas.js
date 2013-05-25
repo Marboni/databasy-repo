@@ -12,7 +12,7 @@ databasy.ui.shapes.Canvas = draw2d.Canvas.extend({
     },
 
     setEditable:function(editable) {
-        var canvasPane = $('#canvas.ui-layout-pane');
+        var canvasPane = $('#canvas');
         if (editable) {
             canvasPane.removeClass('readonly');
         } else {

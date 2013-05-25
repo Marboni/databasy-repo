@@ -5,12 +5,15 @@
     color: #00ce00
 }
 
-#canvas.ui-layout-pane {
+#canvasWrapper.ui-layout-pane {
     padding: 0 !important;
+}
+
+#canvasWrapper.ui-layout-pane #canvas {
     background: transparent url(canvas.png) !important;
 }
 
-#canvas.ui-layout-pane.readonly {
+#canvasWrapper.ui-layout-pane #canvas.readonly {
     background: transparent url(canvas_readonly.png) !important;
 }
 
