@@ -46,11 +46,22 @@ databasy.gateway.Gateway = Class.extend({
     on_roles_changed:function (roles) {
         this.changeRoles(roles);
     },
+    on_exec:function(serializedCommand) {
+        var command = databasy.model.core.serializing.Serializable.deserialize(serializedCommand);
+        this._applyCommand(command);
+    },
 
     executeCommand:function (command) {
         command.set('source_version', this.model.version());
-        this.model.execute_command(command, this.userId);
+        this._applyCommand(command);
         this.commandQueue.push(command);
+    },
+
+    _applyCommand: function(command) {
+        var events = this.model.execute_command(command, this.userId);
+        $.each(events, $.proxy(function(i, event) {
+            this.fire(new databasy.gateway.events.ModelChanged(event));
+        }, this));
     },
 
     requestControl:function () {

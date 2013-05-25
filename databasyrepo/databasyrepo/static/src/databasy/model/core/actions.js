@@ -26,7 +26,9 @@ databasy.model.core.actions.Register = databasy.model.core.actions.Action.extend
         );
     },
     execute:function(model) {
-        model.register(this.val('node'));
+        var node = this.val('node');
+        model.register(node);
+        return new databasy.model.core.events.NodeRegistered(node);
     }
 }, {
     CODE: 'core.actions.Register'
@@ -39,7 +41,8 @@ databasy.model.core.actions.Unregister = databasy.model.core.actions.Action.exte
         );
     },
     execute:function(model) {
-        model.unregister(this.val('node_id'));
+        var node = model.unregister(this.val('node_id'));
+        return new databasy.model.core.events.NodeUnregistered(node);
     }
 }, {
     CODE: 'core.actions.Unregister'
@@ -83,8 +86,18 @@ databasy.model.core.actions.Set = databasy.model.core.actions.CRUDAction.extend(
         );
     },
     execute:function(model) {
-        var node = model.node(this.val('node_id'));
-        node.set(this.val('field'), this.val('value'));
+        var field = this.val('field');
+        var new_value = this.val('value');
+
+        var node_or_model = this.target_node_or_model(model);
+        var old_value = node_or_model.val(field);
+        node_or_model.set(field, new_value);
+        return new databasy.model.core.events.PropertyChanged({
+            node_id: this.val('node_id'),
+            field: field,
+            old_value: old_value,
+            new_value: new_value
+        });
     }
 }, {
     CODE: 'core.actions.Set'
@@ -110,7 +123,7 @@ databasy.model.core.actions.AppendItem = databasy.model.core.actions.CRUDAction.
 
         var action =
             databasy.model.core.actions.InsertItem({node_id:node_id, field:field, index:new_index, item:this.val('item')});
-        action.execute(model);
+        return action.execute(model);
     }
 }, {
     CODE: 'core.actions.AppendItem'
@@ -128,13 +141,19 @@ databasy.model.core.actions.InsertItem = databasy.model.core.actions.CRUDAction.
         );
     },
     execute:function(model) {
-        var node = model.node(this.val('node_id'));
-        var listField = node.val('field');
+        var field = this.val('field');
         var index = this.val('index');
-        if (0 > index > listField.length) {
-            throw new Error('Index is ' + index + ', but field length is ' + listField.length + '.')
-        }
-        listField.splice(index, 0, this.val('item'));
+        var item = this.val('item');
+
+        var node_or_model = this.target_node_or_model(model);
+        node_or_model.insert_item(field, index, item);
+
+        return new databasy.model.core.events.ItemInserted({
+            node_id: this.val('node_id'),
+            field: field,
+            index: index,
+            item: item
+        });
     }
 }, {
     CODE: 'core.actions.InsertItem'
@@ -147,13 +166,18 @@ databasy.model.core.actions.DeleteItem = databasy.model.core.actions.CRUDAction.
         );
     },
     execute:function(model) {
-        var node = model.node(this.val('node_id'));
-        var listField = node.val('field');
+        var field = this.val('field');
         var index = this.val('index');
-        if (0 > index > listField.length - 1) {
-            throw new Error('Unable to remove element with index ' + index + ' from the list of length ' + listField.length + '.')
-        }
-        listField.splice(index, 1);
+
+        var node_or_model = this.target_node_or_model(model);
+        var item = node_or_model.delete_item(field, index);
+
+        return new databasy.model.core.events.ItemDeleted({
+            node_id: this.val('node_id'),
+            field: field,
+            index: index,
+            item: item
+        });
     }
 }, {
     CODE: 'core.actions.DeleteItem'
@@ -175,7 +199,7 @@ databasy.model.core.actions.FindAndDeleteItem = databasy.model.core.actions.CRUD
         var index = node.item_index(this.val('field'), this.val('item'));
 
         var action = databasy.model.core.actions.DeleteItem({node_id:node_id, field:this.val('field'), index:index});
-        action.execute(model);
+        return action.execute(model);
     }
 }, {
     CODE: 'core.actions.FindAndDeleteItem'

@@ -37,13 +37,13 @@ class Register(Action):
         }
 
     def execute(self, model):
-        node = self['node']
+        node = self.val('node')
         model.register(node)
         from databasyrepo.models.core.events import NodeRegistered
         return NodeRegistered(node)
 
     def changes(self):
-        return self['node'].id, None
+        return self.val('node').id, None
 
 
 class Unregister(Action):
@@ -57,12 +57,12 @@ class Unregister(Action):
         }
 
     def execute(self, model, fire=True):
-        node = model.unregister(self['node_id'])
+        node = model.unregister(self.val('node_id'))
         from databasyrepo.models.core.events import NodeUnregistered
         return NodeUnregistered(node)
 
     def changes(self):
-        return self['node_id'], None
+        return self.val('node_id'), None
 
 
 def _ref_or_value(obj):
@@ -83,14 +83,14 @@ class CRUDAction(Action):
         }
 
     def target_node_or_model(self, model):
-        node_id = self['node_id']
+        node_id = self.val('node_id')
         if node_id:
             return model.node(node_id)
         else:
             return model
 
     def changes(self):
-        return self['node_id'], self['field']
+        return self.val('node_id'), self.val('field')
 
 
 class Set(CRUDAction):
@@ -105,15 +105,15 @@ class Set(CRUDAction):
         return fields
 
     def execute(self, model):
-        field = self['field']
-        new_value = self['value']
+        field = self.val('field')
+        new_value = self.val('value')
 
         node_or_model = self.target_node_or_model(model)
         old_value = node_or_model.val(field)
         node_or_model.set(field, new_value)
 
         from databasyrepo.models.core.events import PropertyChanged
-        return PropertyChanged(node_id=self['node_id'], field=field, old_value=old_value, new_value=new_value)
+        return PropertyChanged(node_id=self.val('node_id'), field=field, old_value=old_value, new_value=new_value)
 
 
 class AppendItem(CRUDAction):
@@ -129,13 +129,13 @@ class AppendItem(CRUDAction):
         return fields
 
     def execute(self, model):
-        field = self['field']
+        field = self.val('field')
 
-        node_id = self['node_id']
+        node_id = self.val('node_id')
         node_or_model = self.target_node_or_model(model)
         new_index = node_or_model.items_count(field)
 
-        insert_action = InsertItem(node_id=node_id, field=field, index=new_index, item=self['item'])
+        insert_action = InsertItem(node_id=node_id, field=field, index=new_index, item=self.val('item'))
         return insert_action.execute(model)
 
 class InsertItem(CRUDAction):
@@ -152,15 +152,15 @@ class InsertItem(CRUDAction):
         return fields
 
     def execute(self, model):
-        field = self['field']
-        index = self['index']
-        item = self['item']
+        field = self.val('field')
+        index = self.val('index')
+        item = self.val('item')
 
         node_or_model = self.target_node_or_model(model)
         node_or_model.insert_item(field, index, item)
 
         from databasyrepo.models.core.events import ItemInserted
-        return ItemInserted(node_id=self['node_id'], field=field, index=index, item=item)
+        return ItemInserted(node_id=self.val('node_id'), field=field, index=index, item=item)
 
 
 class DeleteItem(CRUDAction):
@@ -175,14 +175,14 @@ class DeleteItem(CRUDAction):
         return fields
 
     def execute(self, model):
-        field = self['field']
-        index = self['index']
+        field = self.val('field')
+        index = self.val('index')
 
         node_or_model = self.target_node_or_model(model)
         item = node_or_model.delete_item(field, index)
 
         from databasyrepo.models.core.events import ItemDeleted
-        return ItemDeleted(node_id=self['node_id'], field=field, index=index, item=item)
+        return ItemDeleted(node_id=self.val('node_id'), field=field, index=index, item=item)
 
 
 class FindAndDeleteItem(CRUDAction):
@@ -198,11 +198,11 @@ class FindAndDeleteItem(CRUDAction):
         return fields
 
     def execute(self, model):
-        node_id = self['node_id']
+        node_id = self.val('node_id')
         node = self.target_node_or_model(model)
-        index = node.item_index(self['field'], self['item'])
+        index = node.item_index(self.val('field'), self.val('item'))
 
-        action = DeleteItem(node_id=node_id, field=self['field'], index=index)
+        action = DeleteItem(node_id=node_id, field=self.val('field'), index=index)
         return action.execute(model)
 
 

@@ -60,6 +60,7 @@ class ModelsNamespace(BaseNamespace):
             with self.mm.lock:
                 self.mm.execute_command(command, self.user_id)
                 self.emit('exec_done', command_version)
+                self.emit_to_other('exec', command)
                 self.log('[uid:%s] Successfully executed command: \n\n%s\n' % (self.user_id, json.dumps(command, indent=4)))
         except Exception, e:
             self.emit('exec_fail', command_version)

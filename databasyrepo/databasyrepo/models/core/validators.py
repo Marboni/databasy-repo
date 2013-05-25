@@ -26,6 +26,6 @@ class CorrectVersion(Integer):
         user_version = self.get(field, field_values)
         if user_version <= 0:
             raise InvalidStateError('Field must be positive.')
-        if self.current_version < user_version:
+        if self.current_version != user_version:
             raise InvalidStateError('Source version of command (%s) is greater then current model version (%s).' %
                                     (user_version, self.current_version))

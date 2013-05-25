@@ -52,6 +52,7 @@ databasy.model.core.models.Model = databasy.model.core.nodes.Node.extend({
         var nodes = this.val('nodes');
         var index = $.inArray(node, nodes);
         nodes.splice(index, 1);
+        return node;
     },
     node:function (node_id, cls) {
         if (!this.exists(node_id)) {
@@ -68,7 +69,8 @@ databasy.model.core.models.Model = databasy.model.core.nodes.Node.extend({
     },
     execute_command:function (command, user_id) {
         var events = command.execute(this);
-        this.revision_stack().add(user_id, events, true); // TODO User ID
+        this.revision_stack().add(user_id, events, true);
+        return events;
     },
     deserialize:function (serialized_object) {
         this._super(serialized_object);

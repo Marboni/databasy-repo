@@ -6,6 +6,7 @@ databasy.ui.shapes.Table = draw2d.shape.basic.Rectangle.extend({
         this.gateway = gateway;
         this.tableRepr = tableRepr;
 
+        this.gateway.addListener(this);
         this.installEditPolicy(new databasy.ui.policy.TablePolicy(gateway));
 
         this.setBackgroundColor('#00bfff');
@@ -27,5 +28,14 @@ databasy.ui.shapes.Table = draw2d.shape.basic.Rectangle.extend({
     },
     onDoubleClick:function () {
 
+    },
+    onModelChanged:function (event) {
+        var modelEvent = event.modelEvent;
+        if (modelEvent instanceof databasy.model.core.events.PropertyChanged &&
+            modelEvent.val('node_id') === this.tableRepr.id() &&
+            modelEvent.val('field') === 'position') {
+            var newPosition = modelEvent.val('new_value');
+            this.setPosition(newPosition[0], newPosition[1]);
+        }
     }
 });

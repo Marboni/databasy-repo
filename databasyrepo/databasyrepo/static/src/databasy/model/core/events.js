@@ -30,7 +30,7 @@ databasy.model.core.events.NodeRegistered = databasy.model.core.events.Event.ext
 });
 
 
-databasy.model.core.events.NodeUnegistered = databasy.model.core.events.Event.extend({
+databasy.model.core.events.NodeUnregistered = databasy.model.core.events.Event.extend({
     init:function(node) {
         this._super();
         if (node !== undefined) {
