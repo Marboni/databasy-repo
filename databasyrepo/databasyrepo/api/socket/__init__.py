@@ -69,16 +69,16 @@ class ModelsNamespace(BaseNamespace):
         with self.mm.lock:
             self.log('[uid:%s] Requesting control.')
             if self.mm.pass_control(None, self.user_id):
-                self.log('[uid:%s] Control provided.')
                 self.emit_to_all('roles_changed', self.mm.serialize_user_roles())
+                self.log('[uid:%s] Control provided.')
             else:
                 self.log('[uid:%s] Request rejected - other user is editing the model.')
 
     def on_pass_control(self, new_editor):
         with self.mm.lock:
             self.mm.pass_control(self.user_id, new_editor)
-            self.log('[uid:%s] Control passed.')
             self.emit_to_all('roles_changed', self.mm.serialize_user_roles())
+            self.log('[uid:%s] Control passed.')
 
     def recv_disconnect(self):
         if 'user_id' in self.session:
