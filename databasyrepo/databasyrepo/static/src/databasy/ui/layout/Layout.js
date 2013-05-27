@@ -1,13 +1,15 @@
 databasy.ui.layout.Layout = Class.extend({
     init:function (gateway) {
         this.gateway = gateway;
-        this.layout = this._createLayout();
+        this.layout = this.createLayout();
         this.canvas = new databasy.ui.shapes.Canvas(gateway, 'canvas');
 
         this.reset();
+
+        gateway.addListener(this);
     },
 
-    _createLayout:function () {
+    createLayout:function () {
         var defaults = {
             resizable:false,
             closable:false,
@@ -36,10 +38,11 @@ databasy.ui.layout.Layout = Class.extend({
                     applyDefaultStyles:true,
                     defaults:defaults,
                     west:{
-                        paneSelector:"#toolbox",
-                        spacing_open:1,
-                        spacing_closed:1,
-                        size:30
+                        paneSelector:"#toolbar",
+                        size:47,
+                        spacing_open:0,
+                        spacing_closed:0,
+                        closable:true
                     },
                     center:{
                         paneSelector:"#canvasWrapper"
@@ -49,9 +52,11 @@ databasy.ui.layout.Layout = Class.extend({
         });
     },
 
-    reset: function() {
+    reset:function () {
         this.recreateMenuPanel();
+        this.recreateToolbar();
         this.canvas.clear();
+        this.closeToolbar();
     },
 
     recreateMenuPanel:function () {
@@ -61,11 +66,37 @@ databasy.ui.layout.Layout = Class.extend({
         this.menuPanel.reset();
     },
 
+    recreateToolbar:function () {
+        if (this.toolbar === undefined) {
+            this.toolbar = new databasy.ui.layout.Toolbar(this.gateway);
+        }
+        this.toolbar.reset();
+    },
+
+    openToolbar:function () {
+        this.layout.children.center.open('west');
+    },
+
+    closeToolbar:function () {
+        this.layout.children.center.close('west');
+    },
+
     renderTable:function (repr) {
         this.canvas.drawTable(repr);
     },
 
     statusMsg:function (msg) {
         $('#chatPanel').append('<pre>' + msg + '</pre>');
+    },
+
+    onUserRolesChanged:function(event) {
+        var userRoles = event.userRoles;
+        var isEditor = userRoles.isEditor();
+
+        if (isEditor) {
+            this.openToolbar()
+        } else {
+            this.closeToolbar();
+        }
     }
 });

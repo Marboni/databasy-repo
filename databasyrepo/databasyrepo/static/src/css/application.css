@@ -1,12 +1,13 @@
-#contentPanel.ui-layout-pane {
+#contentPanel.ui-layout-pane,
+#canvasWrapper.ui-layout-pane,
+#toolbar.ui-layout-pane {
     padding: 0 !important;
+}
+
+#contentPanel.ui-layout-pane {
     border: none !important;
     overflow: hidden;
     color: #00ce00
-}
-
-#canvasWrapper.ui-layout-pane {
-    padding: 0 !important;
 }
 
 #canvasWrapper.ui-layout-pane #canvas {
@@ -30,4 +31,27 @@
     text-align: center;
     font-size: 0.8em;
     margin: 0.3em 0 0;
+}
+
+#toolbar .ui-button .ui-icon {
+    width: 32px;
+    height: 32px;
+    margin-left: -16px;
+    margin-top: -16px;
+}
+
+#toolbar .ui-button .ui-icon.ui-icon-pointer {
+    background-image: url(toolbar/pointer.png);
+}
+
+#toolbar .ui-button .ui-icon.ui-icon-table {
+    background-image: url(toolbar/table.png);
+}
+
+#toolbar .ui-button-text {
+    font-size: .9em !important;
+}
+
+#toolPanel {
+    margin: 0 2px;
 }
