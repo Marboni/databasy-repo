@@ -84,15 +84,8 @@ databasy.gateway.Gateway = Class.extend({
 
             this.model = databasy.model.core.serializing.Serializable.deserialize(serializedModel);
 
-            var default_canvas_node = this.model.val_as_node('canvases', this.model)[0];
-            var reprs = default_canvas_node.val_as_node('reprs', this.model);
-            $.each(reprs, $.proxy(function (index, repr) {
-                    var reprCode = repr.code();
-                    if (reprCode === databasy.model.core.reprs.TableRepr.CODE) {
-                        this.layout.renderTable(repr);
-                    }
-                },
-                this));
+            var canvas_node = this.model.val_as_node('canvases', this.model)[0];
+            this.layout.createCanvas(canvas_node);
         } finally {
             databasy.utils.preloader.closePreloader();
         }
