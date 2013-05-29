@@ -4,7 +4,7 @@ databasy.model.core.serializing.Serializable = Class.extend({
             this.f['_code'] = this.constructor.CODE;
             var fields = this.fields();
             for (var i = 0; i < fields.length; i++) {
-                this.f[fields[i]] = undefined;
+                this.f[fields[i]] = null;
             }
             if (params !== undefined) {
                 for (var key in params) {
@@ -88,7 +88,7 @@ databasy.model.core.serializing.Serializable = Class.extend({
             }
         },
         copy:function() {
-            return this.constructor.deserialize(this);
+            return databasy.model.core.serializing.Serializable.deserialize(this);
         },
         toString:function() {
             return JSON.stringify(this.serialize());

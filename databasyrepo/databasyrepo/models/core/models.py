@@ -16,6 +16,7 @@ class Model(Node):
     def __init__(self, id=None):
         super(Model, self).__init__(id)
         self._nodes_register = {}
+        self._last_generated_id = None
 
     def fields(self):
         fields = super(Model, self).fields()
@@ -65,6 +66,20 @@ class Model(Node):
     def revision_stack(self):
         return self.val('revision_stack')
 
+    def generate_id(self):
+        """ Nodes created on client and server must have the same IDs. It's why why need more determined solution,
+        then UUID. This method generates unique ID based on the current version of model and sequence of method call.
+        Returns:
+            unique ID of model node. Example: 32.1, where 32 is model version, 1 means that it was first generated ID
+            in this version.
+        """
+        if self._last_generated_id and self._last_generated_id[0] == self.version:
+            self._last_generated_id = (self.version, self._last_generated_id[1] + 1)
+        else:
+            self._last_generated_id = (self.version, 1)
+
+        return '%s.%s' % self._last_generated_id
+
     @classmethod
     def create(cls, model_id, user_id):
         model = cls()
@@ -76,16 +91,19 @@ class Model(Node):
         model.set('modifier_uid', user_id)
 
         model.set('model_id', model_id)
-        model.set('version', 1L)
+        # Pre-initializing version. Will be used to calculate unique IDs of the predefined objects.
+        model.set('version', 0L)
 
         revision_stack = RevisionStack()
         revision_stack.inject_model(model)
         model.set('revision_stack', revision_stack)
 
-        canvas = Canvas()
+        canvas = Canvas(model.generate_id())
         canvas.set('name', 'Default')
         model.register(canvas)
         model.append_item('canvases', canvas.ref())
+
+        model.set('version', 1L)
 
         return model
 
@@ -93,24 +111,20 @@ class Model(Node):
         for node in nodes_list:
             self.register(node)
 
-    def _add_node(self, node):
+    def register(self, node):
+        if self.id is None:
+            self.set('_id', self.generate_id())
         if self._nodes_register.has_key(node.id):
             raise ValueError('Node with ID "%s" already exists.' % node.id)
         self._nodes_register[node.id] = node
         self.val('nodes').append(node)
 
-    def _remove_node(self, id):
-        if not self._nodes_register.has_key(id):
-            raise ValueError('Node with ID "%s" not exists.' % id)
-        node = self._nodes_register.pop(id)
+    def unregister(self, uid):
+        if not self._nodes_register.has_key(uid):
+            raise ValueError('Node with ID "%s" not exists.' % uid)
+        node = self._nodes_register.pop(uid)
         self.val('nodes').remove(node)
         return node
-
-    def register(self, node):
-        self._add_node(node)
-
-    def unregister(self, uid):
-        return self._remove_node(uid)
 
     def node(self, id, clazz=None):
         try:

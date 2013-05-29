@@ -58,9 +58,9 @@ databasy.model.core.actions.CRUDAction = databasy.model.core.actions.Action.exte
     target_node_or_model:function(model) {
         var node_id = this.val('node_id');
         if (node_id === null) {
-            return model.node(node_id);
-        } else {
             return model;
+        } else {
+            return model.node(node_id);
         }
 
     },
@@ -122,7 +122,7 @@ databasy.model.core.actions.AppendItem = databasy.model.core.actions.CRUDAction.
         var new_index = node_or_model.items_count(field);
 
         var action =
-            databasy.model.core.actions.InsertItem({node_id:node_id, field:field, index:new_index, item:this.val('item')});
+            new databasy.model.core.actions.InsertItem({node_id:node_id, field:field, index:new_index, item:this.val('item')});
         return action.execute(model);
     }
 }, {
@@ -198,7 +198,7 @@ databasy.model.core.actions.FindAndDeleteItem = databasy.model.core.actions.CRUD
         var node = this.target_node_or_model(model);
         var index = node.item_index(this.val('field'), this.val('item'));
 
-        var action = databasy.model.core.actions.DeleteItem({node_id:node_id, field:this.val('field'), index:index});
+        var action = new databasy.model.core.actions.DeleteItem({node_id:node_id, field:this.val('field'), index:index});
         return action.execute(model);
     }
 }, {

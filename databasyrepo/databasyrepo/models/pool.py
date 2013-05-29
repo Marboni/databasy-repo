@@ -20,8 +20,8 @@ class ModelsPool(object):
 
     def _load(self, model_id):
         # Creating manager and loading model in non-blocking code.
-        mm = ModelManager()
-        mm.load(model_id)
+        mm = ModelManager(model_id)
+        mm.reload()
         self._lock.acquire_write()
         try:
             # Check again - may be some other thread already loaded it.

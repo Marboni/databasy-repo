@@ -11,8 +11,9 @@ databasy.ui.layout.Toolbar = Class.extend({
 
         this.toolbar.append(this.toolPanel);
 
-        this.createToolbarButton('pointer', 'ui-icon-pointer', 'Select');
-        this.createToolbarButton('createTable', 'ui-icon-table', 'Create Table');
+        var constant = databasy.ui.layout.Toolbar;
+        this.createToolbarButton(constant.POINTER, 'ui-icon-pointer', 'Select');
+        this.createToolbarButton(constant.CREATE_TABLE, 'ui-icon-table', 'Create Table');
 
         this.toolPanel.buttonsetv();
 
@@ -59,4 +60,7 @@ databasy.ui.layout.Toolbar = Class.extend({
     getCurrentTool:function() {
         return this._currentTool;
     }
+}, {
+    POINTER: 'pointer',
+    CREATE_TABLE: 'createTable'
 });

@@ -24,7 +24,10 @@ var databasy = {
         layout: {},
         locators: {},
         shapes: {},
-        policy: {}
+        policy: {
+            canvas: {},
+            shapes: {}
+        }
     },
     utils: {
         preloader: {},

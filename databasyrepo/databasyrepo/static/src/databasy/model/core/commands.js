@@ -12,7 +12,7 @@ databasy.model.core.commands.Command = databasy.model.core.serializing.Serializa
             'source_version'
         )
     },
-    validate_predicates:function(model) {
+    validate_predicates:function (model) {
         if ($.inArray(this.constructor, model.commands()) == -1) {
             throw new Error('Command ' + this.code() + ' can not be executed on model ' + model.code() + '.')
         }
@@ -20,7 +20,7 @@ databasy.model.core.commands.Command = databasy.model.core.serializing.Serializa
     do:function (executor) {
         throw new Error('Not implemented');
     },
-    execute:function(model) {
+    execute:function (model) {
         this.validate_predicates(model);
         var executor = new databasy.model.core.actions.Executor(model);
         this.do(executor);
@@ -29,10 +29,10 @@ databasy.model.core.commands.Command = databasy.model.core.serializing.Serializa
         }
         return executor.events;
     },
-    require_checks:function() {
+    require_checks:function () {
         return true;
     },
-    _check:function(executor) {
+    _check:function (executor) {
         var checkers = executor.model.checkers();
         for (var i = 0; i < checkers.length; i++) {
             checkers[i](executor).modify_errors();
@@ -51,12 +51,14 @@ databasy.model.core.commands.CreateTable = databasy.model.core.commands.Command.
     do:function (executor) {
         var core = databasy.model.core;
 
-        var table = core.elements.Table();
+        var table = new core.elements.Table({
+            _id: executor.model.generate_id(),
+            name: this.val('name')
+        });
         executor.execute(new core.actions.Register({node:table}));
         executor.execute(new core.actions.AppendItem({field:'tables', item:table}));
-        executor.execute(new core.actions.Set({node_id:table.id(), field:'name', value:this.val('name')}));
 
-        core.commands.CreateTableRepr({
+        new core.commands.CreateTableRepr({
             canvas_id:this.val('canvas_id'), table_id:table.id(), position:this.val('position')
         }).do(executor);
     }
@@ -79,11 +81,13 @@ databasy.model.core.commands.CreateTableRepr = databasy.model.core.commands.Comm
         var table = executor.model.node(this.val('table_id'), core.elements.Table);
         var canvas = executor.model.node(this.val('canvas_id'), core.reprs.Canvas);
 
-        var table_repr = new core.reprs.TableRepr();
+        var table_repr = new core.reprs.TableRepr({
+            _id: executor.model.generate_id(),
+            table: table.ref(),
+            position: this.val('position')
+        });
         executor.execute(new core.actions.Register({node:table_repr}));
         executor.execute(new core.actions.AppendItem({node_id:canvas.id(), field:'reprs', item:table_repr}));
-        executor.execute(new core.actions.Set({node_id:table_repr.id(), field:'table', value:table}));
-        executor.execute(new core.actions.Set({node_id:table_repr.id(), field:'position', value:this.val('position')}));
     }
 }, {
     CODE:'core.commands.CreateTableRepr'

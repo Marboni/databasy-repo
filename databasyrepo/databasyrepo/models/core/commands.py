@@ -110,12 +110,12 @@ class CreateTable(Command):
         return validators
 
     def do(self, executor):
-        table = Table()
+        table = Table(executor.model.generate_id())
+        table.set('name', self.val('name'))
         executor.execute(Register(node=table))
         executor.execute(AppendItem(field='tables', item=table))
-        executor.execute(Set(node_id=table.id, field='name', value=self['name']))
 
-        CreateTableRepr(canvas_id=self['canvas_id'], table_id=table.id, position=self['position']).do(executor)
+        CreateTableRepr(canvas_id=self.val('canvas_id'), table_id=table.id, position=self.val('position')).do(executor)
 
 
 class CreateTableRepr(Command):
@@ -143,11 +143,11 @@ class CreateTableRepr(Command):
         table = executor.model.node(self['table_id'], Table)
         canvas = executor.model.node(self['canvas_id'], Canvas)
 
-        table_repr = TableRepr()
+        table_repr = TableRepr(executor.model.generate_id())
+        table_repr.set('table', table.ref())
+        table_repr.set('position', self.val('position'))
         executor.execute(Register(node=table_repr))
         executor.execute(AppendItem(node_id=canvas.id, field='reprs', item=table_repr))
-        executor.execute(Set(node_id=table_repr.id, field='table', value=table))
-        executor.execute(Set(node_id=table_repr.id, field='position', value=self.val('position')))
 
 
 class MoveTableRepr(Command):

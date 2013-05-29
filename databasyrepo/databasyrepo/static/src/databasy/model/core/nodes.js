@@ -1,4 +1,7 @@
 databasy.model.core.nodes.Node = databasy.model.core.serializing.Serializable.extend({
+    init:function(params) {
+        this._super(params);
+    },
     fields:function () {
         return this._super().concat(
             '_id'
@@ -42,7 +45,7 @@ databasy.model.core.nodes.Node = databasy.model.core.serializing.Serializable.ex
         return value;
     },
     ref:function() {
-        return new databasy.model.core.nodes.NodeRef({ref_id:self.id(), ref_code:self.code()})
+        return new databasy.model.core.nodes.NodeRef({ref_id:this.id(), ref_code:this.code()})
     }
 });
 

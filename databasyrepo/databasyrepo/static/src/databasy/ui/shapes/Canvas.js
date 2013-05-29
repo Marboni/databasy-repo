@@ -11,17 +11,30 @@ databasy.ui.shapes.Canvas = draw2d.Canvas.extend({
 
         this.setEditable(false);
         this.initShapes();
+
+        this.installEditPolicy(new databasy.ui.policy.canvas.ToolActionPolicy());
     },
 
     initShapes:function () {
         var reprs = this.canvasNode.val_as_node('reprs', this.gateway.model);
-        $.each(reprs, $.proxy(function (index, repr) {
-                var reprCode = repr.code();
-                if (reprCode === databasy.model.core.reprs.TableRepr.CODE) {
-                    this.drawTable(repr);
-                }
-            },
-            this));
+        var that = this;
+        $.each(reprs, function (index, repr) {
+            that.drawShape(repr);
+        });
+    },
+
+    drawShape:function (repr) {
+        var reprCode = repr.code();
+        if (reprCode === databasy.model.core.reprs.TableRepr.CODE) {
+            this.drawTable(repr);
+        } else {
+            throw Error('Unknown reprCode ' + reprCode);
+        }
+    },
+
+    drawTable:function (repr) {
+        var shape = new databasy.ui.shapes.Table(this, this.gateway, repr);
+        shape.draw(this);
     },
 
     setEditable:function (editable) {
@@ -33,13 +46,18 @@ databasy.ui.shapes.Canvas = draw2d.Canvas.extend({
         }
     },
 
-    drawTable:function (repr) {
-        var shape = new databasy.ui.shapes.Table(this, this.gateway, repr);
-        shape.draw(this);
-    },
-
     onUserRolesChanged:function (event) {
         var editable = event.userRoles.isEditor();
         this.setEditable(editable);
+    },
+
+    onModelChanged:function (event) {
+        var modelEvent = event.modelEvent;
+        if (modelEvent instanceof databasy.model.core.events.ItemInserted &&
+            modelEvent.val('node_id') === this.canvasNode.id() &&
+            modelEvent.val('field') === 'reprs') {
+            // New repr added, drawing.
+            this.drawShape(modelEvent.val('item'));
+        }
     }
 });

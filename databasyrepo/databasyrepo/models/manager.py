@@ -8,8 +8,9 @@ from databasyrepo.models.register import register
 __author__ = 'Marboni'
 
 class ModelManager(object):
-    def __init__(self):
+    def __init__(self, model_id=None):
         super(ModelManager, self).__init__()
+        self.model_id = model_id
         self.lock = threading.Lock()
         self._user_roles = UserRoles()
 
@@ -18,6 +19,8 @@ class ModelManager(object):
             raise ValueError('Manager has no model.')
 
     def create(self, model_id, user_id):
+        self.model_id = model_id
+
         serial = self.code_by_id(model_id)
         # TODO Handle case when model not found.
         model_class = register.get(serial, Model)
@@ -41,13 +44,18 @@ class ModelManager(object):
         model.inject_connection(conn)
         return model
 
-    def load(self, model_id):
-        self._model = self.retrieve_model(model_id, mg())
+    def reload(self):
+        self._model = self.retrieve_model(self.model_id, mg())
 
     def execute_command(self, command, user_id):
         self._check_model()
-        actions = self._model.execute_command(command, user_id)
-        return actions
+        try:
+            actions = self._model.execute_command(command, user_id)
+            return actions
+        except Exception, e:
+            self.reload()
+            raise e
+
 
     def has_active_users(self):
         return bool(self._user_roles.active_users)

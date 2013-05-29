@@ -7,7 +7,7 @@ databasy.ui.shapes.Table = draw2d.shape.basic.Rectangle.extend({
         this.tableRepr = tableRepr;
 
         this.gateway.addListener(this);
-        this.installEditPolicy(new databasy.ui.policy.TablePolicy(gateway));
+        this.installEditPolicy(new databasy.ui.policy.shapes.TablePolicy());
 
         this.setBackgroundColor('#00bfff');
         this.setColor('#009acd');

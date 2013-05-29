@@ -1,4 +1,3 @@
-from uuid import uuid4
 from databasyrepo.models.core.serializing import Serializable
 
 __author__ = 'Marboni'
@@ -6,7 +5,7 @@ __author__ = 'Marboni'
 class Node(Serializable):
     def __init__(self, id=None):
         super(Node, self).__init__()
-        self.set('_id', id or str(uuid4()))
+        self.set('_id', id)
 
     def fields(self):
         return {

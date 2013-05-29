@@ -53,7 +53,6 @@ databasy.ui.layout.Layout = Class.extend({
         this.createLayout();
         this.createMenuPanel();
         this.createToolbar();
-        this.closeToolbar();
     },
 
     recreateHtml:function() {

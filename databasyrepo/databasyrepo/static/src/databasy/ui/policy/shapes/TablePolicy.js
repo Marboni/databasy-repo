@@ -1,9 +1,12 @@
-databasy.ui.policy.TablePolicy = draw2d.policy.figure.RectangleSelectionFeedbackPolicy.extend({
-    NAME:"databasy.ui.policy.TablePolicy",
+databasy.ui.policy.shapes.TablePolicy = draw2d.policy.figure.RectangleSelectionFeedbackPolicy.extend({
+    NAME:"databasy.ui.policy.shapes.TablePolicy",
 
-    init:function (gateway) {
-        this._super();
-        this.gateway = gateway;
+    onInstall: function(table) {
+        if (table instanceof databasy.ui.shapes.Table) {
+            this.gateway = table.gateway;
+        } else {
+            throw new Error('TablePolicy can\'t be installed on this figure.')
+        }
     },
 
     onDragStart:function (canvas, figure) {
