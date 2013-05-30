@@ -1,3 +1,4 @@
+from uuid import uuid4
 from databasyrepo.mg import mg
 from databasyrepo.models.core.commands import *
 from databasyrepo.models.core.elements import Table
@@ -42,6 +43,8 @@ class CommandTest(ODMTest):
         canvas = default_canvas(model)
 
         execute_command(model, CreateTable,
+            table_id = str(uuid4()),
+            default_table_repr_id = str(uuid4()),
             name='Table',
             canvas_id=canvas.id,
             position = [1, 1]
@@ -62,6 +65,8 @@ class CommandTest(ODMTest):
         nodes_v1 = model.copy().val('nodes')
 
         execute_command(model, CreateTable,
+            table_id = str(uuid4()),
+            default_table_repr_id = str(uuid4()),
             name='Table',
             canvas_id=canvas.id,
             position = [1, 1]
@@ -91,6 +96,8 @@ class CommandTest(ODMTest):
         canvas = default_canvas(model)
 
         execute_command(model, CreateTable,
+            table_id = str(uuid4()),
+            default_table_repr_id = str(uuid4()),
             name='Table',
             canvas_id=canvas.id,
             position = [1, 1]

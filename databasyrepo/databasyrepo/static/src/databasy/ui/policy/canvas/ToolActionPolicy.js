@@ -51,7 +51,10 @@ databasy.ui.policy.canvas.ToolActionPolicy = draw2d.policy.canvas.CanvasPolicy.e
         }
         // New name found.
 
+        var uuid = databasy.model.utils.uuid;
         var command = new databasy.model.core.commands.CreateTable({
+            table_id: uuid(),
+            default_table_repr_id: uuid(),
             name: newTableName,
             canvas_id: canvas.canvasNode.id(),
             position: pos

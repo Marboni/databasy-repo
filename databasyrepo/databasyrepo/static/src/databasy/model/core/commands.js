@@ -43,6 +43,8 @@ databasy.model.core.commands.Command = databasy.model.core.serializing.Serializa
 databasy.model.core.commands.CreateTable = databasy.model.core.commands.Command.extend({
     fields:function () {
         return this._super().concat(
+            'table_id',
+            'default_table_repr_id',
             'name',
             'canvas_id',
             'position'
@@ -52,14 +54,17 @@ databasy.model.core.commands.CreateTable = databasy.model.core.commands.Command.
         var core = databasy.model.core;
 
         var table = new core.elements.Table({
-            _id: executor.model.generate_id(),
+            _id: this.val('table_id'),
             name: this.val('name')
         });
         executor.execute(new core.actions.Register({node:table}));
         executor.execute(new core.actions.AppendItem({field:'tables', item:table}));
 
         new core.commands.CreateTableRepr({
-            canvas_id:this.val('canvas_id'), table_id:table.id(), position:this.val('position')
+            table_repr_id: this.val('default_table_repr_id'),
+            canvas_id:this.val('canvas_id'),
+            table_id:table.id(),
+            position:this.val('position')
         }).do(executor);
     }
 }, {
@@ -70,6 +75,7 @@ databasy.model.core.commands.CreateTable = databasy.model.core.commands.Command.
 databasy.model.core.commands.CreateTableRepr = databasy.model.core.commands.Command.extend({
     fields:function () {
         return this._super().concat(
+            'table_repr_id',
             'canvas_id',
             'table_id',
             'position'
@@ -82,7 +88,7 @@ databasy.model.core.commands.CreateTableRepr = databasy.model.core.commands.Comm
         var canvas = executor.model.node(this.val('canvas_id'), core.reprs.Canvas);
 
         var table_repr = new core.reprs.TableRepr({
-            _id: executor.model.generate_id(),
+            _id: this.val('table_repr_id'),
             table: table.ref(),
             position: this.val('position')
         });

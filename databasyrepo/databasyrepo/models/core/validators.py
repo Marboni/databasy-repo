@@ -15,6 +15,16 @@ class NodeClass(FieldValidator):
         except ValueError, e:
             raise InvalidStateError(e)
 
+class UniqueID(FieldValidator):
+    def __init__(self, model):
+        FieldValidator.__init__(self)
+        self.model = model
+
+    def __call__(self, field, field_values):
+        id = self.get(field, field_values)
+        if self.model.exists(id):
+            raise InvalidStateError('ID %s already exists.' % id)
+
 
 class CorrectVersion(Integer):
     def __init__(self, model):

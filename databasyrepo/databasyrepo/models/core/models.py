@@ -66,20 +66,6 @@ class Model(Node):
     def revision_stack(self):
         return self.val('revision_stack')
 
-    def generate_id(self):
-        """ Nodes created on client and server must have the same IDs. It's why why need more determined solution,
-        then UUID. This method generates unique ID based on the current version of model and sequence of method call.
-        Returns:
-            unique ID of model node. Example: 32.1, where 32 is model version, 1 means that it was first generated ID
-            in this version.
-        """
-        if self._last_generated_id and self._last_generated_id[0] == self.version:
-            self._last_generated_id = (self.version, self._last_generated_id[1] + 1)
-        else:
-            self._last_generated_id = (self.version, 1)
-
-        return '%s.%s' % self._last_generated_id
-
     @classmethod
     def create(cls, model_id, user_id):
         model = cls()
@@ -98,7 +84,7 @@ class Model(Node):
         revision_stack.inject_model(model)
         model.set('revision_stack', revision_stack)
 
-        canvas = Canvas(model.generate_id())
+        canvas = Canvas()
         canvas.set('name', 'Default')
         model.register(canvas)
         model.append_item('canvases', canvas.ref())
@@ -113,7 +99,7 @@ class Model(Node):
 
     def register(self, node):
         if self.id is None:
-            self.set('_id', self.generate_id())
+            raise ValueError('Node ID not specified.')
         if self._nodes_register.has_key(node.id):
             raise ValueError('Node with ID "%s" already exists.' % node.id)
         self._nodes_register[node.id] = node

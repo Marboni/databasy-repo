@@ -281,7 +281,16 @@ class Iterable(FieldValidator):
             if self.max_length and length > self.max_length:
                 raise InvalidStateError('Fields must contain not more then %s elements.' % self.max_length)
 
+class NotEqual(FieldValidator):
+    def __init__(self, *other_fields):
+        FieldValidator.__init__(self)
+        self.other_fields = other_fields
 
+    def __call__(self, field, field_values):
+        value = self.get(field, field_values)
+        for other_field in self.other_fields:
+            if value == other_field:
+                raise InvalidStateError('Value of field "%s" equals to value of field "%s": %s.' % (field, other_field, value))
 
 class InvalidStateError(Exception):
     def __init__(self, message):

@@ -39,21 +39,6 @@ databasy.model.core.models.Model = databasy.model.core.nodes.Node.extend({
     revision_stack:function () {
         return this.val('revision_stack');
     },
-    /**
-     * Nodes created on client and server must have the same IDs. It's why why need more determined solution,
-     * then UUID. This method generates unique ID based on the current version of model and sequence of method call.
-     * @return {String} unique ID of model node. Example: 32.1, where 32 is model version, 1 means that it was first
-     * generated ID in this version.
-     */
-    generate_id: function() {
-        var version = this.version();
-        if (this._last_generated_id !== null && this._last_generated_id[0] === version) {
-            this._last_generated_id = [version, this._last_generated_id[1] + 1];
-        } else {
-            this._last_generated_id = [version, 1];
-        }
-        return this._last_generated_id[0] + '.' + this._last_generated_id[1];
-    },
     register:function (node) {
         var node_id = node.id();
         if (this.exists(node_id)) {

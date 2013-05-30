@@ -15,7 +15,8 @@ var databasy = {
         postgres: {
             models: {}
         },
-        register: {}
+        register: {},
+        utils: {}
     },
     gateway: {
         events: {}
