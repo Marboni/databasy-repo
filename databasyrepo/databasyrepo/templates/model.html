@@ -403,6 +403,8 @@ $(function () {
 
             .script("/static/src/databasy/utils/socket.js")
             .script("/static/src/databasy/utils/preloader.js")
+            .script("/static/src/databasy/utils/events/Observer.js")
+            .script("/static/src/databasy/utils/events/Event.js")
 
             // Model
             .script("/static/src/databasy/model/core/serializing.js")
@@ -426,12 +428,15 @@ $(function () {
             .script("/static/src/databasy/ui/layout/Layout.js")
             .script("/static/src/databasy/ui/layout/MenuPanel.js")
             .script("/static/src/databasy/ui/layout/Toolbar.js")
+            .script("/static/src/databasy/ui/layout/PropertyPanel.js")
 
-            .script("/static/src/databasy/ui/policy/shapes/TablePolicy.js")
+            .script("/static/src/databasy/ui/policy/components/TablePolicy.js")
             .script("/static/src/databasy/ui/policy/canvas/ToolActionPolicy.js")
 
-            .script("/static/src/databasy/ui/shapes/Canvas.js")
-            .script("/static/src/databasy/ui/shapes/Table.js")
+            .script("/static/src/databasy/ui/components/Canvas.js")
+            .script("/static/src/databasy/ui/components/Table.js")
+
+            .script("/static/src/databasy/ui/events/ComponentDblClicked.js")
             // UI end
 
             // Gateway
@@ -439,7 +444,6 @@ $(function () {
             .script("/static/src/databasy/gateway/CommandQueue.js")
             .script("/static/src/databasy/gateway/UserRoles.js")
 
-            .script("/static/src/databasy/gateway/events/Event.js")
             .script("/static/src/databasy/gateway/events/UserRolesChanged.js")
             .script("/static/src/databasy/gateway/events/ModelChanged.js")
             // Gateway end

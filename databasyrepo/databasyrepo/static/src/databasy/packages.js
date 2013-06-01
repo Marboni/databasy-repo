@@ -22,15 +22,18 @@ var databasy = {
         events: {}
     },
     ui: {
-        layout: {},
+        layout: {
+        },
         locators: {},
-        shapes: {},
+        components: {},
         policy: {
             canvas: {},
-            shapes: {}
-        }
+            components: {}
+        },
+        events: {}
     },
     utils: {
+        events: {},
         preloader: {},
         socket: {}
     }

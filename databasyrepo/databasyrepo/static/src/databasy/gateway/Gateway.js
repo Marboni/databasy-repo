@@ -3,9 +3,7 @@ databasy.gateway.Gateway = Class.extend({
         this.modelId = modelId;
         this.userId = userId;
 
-        this._listeners = [];
-
-        this.layout = new databasy.ui.layout.Layout(this);
+        this._observer = new databasy.utils.events.Observer();
 
         this.socket = this.createSocket();
         this.commandQueue = new databasy.gateway.CommandQueue(this);
@@ -23,18 +21,15 @@ databasy.gateway.Gateway = Class.extend({
 
     // SOCKET CALLBACKS
     on_connect:function () {
-        this.layout.statusMsg('Connected');
         this.socket.emit('enter', this.modelId, this.userId);
     },
     on_reconnect:function () {
-        this.layout.statusMsg('Reconnected');
     },
     on_reconnecting:function () {
-        this.layout.statusMsg('Reconnecting');
         databasy.utils.preloader.openPreloader(false);
     },
-    on_error:function () {
-        this.layout.statusMsg('Error: ' + e.message);
+    on_error:function (e) {
+        alert('ERROR: ' + e.message);
     },
     on_enter_done:function () {
         this.socket.emit('load');
@@ -80,41 +75,29 @@ databasy.gateway.Gateway = Class.extend({
         databasy.utils.preloader.openPreloader(false);
 
         try {
-            this.reset();
-
+            this.commandQueue.reset();
+            this.userRoles = undefined;
             this.model = databasy.model.core.serializing.Serializable.deserialize(serializedModel);
-
-            var canvas_node = this.model.val_as_node('canvases', this.model)[0];
-            this.layout.createCanvas(canvas_node);
+            this.layout = new databasy.ui.layout.Layout(this);
         } finally {
             databasy.utils.preloader.closePreloader();
         }
     },
+
     changeRoles:function (serializedRoles) {
         this.userRoles = new databasy.gateway.UserRoles(this.userId, serializedRoles);
         this.fire(new databasy.gateway.events.UserRolesChanged(this.userRoles));
     },
 
     fire:function(event) {
-        var listenerFunc = 'on' + event.eventName;
-        $.each(this._listeners, function(i, listener) {
-            if (listener[listenerFunc] !== undefined) {
-                listener[listenerFunc](event);
-            }
-        });
-    },
-    addListener:function(listener) {
-        if ($.inArray(this._listeners, listener) === -1) {
-            this._listeners.push(listener);
-        }
-    },
-    removeListener:function(listener) {
-        this._listeners.splice($.inArray(listener, this._listeners), 1)
+        this._observer.fire(event);
     },
 
-    reset:function() {
-        this.commandQueue.reset();
-        this.layout.reset();
-        this.userRoles = undefined;
-    }
+    addListener:function(listener) {
+        this._observer.addListener(listener);
+    },
+
+    removeListener:function(listener) {
+        this._observer.removeListener(listener);
+    },
 });

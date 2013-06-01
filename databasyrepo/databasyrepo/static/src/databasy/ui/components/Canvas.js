@@ -1,29 +1,33 @@
-databasy.ui.shapes.Canvas = draw2d.Canvas.extend({
-    NAME:"databasy.ui.shapes.Canvas",
+databasy.ui.components.Canvas = draw2d.Canvas.extend({
+    NAME:"databasy.ui.components.Canvas",
 
-    init:function (gateway, domNodeId, canvasNode) {
+    init:function (gateway, domNodeId) {
         this._super(domNodeId);
         this.setScrollArea('#' + domNodeId);
-        this.canvasNode = canvasNode;
 
         this.gateway = gateway;
         this.gateway.addListener(this);
 
+        var model = this.gateway.model;
+        this.canvasNode = model.val_as_node('canvases', model)[0];
+
+        this._observer = new databasy.utils.events.Observer();
+
         this.setEditable(false);
-        this.initShapes();
+        this.initComponents();
 
         this.installEditPolicy(new databasy.ui.policy.canvas.ToolActionPolicy());
     },
 
-    initShapes:function () {
+    initComponents:function () {
         var reprs = this.canvasNode.val_as_node('reprs', this.gateway.model);
         var that = this;
         $.each(reprs, function (index, repr) {
-            that.drawShape(repr);
+            that.drawComponent(repr);
         });
     },
 
-    drawShape:function (repr) {
+    drawComponent:function (repr) {
         var reprCode = repr.code();
         if (reprCode === databasy.model.core.reprs.TableRepr.CODE) {
             this.drawTable(repr);
@@ -33,8 +37,8 @@ databasy.ui.shapes.Canvas = draw2d.Canvas.extend({
     },
 
     drawTable:function (repr) {
-        var shape = new databasy.ui.shapes.Table(this, this.gateway, repr);
-        shape.draw(this);
+        var component = new databasy.ui.components.Table(this.gateway, repr);
+        component.draw(this);
     },
 
     setEditable:function (editable) {
@@ -44,6 +48,18 @@ databasy.ui.shapes.Canvas = draw2d.Canvas.extend({
         } else {
             canvasPane.addClass('readonly');
         }
+    },
+
+    fire:function(event) {
+        this._observer.fire(event);
+    },
+
+    addListener:function(listener) {
+        this._observer.addListener(listener);
+    },
+
+    removeListener:function(listener) {
+        this._observer.removeListener(listener);
     },
 
     onUserRolesChanged:function (event) {
@@ -57,7 +73,7 @@ databasy.ui.shapes.Canvas = draw2d.Canvas.extend({
             modelEvent.val('node_id') === this.canvasNode.id() &&
             modelEvent.val('field') === 'reprs') {
             // New repr added, drawing.
-            this.drawShape(modelEvent.val('item'));
+            this.drawComponent(modelEvent.val('item'));
         }
     }
 });

@@ -11,8 +11,7 @@ databasy.ui.layout.MenuPanel = Class.extend({
     init: function(gateway) {
         this.gateway = gateway;
         gateway.addListener(this);
-    },
-    reset:function() {
+
         this.createMenuPanel();
         this.createControlPanel();
         this.createControlButton();

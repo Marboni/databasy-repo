@@ -3,9 +3,7 @@ databasy.ui.layout.Toolbar = Class.extend({
         this.gateway = gateway;
         this._currentTool = null;
         this._defaultTool = 'pointer';
-    },
 
-    reset:function () {
         this.createToolbar();
         this.createEditToolbar();
 

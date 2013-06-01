@@ -25,7 +25,6 @@ html, body {
 #contentPanel.ui-layout-pane {
     border: none !important;
     overflow: hidden;
-    color: #00ce00
 }
 
 #canvasWrapper.ui-layout-pane #canvas {

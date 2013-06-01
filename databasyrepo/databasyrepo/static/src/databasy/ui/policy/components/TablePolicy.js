@@ -1,8 +1,8 @@
-databasy.ui.policy.shapes.TablePolicy = draw2d.policy.figure.RectangleSelectionFeedbackPolicy.extend({
-    NAME:"databasy.ui.policy.shapes.TablePolicy",
+databasy.ui.policy.components.TablePolicy = draw2d.policy.figure.RectangleSelectionFeedbackPolicy.extend({
+    NAME:"databasy.ui.policy.components.TablePolicy",
 
     onInstall: function(table) {
-        if (table instanceof databasy.ui.shapes.Table) {
+        if (table instanceof databasy.ui.components.Table) {
             this.gateway = table.gateway;
         } else {
             throw new Error('TablePolicy can\'t be installed on this figure.')

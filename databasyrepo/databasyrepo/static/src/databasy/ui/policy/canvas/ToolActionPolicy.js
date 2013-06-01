@@ -2,7 +2,7 @@ databasy.ui.policy.canvas.ToolActionPolicy = draw2d.policy.canvas.CanvasPolicy.e
     NAME:"databasy.ui.policy.canvas.ToolActionPolicy",
 
     onInstall:function(canvas) {
-        if (canvas instanceof databasy.ui.shapes.Canvas) {
+        if (canvas instanceof databasy.ui.components.Canvas) {
             this.gateway = canvas.gateway;
         } else {
             throw new Error("ToolActionPolicy can't be installed on this canvas.")
