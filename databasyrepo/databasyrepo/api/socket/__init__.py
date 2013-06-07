@@ -31,6 +31,9 @@ class ModelsNamespace(BaseNamespace):
             app.preprocess_request()
         super(ModelsNamespace, self).__init__(environ, ns_name)
 
+    def get_initial_acl(self):
+        return ['recv_connect', 'on_enter']
+
     def log(self, message):
         self.context.app.logger.info("[%s] %s" % (self.socket.sessid, message))
 
@@ -42,15 +45,18 @@ class ModelsNamespace(BaseNamespace):
         self.session['model_id'] = model_id
 
         self.context.app.pool.connect(model_id, user_id, self.socket)
+        self.lift_acl_restrictions()
 
+        self.mm.emit_runtime()
         self.emit('enter_done')
+
         self.log('[uid:%s] Connected to model %s.' % (self.user_id, self.model_id))
 
     def on_load(self):
         with self.mm.lock:
             model = self.mm.serialize_model()
-            active_users = self.mm.serialize_user_roles()
-            self.emit('load_done', model, active_users)
+            runtime = self.mm.serialize_runtime()
+            self.emit('load_done', model, runtime)
             self.log('[uid:%s] Loaded model %s.' % (self.user_id, self.model_id))
 
     def on_exec(self, command):
@@ -70,7 +76,7 @@ class ModelsNamespace(BaseNamespace):
         with self.mm.lock:
             self.log('[uid:%s] Requesting control.')
             if self.mm.pass_control(None, self.user_id):
-                self.emit_to_all('roles_changed', self.mm.serialize_user_roles())
+                self.emit_to_all('runtime_changed', self.mm.serialize_runtime())
                 self.log('[uid:%s] Control provided.')
             else:
                 self.log('[uid:%s] Request rejected - other user is editing the model.')
@@ -78,8 +84,12 @@ class ModelsNamespace(BaseNamespace):
     def on_pass_control(self, new_editor):
         with self.mm.lock:
             self.mm.pass_control(self.user_id, new_editor)
-            self.emit_to_all('roles_changed', self.mm.serialize_user_roles())
+            self.emit_to_all('runtime_changed', self.mm.serialize_runtime())
             self.log('[uid:%s] Control passed.')
+
+    def on_activity(self, active):
+        with self.mm.lock:
+            self.mm.update_activity(self.user_id, active)
 
     def recv_disconnect(self):
         if 'user_id' in self.session:
@@ -108,11 +118,12 @@ class ModelsNamespace(BaseNamespace):
         return self.context.app.pool.get(self.model_id)
 
     def emit_to_all(self, event, *args):
-        self.emit_to_users(self.mm.active_users(), event, *args)
+        user_ids = self.mm.users.keys()
+        self.emit_to_users(user_ids, event, *args)
 
     def emit_to_other(self, event, *args):
-        user_ids = self.mm.active_users() # returns copy of user IDs set.
-        user_ids.remove(self.user_id)
+        users = self.mm.users
+        user_ids = [user_id for user_id in users.keys() if user_id != self.user_id]
         self.emit_to_users(user_ids, event, *args)
 
     def emit_to_users(self, user_ids, event, *args):

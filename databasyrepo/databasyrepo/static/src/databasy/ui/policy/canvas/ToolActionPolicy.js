@@ -10,7 +10,7 @@ databasy.ui.policy.canvas.ToolActionPolicy = draw2d.policy.canvas.CanvasPolicy.e
     },
 
     onMouseUp: function(canvas, x,y) {
-        if (!this.gateway.userRoles.isEditor()) {
+        if (!this.gateway.runtime.isEditor()) {
             return;
         }
         var toolbar = this.gateway.layout.toolbar;

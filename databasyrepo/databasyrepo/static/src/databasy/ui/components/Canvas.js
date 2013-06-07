@@ -62,8 +62,8 @@ databasy.ui.components.Canvas = draw2d.Canvas.extend({
         this._observer.removeListener(listener);
     },
 
-    onUserRolesChanged:function (event) {
-        var editable = event.userRoles.isEditor();
+    onRuntimeChanged:function (event) {
+        var editable = event.runtime.isEditor();
         this.setEditable(editable);
     },
 

@@ -1,4 +1,4 @@
-from databasyrepo.models.core.errors import IllegalCommand, ModelNotFound
+from databasyrepo.models.core.errors import ModelNotFound
 from databasyrepo.models.manager import ModelManager
 from databasyrepo.utils.commons import ReadWriteLock
 
@@ -7,6 +7,7 @@ __author__ = 'Marboni'
 class ModelsPool(object):
     def __init__(self):
         super(ModelsPool, self).__init__()
+
         self._model_managers = {} # IDs and model managers.
         self._lock = ReadWriteLock()
 
@@ -20,7 +21,7 @@ class ModelsPool(object):
 
     def _load(self, model_id):
         # Creating manager and loading model in non-blocking code.
-        mm = ModelManager(model_id)
+        mm = ModelManager(self, model_id)
         mm.reload()
         self._lock.acquire_write()
         try:
@@ -34,7 +35,7 @@ class ModelsPool(object):
     def _create(self, model_id, user_id):
         """ Creates model.
         """
-        mm = ModelManager()
+        mm = ModelManager(self)
         mm.create(model_id, user_id)
         self._lock.acquire_write()
         try:
@@ -62,7 +63,7 @@ class ModelsPool(object):
             except ModelNotFound:
                 mm = self._create(model_id, user_id)
         with mm.lock:
-            mm.add_active_user(user_id, socket)
+            mm.add_user(user_id, socket)
 
     def get(self, model_id):
         mm = self._get(model_id)
@@ -75,8 +76,8 @@ class ModelsPool(object):
         if not mm:
             return
         with mm.lock:
-            mm.remove_active_user(user_id)
-            if not mm.active_users():
+            mm.remove_user(user_id)
+            if not mm.users:
                 self._lock.acquire_write()
                 try:
                     del self._model_managers[model_id]

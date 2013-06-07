@@ -63,8 +63,9 @@ databasy.ui.layout.Layout = Class.extend({
 
     recreateHtml:function() {
         //noinspection JSJQueryEfficiency
-        $('#application').remove();
-        $('body').append('<div id="application"></div>');
+        var body = $('body');
+        body.empty();
+        body.append('<div id="application"></div>');
 
         //noinspection JSJQueryEfficiency
         var application = $('#application');
@@ -100,8 +101,8 @@ databasy.ui.layout.Layout = Class.extend({
         this.layout.children.center.close('south');
     },
 
-    onUserRolesChanged:function(event) {
-        var userRoles = event.userRoles;
+    onRuntimeChanged:function(event) {
+        var userRoles = event.runtime;
         var isEditor = userRoles.isEditor();
 
         if (isEditor) {

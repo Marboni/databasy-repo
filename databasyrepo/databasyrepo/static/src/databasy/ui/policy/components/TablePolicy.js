@@ -10,7 +10,7 @@ databasy.ui.policy.components.TablePolicy = draw2d.policy.figure.RectangleSelect
     },
 
     onDragStart:function (canvas, figure) {
-        if (!this.gateway.userRoles.isEditor()) {
+        if (!this.gateway.runtime.isEditor()) {
             return;
         }
         this._super(canvas, figure);
@@ -18,7 +18,7 @@ databasy.ui.policy.components.TablePolicy = draw2d.policy.figure.RectangleSelect
     },
 
     onDragEnd:function (canvas, figure) {
-        if (!this.gateway.userRoles.isEditor()) {
+        if (!this.gateway.runtime.isEditor()) {
             return;
         }
         this._super(canvas, figure);
@@ -34,7 +34,7 @@ databasy.ui.policy.components.TablePolicy = draw2d.policy.figure.RectangleSelect
     },
 
     adjustPosition:function (figure, x, y) {
-        return this.gateway.userRoles.isEditor() ?
+        return this.gateway.runtime.isEditor() ?
             this._super(figure, x, y) : new draw2d.geo.Point(figure.getX(), figure.getY());
     },
 

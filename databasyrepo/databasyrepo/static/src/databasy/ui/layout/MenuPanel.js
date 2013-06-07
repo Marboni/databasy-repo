@@ -38,15 +38,15 @@ databasy.ui.layout.MenuPanel = Class.extend({
         this.controlStatusMsg.text(this.NOBODY_EDITING_MSG);
     },
     controlButtonClick: function() {
-        if (this.gateway.userRoles.isEditor()) {
+        if (this.gateway.runtime.isEditor()) {
             this.gateway.passControl();
         } else {
             this.gateway.requestControl();
         }
     },
 
-    onUserRolesChanged:function(event) {
-        var userRoles = event.userRoles;
+    onRuntimeChanged:function(event) {
+        var userRoles = event.runtime;
         var isEditor = userRoles.isEditor();
 
         if (isEditor) {

@@ -1,8 +1,8 @@
-databasy.gateway.UserRoles = Class.extend({
-    init:function (userId, serializedRoles) {
+databasy.gateway.Runtime = Class.extend({
+    init:function (userId, serializedRuntime) {
         this.userId = userId;
-        this.activeUsers = serializedRoles['active_users'];
-        this.editor = serializedRoles['editor'];
+        this.users = serializedRuntime['users'];
+        this.editor = serializedRuntime['editor'];
         this.passingControl = false;
         this.requestingControl = false;
     },
