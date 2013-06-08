@@ -40,7 +40,7 @@ def configure_logging(app):
         app.logger.addHandler(stderr_handler)
 
 def create_models_pool(app):
-    app.pool = ModelsPool()
+    app.pool = ModelsPool(app)
 
 def create_app():
     app = Flask('databasyrepo')

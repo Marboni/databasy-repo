@@ -9,7 +9,7 @@ from databasyrepo.utils import dateutils, geventutils
 __author__ = 'Marboni'
 
 ONLINE_TIMEOUT = 10
-ACTIVE_TIMEOUT = 10
+ACTIVE_TIMEOUT = 30
 ONLINE_STATUS_CHECK_PERIOD = 5
 
 MODELS_NS = '/models'
@@ -30,24 +30,20 @@ class ModelManager(object):
         geventutils.schedule(ONLINE_STATUS_CHECK_PERIOD, self.update_users_activity)
 
     def update_users_activity(self):
-        runtime_updated = False
-        offline_users_id = []
+        requires_runtime_emit = False
 
         for user_id in self._runtime.users.keys():
             now = dateutils.now()
             user_info = self._runtime.users[user_id]
 
-            if now - user_info.last_activity > ACTIVE_TIMEOUT * 1000:
-                user_info['active'] = False
-                runtime_updated = True
             if now - user_info.last_online > ONLINE_TIMEOUT * 1000:
-                offline_users_id.append(user_id)
-                runtime_updated = True
+                self.user_socket(user_id).disconnect(silent=True)
+                requires_runtime_emit = False # Disconnect emits runtime itself.
+            elif now - user_info.last_activity > ACTIVE_TIMEOUT * 1000 and user_info['active']:
+                user_info['active'] = False
+                requires_runtime_emit = True
 
-        if runtime_updated:
-            if offline_users_id:
-                for offline_user_id in offline_users_id:
-                    self.pool.disconnect(self.model_id, offline_user_id)
+        if requires_runtime_emit:
             self.emit_runtime()
 
     def create(self, model_id, user_id):
@@ -126,6 +122,10 @@ class ModelManager(object):
     def serialize_runtime(self):
         return dict(self._runtime)
 
+    def log(self, message):
+        self.pool.app.logger.info("[ModelManager:%s] %s" % (self.model_id, message))
+
+
 class Runtime(dict):
     def __init__(self):
         super(Runtime, self).__init__()
@@ -202,12 +202,19 @@ class UserInfo(dict):
     def user_id(self):
         return self['user_id']
 
+    @property
+    def active(self):
+        return self['active']
+
+    @active.setter
+    def active(self, active):
+        self['active'] = active
+
     def update_last_online(self):
         self.last_online = dateutils.now()
 
     def update_last_activity(self):
         self.last_activity = dateutils.now()
-        self['active'] = True
+        if not self.active:
+            self.active = True
 
-    def is_active(self):
-        return self['active']

@@ -5,19 +5,12 @@ from databasyrepo.utils.commons import ReadWriteLock
 __author__ = 'Marboni'
 
 class ModelsPool(object):
-    def __init__(self):
+    def __init__(self, app):
         super(ModelsPool, self).__init__()
 
+        self.app = app
         self._model_managers = {} # IDs and model managers.
         self._lock = ReadWriteLock()
-
-    def _get(self, model_id):
-        self._lock.acquire_read()
-        try:
-            mm = self._model_managers.get(model_id)
-        finally:
-            self._lock.release_read()
-        return mm
 
     def _load(self, model_id):
         # Creating manager and loading model in non-blocking code.
@@ -27,6 +20,7 @@ class ModelsPool(object):
         try:
             # Check again - may be some other thread already loaded it.
             if not self._model_managers.has_key(model_id):
+                self.log('ModelManager:%s was added to the pool.' % model_id)
                 self._model_managers[model_id] = mm
             return self._model_managers[model_id]
         finally:
@@ -42,6 +36,7 @@ class ModelsPool(object):
             # Check again - may be some other thread already loaded it.
             if not self._model_managers.has_key(model_id):
                 self._model_managers[model_id] = mm
+                self.log('ModelManager:%s was added to the pool.' % model_id)
             return self._model_managers[model_id]
         finally:
             self._lock.release_write()
@@ -55,8 +50,16 @@ class ModelsPool(object):
         finally:
             self._lock.release_write()
 
+    def get(self, model_id):
+        self._lock.acquire_read()
+        try:
+            mm = self._model_managers.get(model_id)
+        finally:
+            self._lock.release_read()
+        return mm
+
     def connect(self, model_id, user_id, socket):
-        mm = self._get(model_id)
+        mm = self.get(model_id)
         if not mm:
             try:
                 mm = self._load(model_id)
@@ -65,25 +68,18 @@ class ModelsPool(object):
         with mm.lock:
             mm.add_user(user_id, socket)
 
-    def get(self, model_id):
-        mm = self._get(model_id)
-        if not mm:
-            raise ValueError('Model with ID %s not found in the pool.')
-        return mm
-
     def disconnect(self, model_id, user_id):
-        mm = self._get(model_id)
+        mm = self.get(model_id)
         if not mm:
             return
         with mm.lock:
             mm.remove_user(user_id)
             if not mm.users:
-                self._lock.acquire_write()
-                try:
-                    del self._model_managers[model_id]
-                except KeyError:
-                    pass
-                finally:
-                    self._lock.release_write()
+                self._remove(model_id)
+                self.log('ModelManager:%s had no online users and was removed from the pool.' % model_id)
+
+
+    def log(self, message):
+        self.app.logger.info("[Pool] %s" % message)
 
 

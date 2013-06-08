@@ -35,7 +35,7 @@ class ModelsNamespace(BaseNamespace):
         return ['recv_connect', 'on_enter']
 
     def log(self, message):
-        self.context.app.logger.info("[%s] %s" % (self.socket.sessid, message))
+        self.context.app.logger.info("[SocketSession:%s] %s" % (self.socket.sessid, message))
 
     def on_enter(self, model_id, user_id):
         user_id = long(user_id)
@@ -91,19 +91,19 @@ class ModelsNamespace(BaseNamespace):
         with self.mm.lock:
             self.mm.update_activity(self.user_id, active)
 
-    def recv_disconnect(self):
+    def disconnect(self, *args, **kwargs):
         if 'user_id' in self.session:
             self.context.app.pool.disconnect(self.model_id, self.user_id)
-            self.disconnect(silent=True)
-            self.log('[uid:%s] Disconnected from model %s.' % (self.user_id, self.model_id))
-
-    def disconnect(self, *args, **kwargs):
-        if self.context:
-            try:
-                self.context.pop()
-            except:
-                return
+            if self.mm:
+                # This user was not last, model was not removed from pool.
+                self.mm.emit_runtime()
+            if self.context:
+                try:
+                    self.context.pop()
+                except:
+                    pass
         super(ModelsNamespace, self).disconnect(*args, **kwargs)
+        self.log('[uid:%s] Disconnected from model %s.' % (self.user_id, self.model_id))
 
     @property
     def user_id(self):
