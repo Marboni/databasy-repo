@@ -114,12 +114,17 @@ class CreateTable(Command):
         return validators
 
     def do(self, executor):
-        table = Table()
+        table = Table(self.val('table_id'))
         table.set('name', self.val('name'))
         executor.execute(Register(node=table))
         executor.execute(AppendItem(field='tables', item=table))
 
-        CreateTableRepr(canvas_id=self.val('canvas_id'), table_id=table.id, position=self.val('position')).do(executor)
+        CreateTableRepr(
+            canvas_id=self.val('canvas_id'),
+            table_id=table.id,
+            table_repr_id=self.val('default_table_repr_id'),
+            position=self.val('position')
+        ).do(executor)
 
 
 class CreateTableRepr(Command):
