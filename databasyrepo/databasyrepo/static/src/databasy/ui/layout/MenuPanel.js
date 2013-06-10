@@ -98,7 +98,7 @@ databasy.ui.layout.MenuPanel = Class.extend({
         }
 
         for (var i = 0; i < runtime.applicants.length; i++) {
-            var applicant = runtime.users[runtime.applicants[0]];
+            var applicant = runtime.users[runtime.applicants[i]];
             var applicantId = applicant['user_id'];
 
             var applicantRow = '';
