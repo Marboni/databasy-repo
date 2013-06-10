@@ -8,7 +8,7 @@ from databasyrepo.utils import dateutils, geventutils
 
 __author__ = 'Marboni'
 
-ONLINE_TIMEOUT = 10
+ONLINE_TIMEOUT = 30
 ACTIVE_TIMEOUT = 30
 ONLINE_STATUS_CHECK_PERIOD = 5
 
@@ -19,6 +19,7 @@ class ModelManager(object):
         super(ModelManager, self).__init__()
         self.pool = pool
         self.model_id = model_id
+        self.runtime = None
         self.lock = threading.Lock()
 
     def _check_model(self):
@@ -26,21 +27,29 @@ class ModelManager(object):
             raise ValueError('Manager has no model.')
 
     def _init_runtime(self):
-        self._runtime = Runtime()
+        self.runtime = Runtime()
         geventutils.schedule(ONLINE_STATUS_CHECK_PERIOD, self.update_users_activity)
 
     def update_users_activity(self):
         requires_runtime_emit = False
 
-        for user_id in self._runtime.users.keys():
+        for user_id in self.runtime.users.keys():
             now = dateutils.now()
-            user_info = self._runtime.users[user_id]
+            user_info = self.runtime.users[user_id]
 
             if now - user_info.last_online > ONLINE_TIMEOUT * 1000:
-                self.user_socket(user_id).disconnect(silent=True)
+                # Checking online / offline.
+                self.runtime.user_socket(user_id).disconnect(silent=True)
                 requires_runtime_emit = False # Disconnect emits runtime itself.
-            elif now - user_info.last_activity > ACTIVE_TIMEOUT * 1000 and user_info['active']:
-                user_info['active'] = False
+
+            elif now - user_info.last_activity > ACTIVE_TIMEOUT * 1000 and user_info.active:
+                # Checking activity.
+                user_info.active = False
+                if user_id == self.runtime.editor and self.runtime.applicants:
+                    # Editor is inactive and other users requested control - passing control.
+                    applicant_id = self.runtime.applicants[0]
+                    self.runtime.pass_control(user_id, applicant_id)
+                    self.log('Editor %s is inactive, control passed to user %s.' % (user_id, applicant_id))
                 requires_runtime_emit = True
 
         if requires_runtime_emit:
@@ -86,41 +95,20 @@ class ModelManager(object):
             self.reload()
             raise e
 
-    @property
-    def users(self):
-        """ Returns dict of IDs and UserInfos of active users.
-        """
-        return self._runtime.users
-
-    def user_socket(self, user_id):
-        return self._runtime.user_socket(user_id)
-
-    def add_user(self, user_id, socket):
-        return self._runtime.add_user(user_id, socket)
-
-    def update_activity(self, user_id, activity):
-        return self._runtime.update_activity(user_id, activity)
-
-    def remove_user(self, user_id):
-        return self._runtime.remove_user(user_id)
-
-    def pass_control(self, from_user, to_user):
-        return self._runtime.pass_control(from_user, to_user)
-
     def emit_runtime(self):
         self.emit_to_users('runtime_changed', self.serialize_runtime())
 
     def emit_to_users(self, event, *args):
         pkt = dict(type='event', name=event, args=args, endpoint=MODELS_NS)
-        for user_id in self.users.keys():
-            socket = self.user_socket(user_id)
+        for user_id in self.runtime.users.keys():
+            socket = self.runtime.user_socket(user_id)
             socket.send_packet(pkt)
 
     def serialize_model(self):
         return self._model.serialize_for_client()
 
     def serialize_runtime(self):
-        return dict(self._runtime)
+        return dict(self.runtime)
 
     def log(self, message):
         self.pool.app.logger.info("[ModelManager:%s] %s" % (self.model_id, message))
@@ -131,6 +119,7 @@ class Runtime(dict):
         super(Runtime, self).__init__()
         self['users'] = {}
         self['editor'] = None
+        self['applicants'] = [] # IDs of users that requested control.
 
     @property
     def users(self):
@@ -139,6 +128,10 @@ class Runtime(dict):
     @property
     def editor(self):
         return self['editor']
+
+    @property
+    def applicants(self):
+        return self['applicants']
 
     def add_user(self, user_id, socket):
         # If user reconnects and already exists in list of active users, just update his socket.
@@ -151,10 +144,22 @@ class Runtime(dict):
     def remove_user(self, user_id):
         if not self.users.has_key(user_id):
             raise ValueError('User %s is not online.' % user_id)
-        user_info = self.users[user_id]
-        if self.is_editor(user_info.user_id):
+        if self.is_editor(user_id):
             self.pass_control(user_id, None)
+        elif self.is_applicant(user_id):
+            self.remove_applicant(user_id)
         del self.users[user_id]
+
+    def add_applicant(self, user_id):
+        if user_id not in self['applicants']:
+            self['applicants'].append(user_id)
+
+    def remove_applicant(self, user_id):
+        if user_id in self['applicants']:
+            self['applicants'].remove(user_id)
+
+    def remove_applicants(self):
+        self['applicants'] = []
 
     def update_activity(self, user_id, activity):
         if not self.users.has_key(user_id):
@@ -171,17 +176,21 @@ class Runtime(dict):
                 raise ValueError('User %s is not online.' % from_user_id)
             if not self.is_editor(from_user_id):
                 raise ValueError('User %s is not an editor.' % from_user_id)
-        if to_user_id:
-            to_user = self.users.get(to_user_id)
-            if not to_user:
-                raise ValueError('User %s is not online.' % to_user)
+        if to_user_id and not self.users.get(to_user_id):
+            to_user_id = None
+        if not to_user_id and self.applicants:
+            to_user_id = self.applicants[0]
         if not from_user_id and self.editor:
             return False # User requested control not knowing that other user edits the model.
         self['editor'] = to_user_id
+        self['applicants'] = []
         return True
 
     def is_editor(self, user_id):
         return user_id == self.editor
+
+    def is_applicant(self, user_id):
+        return user_id in self.applicants
 
     def user_socket(self, user_id):
         try:

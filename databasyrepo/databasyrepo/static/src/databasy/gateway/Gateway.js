@@ -39,9 +39,8 @@ databasy.gateway.Gateway = Class.extend({
         databasy.utils.preloader.openPreloader(false);
     },
     on_error:function (e) {
-        var body = $('body');
-        body.empty();
-        body.append('<strong>Error occurred: ' + e.toString() + '</string>')
+        console.log('ERROR: ' + e.toString());
+        this.socket.emit('enter', this.modelId, this.userId);
     },
     on_enter_done:function () {
         this.socket.emit('load');
@@ -77,10 +76,28 @@ databasy.gateway.Gateway = Class.extend({
         this.socket.emit('request_control');
     },
 
-    passControl:function () {
+    passControl:function (toUserId) {
         this.runtime.passControl();
         this.fire(new databasy.gateway.events.RuntimeChanged(this.runtime));
-        this.socket.emit('pass_control', null);
+        this.socket.emit('pass_control', toUserId);
+    },
+
+    /**
+     * Applicant cancels its control request.
+     */
+    cancelControlRequest: function() {
+        this.runtime.cancelControlRequest();
+        this.fire(new databasy.gateway.events.RuntimeChanged(this.runtime));
+        this.socket.emit('cancel_control_request');
+    },
+
+    /**
+     * Editor rejects control requests.
+     */
+    rejectControlRequests: function() {
+        this.runtime.rejectControlRequests();
+        this.fire(new databasy.gateway.events.RuntimeChanged(this.runtime));
+        this.socket.emit('reject_control_requests');
     },
 
     initializeModel:function (serializedModel) {

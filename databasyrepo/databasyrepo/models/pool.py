@@ -66,15 +66,15 @@ class ModelsPool(object):
             except ModelNotFound:
                 mm = self._create(model_id, user_id)
         with mm.lock:
-            mm.add_user(user_id, socket)
+            mm.runtime.add_user(user_id, socket)
 
     def disconnect(self, model_id, user_id):
         mm = self.get(model_id)
         if not mm:
             return
         with mm.lock:
-            mm.remove_user(user_id)
-            if not mm.users:
+            mm.runtime.remove_user(user_id)
+            if not mm.runtime.users:
                 self._remove(model_id)
                 self.log('ModelManager:%s had no online users and was removed from the pool.' % model_id)
 

@@ -1,0 +1,26 @@
+#toolbar.ui-layout-pane {
+    padding: 0 !important;
+}
+
+#toolbar .ui-button .ui-icon {
+    width: 32px;
+    height: 32px;
+    margin-left: -16px;
+    margin-top: -16px;
+}
+
+#toolbar .ui-button .ui-icon.ui-icon-pointer {
+    background-image: url(pointer.png);
+}
+
+#toolbar .ui-button .ui-icon.ui-icon-table {
+    background-image: url(table.png);
+}
+
+#toolbar .ui-button-text {
+    font-size: .9em !important;
+}
+
+#toolPanel {
+    margin: 0 2px;
+}

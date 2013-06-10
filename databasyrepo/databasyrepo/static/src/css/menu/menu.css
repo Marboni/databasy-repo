@@ -1,0 +1,29 @@
+#controlPanel {
+    float: right;
+}
+
+#controlButton {
+    width: 150px;
+}
+
+#controlStatusMsg {
+    text-align: center;
+    margin: 0.3em 0 0;
+}
+
+#controlPassDialog {
+    padding: 0 0.5em;
+    font-size: 1em;
+}
+
+#controlPassDialog table {
+    border: none;
+}
+
+#controlPassDialog .notNowRow {
+    line-height: 2.5em;
+}
+
+#controlPassDialog .notNow {
+    color: red;
+}
