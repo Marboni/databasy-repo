@@ -45,6 +45,7 @@ databasy.ui.layout.Toolbar = Class.extend({
                     that._currentTool = tool;
                 }
             });
+        button.css({width: '40px', 'padding-top': '5px', 'padding-bottom': '5px'});
         return button;
     },
     select:function(tool) {

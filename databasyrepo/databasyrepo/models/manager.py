@@ -11,7 +11,7 @@ __author__ = 'Marboni'
 MODELS_NS = '/models'
 
 class ModelManager(object):
-    ONLINE_TIMEOUT = 30
+    ONLINE_TIMEOUT = 10
     ACTIVE_TIMEOUT = 30
     ONLINE_STATUS_CHECK_PERIOD = 5
 
