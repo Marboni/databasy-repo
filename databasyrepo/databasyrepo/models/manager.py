@@ -8,13 +8,13 @@ from databasyrepo.utils import dateutils, geventutils
 
 __author__ = 'Marboni'
 
-ONLINE_TIMEOUT = 30
-ACTIVE_TIMEOUT = 30
-ONLINE_STATUS_CHECK_PERIOD = 5
-
 MODELS_NS = '/models'
 
 class ModelManager(object):
+    ONLINE_TIMEOUT = 30
+    ACTIVE_TIMEOUT = 30
+    ONLINE_STATUS_CHECK_PERIOD = 5
+
     def __init__(self, pool, model_id=None):
         super(ModelManager, self).__init__()
         self.pool = pool
@@ -28,7 +28,7 @@ class ModelManager(object):
 
     def _init_runtime(self):
         self.runtime = Runtime()
-        geventutils.schedule(ONLINE_STATUS_CHECK_PERIOD, self.update_users_activity)
+        geventutils.schedule(self.ONLINE_STATUS_CHECK_PERIOD, self.update_users_activity)
 
     def update_users_activity(self):
         requires_runtime_emit = False
@@ -37,12 +37,12 @@ class ModelManager(object):
             now = dateutils.now()
             user_info = self.runtime.users[user_id]
 
-            if now - user_info.last_online > ONLINE_TIMEOUT * 1000:
+            if now - user_info.last_online > self.ONLINE_TIMEOUT * 1000:
                 # Checking online / offline.
                 self.runtime.user_socket(user_id).disconnect(silent=True)
                 requires_runtime_emit = False # Disconnect emits runtime itself.
 
-            elif now - user_info.last_activity > ACTIVE_TIMEOUT * 1000 and user_info.active:
+            elif now - user_info.last_activity > self.ACTIVE_TIMEOUT * 1000 and user_info.active:
                 # Checking activity.
                 user_info.active = False
                 if user_id == self.runtime.editor and self.runtime.applicants:
@@ -186,11 +186,14 @@ class Runtime(dict):
         self['applicants'] = []
         return True
 
-    def is_editor(self, user_id):
-        return user_id == self.editor
+    def is_online(self, user_id):
+        return user_id in self.users
 
     def is_applicant(self, user_id):
         return user_id in self.applicants
+
+    def is_editor(self, user_id):
+        return user_id == self.editor
 
     def user_socket(self, user_id):
         try:

@@ -1,5 +1,6 @@
 from unittest import TestCase
-from databasyrepo.models.manager import Runtime
+import time
+from databasyrepo.models.manager import Runtime, ModelManager
 
 __author__ = 'Marboni'
 
@@ -69,6 +70,85 @@ class RuntimeTest(TestCase):
         self.assertIsNotNone(user_info.last_online)
         self.assertIsNotNone(user_info.last_online)
         self.assertTrue(user_info.active)
+
+    def _MM(self):
+        mm = ModelManager(None, None)
+
+        mm.runtime_emitted = False
+        mm.runtime = Runtime()
+        mm.log = lambda message: None
+
+        mm.ONLINE_TIMEOUT = 0.3
+        mm.ACTIVE_TIMEOUT = 0.2
+        mm.ONLINE_STATUS_CHECK_PERIOD = 0.05
+
+        def emit_runtime_stub():
+            mm.runtime_emitted = True
+        mm.emit_runtime = emit_runtime_stub
+
+        def user_socket_stub(user_id):
+            class SocketStub:
+                def disconnect(self, **kwargs):
+                    mm.runtime.remove_user(user_id)
+                    mm.runtime_emitted = True
+            return SocketStub()
+        mm.runtime.user_socket = user_socket_stub
+
+        return mm
+
+    #noinspection PyUnresolvedReferences
+    def test_update_users_activity(self):
+        # Disconnect by timeout
+        mm = self._MM()
+        mm.runtime.add_user(1L, 'S1')
+        self.assertTrue(mm.runtime.is_online(1L))
+        time.sleep(0.35)
+        mm.update_users_activity()
+        self.assertFalse(mm.runtime.is_online(1L))
+        self.assertTrue(mm.runtime_emitted)
+
+        # Passing control from inactive editor to applicant.
+        mm = self._MM()
+        mm.runtime.add_user(1L, 'S1')
+        mm.runtime.add_user(2L, 'S2')
+
+        mm.runtime.pass_control(None, 1L)
+        mm.runtime.add_applicant(2L)
+
+        self.assertTrue(mm.runtime.is_editor(1L))
+        self.assertTrue(mm.runtime.is_applicant(2L))
+
+        time.sleep(0.25)
+        mm.update_users_activity()
+
+        self.assertTrue(mm.runtime.is_online(1L))
+        self.assertTrue(mm.runtime.is_online(2L))
+
+        self.assertFalse(mm.runtime.is_editor(1L))
+        self.assertTrue(mm.runtime.is_editor(2L))
+
+        self.assertFalse(mm.runtime.applicants)
+
+        self.assertTrue(mm.runtime_emitted)
+
+        # Editor is inactive, but nobody requests control.
+        mm = self._MM()
+        mm.runtime.add_user(1L, 'S1')
+        mm.runtime.add_user(2L, 'S2')
+
+        mm.runtime.pass_control(None, 1L)
+
+        self.assertTrue(mm.runtime.users[1L].active)
+        self.assertTrue(mm.runtime.is_editor(1L))
+
+        time.sleep(0.25)
+        mm.update_users_activity()
+
+        self.assertFalse(mm.runtime.users[1L].active)
+        self.assertTrue(mm.runtime.is_editor(1L))
+
+
+
 
 
 
