@@ -11,7 +11,9 @@ databasy.gateway.Gateway = Class.extend({
     },
 
     createSocket:function () {
-        var socket = io.connect('/models');
+        var socket = io.connect('/models', {
+            'reconnection limit': 4000
+        });
 
         $(window).bind('beforeunload', function() {
             socket.disconnect();
