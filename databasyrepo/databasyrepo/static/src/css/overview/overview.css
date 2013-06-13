@@ -1,3 +1,11 @@
 #overviewPanel.ui-layout-pane {
     padding: 0 !important;
 }
+
+#schemaTreePanel {
+    padding-top: 0.2em;
+}
+
+#schemaTree {
+    background: none;
+}
