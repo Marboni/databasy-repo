@@ -60,8 +60,7 @@ databasy.ui.layout.overview.SchemaTreePanel = Class.extend({
 
         var tables = this.gateway.model.val_as_node('tables', this.gateway.model);
         $.each(tables, function (index, table) {
-            var tableNode = that.tableToNode(table);
-            
+            that.createTableNode(table);
         });
         
         this.schemaTree.find('li').on('dblclick', function () {
@@ -120,7 +119,7 @@ databasy.ui.layout.overview.SchemaTreePanel = Class.extend({
         };
     },
 
-    tableToNode:function (table) {
+    createTableNode:function (table) {
         var tableId = table.id();
         var tableName = table.val('name');
         var tableNode = {
@@ -143,8 +142,7 @@ databasy.ui.layout.overview.SchemaTreePanel = Class.extend({
             modelEvent.val('field') === 'tables') {
             // Table inserted to the model.
             var table = modelEvent.val('item');
-            var tableNode = this.tableToNode(table);
-            this.schemaTree.jstree('create', '#schemaTreeTables', 'last', tableNode, false, true);
+            this.createTableNode(table);
         }
     }
 });
