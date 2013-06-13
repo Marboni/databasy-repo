@@ -57,6 +57,13 @@ databasy.ui.layout.overview.SchemaTreePanel = Class.extend({
 
     initSchemaTree:function() {
         var that = this;
+
+        var tables = this.gateway.model.val_as_node('tables', this.gateway.model);
+        $.each(tables, function (index, table) {
+            var tableNode = that.tableToNode(table);
+            
+        });
+        
         this.schemaTree.find('li').on('dblclick', function () {
             if (!that.schemaTree.jstree('is_leaf', this)) {
                 that.schemaTree.jstree('toggle_node', this);
@@ -98,7 +105,7 @@ databasy.ui.layout.overview.SchemaTreePanel = Class.extend({
             ]
         };
 
-        var rootNode = {
+        return {
             data:'Schema',
             attr:{
                 id:'schemaTreeRoot',
@@ -111,20 +118,12 @@ databasy.ui.layout.overview.SchemaTreePanel = Class.extend({
                 viewsNode
             ]
         };
-
-        var that = this;
-        var tables = this.gateway.model.val_as_node('tables', this.gateway.model);
-        $.each(tables, function (index, table) {
-            tablesNode.children.push(that.tableToNode(table));
-        });
-
-        return rootNode;
     },
 
     tableToNode:function (table) {
         var tableId = table.id();
         var tableName = table.val('name');
-        return {
+        var tableNode = {
             data:{
                 title:tableName
             },
@@ -134,6 +133,7 @@ databasy.ui.layout.overview.SchemaTreePanel = Class.extend({
             },
             children:null
         };
+        this.schemaTree.jstree('create', '#schemaTreeTables', 'last', tableNode, false, true);
     },
 
     onModelChanged:function (event) {
