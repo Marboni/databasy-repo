@@ -13,39 +13,55 @@ databasy.ui.layout.overview.SchemaTreePanel = Class.extend({
     },
 
     createSchemaTree:function () {
+        var that = this;
+
         this.schemaTree = $('<div id="schemaTree"></div>');
         this.schemaTreePanel.append(this.schemaTree);
 
         var initialTree = this.modelToNode();
 
-        this.schemaTree.jstree({
-            plugins:['themes', 'json_data', 'ui', 'crrm', 'sort', 'types'],
-            initially_open:['schemaTreeRoot'],
-            core:{
-                animation:0
-            },
-            themes:{
-                theme:'default',
-                dots:false
-            },
-            json_data:{
-                data:initialTree
-            },
-            sort:this.compareNodes,
-            types:{
+        this.schemaTree
+            .bind("loaded.jstree", function (event, data) {
+                that.initSchemaTree();
+            })
+            .jstree({
+                plugins:['themes', 'json_data', 'ui', 'crrm', 'sort', 'types'],
+                initially_open:['schemaTreeRoot'],
+                core:{
+                    animation:0
+                },
+                themes:{
+                    theme:'default',
+                    dots:false
+                },
+                json_data:{
+                    data:initialTree
+                },
+                sort:this.compareNodes,
                 types:{
-                    schema:{
-                        icon:{
-                            image:'/static/src/css/overview/schema.png'
-                        }
-                    },
-                    table:{
-                        icon:{
-                            image:'/static/src/css/overview/table.png'
+                    types:{
+                        schema:{
+                            icon:{
+                                image:'/static/src/css/overview/schema.png'
+                            }
+                        },
+                        table:{
+                            icon:{
+                                image:'/static/src/css/overview/table.png'
+                            }
                         }
                     }
                 }
+            });
+    },
+
+    initSchemaTree:function() {
+        var that = this;
+        this.schemaTree.find('li').on('dblclick', function () {
+            if (!that.schemaTree.jstree('is_leaf', this)) {
+                that.schemaTree.jstree('toggle_node', this);
             }
+            return false;
         });
     },
 
@@ -86,6 +102,7 @@ databasy.ui.layout.overview.SchemaTreePanel = Class.extend({
             data:'Schema',
             attr:{
                 id:'schemaTreeRoot',
+                class:'openOnDblClick',
                 rel:'schema'
             },
             state:'open',
