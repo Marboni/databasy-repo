@@ -23,6 +23,7 @@ var databasy = {
     },
     ui: {
         layout: {
+            overview: {}
         },
         locators: {},
         components: {},

@@ -10,6 +10,7 @@ databasy.ui.layout.Layout = Class.extend({
         this.menuPanel = new databasy.ui.layout.MenuPanel(this.gateway);
         this.toolbar = new databasy.ui.layout.Toolbar(this.gateway);
         this.propertyPanel = new databasy.ui.layout.PropertyPanel(this.gateway, this);
+        this.overviewPanel = new databasy.ui.layout.overview.OverviewPanel(this.gateway);
     },
 
     createLayout:function () {
@@ -32,7 +33,7 @@ databasy.ui.layout.Layout = Class.extend({
                 closable:true
             },
             west:{
-                paneSelector:'#treePanel',
+                paneSelector:'#overviewPanel',
                 closable:true
             },
             center:{
@@ -72,7 +73,7 @@ databasy.ui.layout.Layout = Class.extend({
 
         application.append('<div id="menuPanel"></div>');
         application.append('<div id="chatPanel"></div>');
-        application.append('<div id="treePanel"></div>');
+        application.append('<div id="overviewPanel"></div>');
         application.append('<div id="contentPanel"></div>');
 
         var contentPanel = $('#contentPanel');
