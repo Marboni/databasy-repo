@@ -28,7 +28,7 @@ databasy.ui.components.Table = draw2d.shape.basic.Rectangle.extend({
         canvas.addFigure(this, position[0], position[1]);
     },
     onDoubleClick:function () {
-        this.canvas.fire(new databasy.ui.events.ComponentDblClicked(this));
+        this.gateway.layout.propertyPanel.refreshProperties(this.table);
     },
     onModelChanged:function (event) {
         var modelEvent = event.modelEvent;

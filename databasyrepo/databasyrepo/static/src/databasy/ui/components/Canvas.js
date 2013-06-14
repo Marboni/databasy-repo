@@ -11,7 +11,6 @@ databasy.ui.components.Canvas = draw2d.Canvas.extend({
         var model = this.gateway.model;
         this.canvasNode = model.val_as_node('canvases', model)[0];
 
-        this._observer = new databasy.utils.events.Observer();
         this._componentsByReprId = {};
         this._componentsByElementId = {};
 
@@ -90,18 +89,6 @@ databasy.ui.components.Canvas = draw2d.Canvas.extend({
         var centerX = component.x + component.width / 2;
         var centerY = component.y + component.height / 2;
         this.scrollTo(centerX, centerY);
-    },
-
-    fire:function(event) {
-        this._observer.fire(event);
-    },
-
-    addListener:function(listener) {
-        this._observer.addListener(listener);
-    },
-
-    removeListener:function(listener) {
-        this._observer.removeListener(listener);
     },
 
     onRuntimeChanged:function (event) {

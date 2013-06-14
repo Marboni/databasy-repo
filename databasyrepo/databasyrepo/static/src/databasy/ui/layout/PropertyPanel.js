@@ -2,30 +2,21 @@ databasy.ui.layout.PropertyPanel = Class.extend({
     init:function (gateway, layout) {
         this.gateway = gateway;
         this.layout = layout;
-        this.currentComponent = null;
 
         this.propertyPanel = $('#propertyPanel');
-
-        layout.canvas.addListener(this);
     },
 
-    onComponentDblClicked: function(event) {
-        this.layout.openPropertyPanel();
-
-        var component = event.component;
-        if (this.currentComponent === component) {
-            return;
-        }
-        this.currentComponent = component;
-
+    refreshProperties: function(element) {
         this.propertyPanel.empty();
-        if (component instanceof databasy.ui.components.Table) {
-            this.createTableProperties();
+
+        if (element instanceof databasy.model.core.elements.Table) {
+            this.createTableProperties(element);
         }
+
+        this.layout.openPropertyPanel();
     },
 
-    createTableProperties:function() {
-        var table = this.currentComponent.table;
+    createTableProperties:function(table) {
         this.propertyPanel.append('<h2>' + table.val('name') + '</h2>');
     }
 });

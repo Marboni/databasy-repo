@@ -15,6 +15,7 @@ databasy.ui.layout.Layout = Class.extend({
 
     createLayout:function () {
         var defaults = {
+            fxName: 'none',
             resizable:false,
             closable:false,
             spacing_open:5,
@@ -43,6 +44,7 @@ databasy.ui.layout.Layout = Class.extend({
                     defaults:defaults,
                     west:{
                         paneSelector:"#toolbar",
+                        fxName: 'slide',
                         initClosed: true,
                         size:47,
                         spacing_open:0,
@@ -54,6 +56,7 @@ databasy.ui.layout.Layout = Class.extend({
                     },
                     south: {
                         paneSelector:"#propertyPanel",
+                        size:150,
                         initClosed: true,
                         closable:true
                     }

@@ -73,10 +73,15 @@ databasy.ui.layout.overview.SchemaTreePanel = Class.extend({
                 that.schemaTree.jstree('toggle_node', this);
             }
             var elementId = $(this).attr('elementId');
+            var element = that.gateway.model.node(elementId);
+
             if (elementId !== undefined) {
                 var canvas = that.gateway.layout.canvas;
+                var propertyPanel = that.gateway.layout.propertyPanel;
+
                 var component = canvas.componentByElementId(elementId);
                 if (component !== undefined) {
+                    propertyPanel.refreshProperties(element);
                     canvas.scrollToComponent(component);
                 }
             }
