@@ -9,7 +9,11 @@ databasy.model.core.reprs.Canvas = databasy.model.core.nodes.Node.extend({
     CODE:'core.reprs.Canvas'
 });
 
-databasy.model.core.reprs.Repr = databasy.model.core.nodes.Node.extend({});
+databasy.model.core.reprs.Repr = databasy.model.core.nodes.Node.extend({
+    elementId:function() {
+        throw new Error('Not implemented');
+    }
+});
 
 databasy.model.core.reprs.TableRepr = databasy.model.core.reprs.Repr.extend({
     fields:function() {
@@ -17,6 +21,9 @@ databasy.model.core.reprs.TableRepr = databasy.model.core.reprs.Repr.extend({
             'table',
             'position'
         )
+    },
+    elementId: function() {
+        return this.val('table').val('ref_id');
     }
 }, {
     CODE:'core.reprs.TableRepr'

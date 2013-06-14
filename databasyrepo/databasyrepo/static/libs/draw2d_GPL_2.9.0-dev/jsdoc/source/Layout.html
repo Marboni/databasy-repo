@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js">
+<span id='draw2d-shape-layout-Layout'>/**
+</span> * @class draw2d.shape.layout.Layout
+ * 
+ * A base class for positioning child figures and determining the ideal size for 
+ * a figure with children. 
+ * 
+ *     
+ * @author Andreas Herz
+ * @extends draw2d.shape.basic.Rectangle
+ */
+draw2d.shape.layout.Layout= draw2d.shape.basic.Rectangle.extend({
+
+	NAME : &quot;draw2d.shape.layout.Layout&quot;,
+
+<span id='draw2d-shape-layout-Layout-method-constructor'>    /**
+</span>     * @constructor
+     * 
+     * 
+     */
+    init : function()
+    {
+        this._super();
+         
+        this.setBackgroundColor(null);
+        this.setRadius(0);
+        this.setStroke(0);
+        this.installEditPolicy(new draw2d.policy.figure.AntSelectionFeedbackPolicy());
+    },
+    
+    
+    addFigure : function(child, locator)
+    {
+       this._super(child, this.locator);
+       child.attachResizeListener(this);
+    },
+    
+    
+    onOtherFigureIsResizing:function(figure)
+    {
+        // propagate the event to the parent or other listener if existing
+        //
+        if(this.getParent() instanceof draw2d.shape.layout.Layout){
+            this.fireResizeEvent();
+        }
+        // or we are the parent and must consume it self
+        else {
+            this.setDimension(1,1);
+        }
+    },
+    
+
+    onDoubleClick:function(angle)
+    {
+    	// ignore them for the layout elements
+        // Layout's can't rotate
+    }
+    
+});
+
+
+
+</pre>
+</body>
+</html>

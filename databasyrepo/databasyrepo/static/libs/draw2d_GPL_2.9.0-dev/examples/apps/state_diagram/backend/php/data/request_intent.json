@@ -1,0 +1,121 @@
+[
+  {
+    "type": "draw2d.shape.state.Start",
+    "id": "dc1a0681-a414-e274-d38a-89c02d879481",
+    "x": 350,
+    "y": 51,
+    "width": 50,
+    "height": 50,
+    "userData": null
+  },
+  {
+    "type": "example.shape.Activity",
+    "id": "3c37bd14-3197-bb98-349b-1350a07fba84",
+    "x": 317,
+    "y": 169,
+    "width": 127,
+    "height": 52.84375,
+    "userData": {
+      "activity": "IntentRequestForDay",
+      "mapping": [
+        {
+          "activityParameter": "requestedDay",
+          "contextVariable": "when"
+        }
+      ]
+    },
+    "radius": 5,
+    "label": "Activity"
+  },
+  {
+    "type": "example.shape.Activity",
+    "id": "30a4e7cd-5ca5-f62c-696f-677c7d91bfcf",
+    "x": 542,
+    "y": 281,
+    "width": 176,
+    "height": 52.84375,
+    "userData": {
+      "activity": "IntentDeleteFromListInContext",
+      "mapping": [
+        {
+          "activityParameter": "indexOfIntent",
+          "contextVariable": "indexToDelete"
+        }
+      ]
+    },
+    "radius": 5,
+    "label": "Delete Intent with index"
+  },
+  {
+    "type": "example.shape.Connection",
+    "id": "b708489f-958e-034b-1e03-6db172c124ac",
+    "userData": [
+      {
+        "regexpr": "(?:habe ich ){0,1}(.*) eine fah.*",
+        "defaultAnswer": "Ich konnte keine Fahrt für diesen Tag finden",
+        "test": "habe ich am freitag eine fahrt",
+        "mapping": [
+          {
+            "variable": "when"
+          },
+          {}
+        ]
+      },
+      {
+        "regexpr": null,
+        "defaultAnswer": null,
+        "test": null,
+        "mapping": null
+      }
+    ],
+    "cssClass": "stroke",
+    "stroke": 2,
+    "color": "#303030",
+    "source": {
+      "node": "dc1a0681-a414-e274-d38a-89c02d879481",
+      "port": "output0"
+    },
+    "target": {
+      "node": "3c37bd14-3197-bb98-349b-1350a07fba84",
+      "port": "hybrid0"
+    },
+    "router": "draw2d.layout.connection.FanConnectionRouter",
+    "label": null
+  },
+  {
+    "type": "example.shape.Connection",
+    "id": "1f467f61-2f2e-906b-4043-dcd682de68c9",
+    "userData": [
+      {
+        "regexpr": "lösche (?:den|die) ([1-9])[.,!]*",
+        "defaultAnswer": "",
+        "test": "lösche die 1.",
+        "mapping": [
+          {
+            "variable": "indexToDelete"
+          },
+          {}
+        ]
+      },
+      {
+        "regexpr": null,
+        "defaultAnswer": null,
+        "test": null,
+        "mapping": null
+      }
+    ],
+    "cssClass": "stroke",
+    "stroke": 2,
+    "color": "#303030",
+    "source": {
+      "node": "3c37bd14-3197-bb98-349b-1350a07fba84",
+      "port": "hybrid0"
+    },
+    "target": {
+      "node": "30a4e7cd-5ca5-f62c-696f-677c7d91bfcf",
+      "port": "hybrid0"
+    },
+    "router": "draw2d.layout.connection.FanConnectionRouter",
+    "label": null
+  }
+]

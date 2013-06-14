@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js">
+<span id='draw2d-shape-basic-Image'>/**
+</span> * @class draw2d.shape.basic.Image
+ * Simple Image shape.
+ * 
+ * @inheritable
+ * @author Andreas Herz
+ * @extends draw2d.shape.node.Node
+ */
+draw2d.shape.basic.Image = draw2d.shape.node.Node.extend({
+    NAME : &quot;draw2d.shape.basic.Image&quot;,
+
+<span id='draw2d-shape-basic-Image-method-constructor'>    /**
+</span>     * @constructor
+     * Creates a new figure element which are not assigned to any canvas.
+     * 
+     * @param {Number} path relative or absolute path of the image
+     * @param {Number} width initial width of the shape
+     * @param {Number} height initial height of the shape
+     */
+    init : function(path,  width, height)
+    {
+        this.path = path;
+        this._super(width, height);
+    },
+      
+
+<span id='draw2d-shape-basic-Image-method-setPath'>    /**
+</span>     * @method
+     * Set the image path attribute of the Image shape and repaint them.
+     * The path can be relative or absolute
+     * 
+     * @param path
+     * @since 2.8.0
+     */
+    setPath: function(path){
+        this.path = path;
+        this.repaint();
+        
+        return this;
+    },
+    
+<span id='draw2d-shape-basic-Image-method-getPath'>    /**
+</span>     * @method
+     * Return the image path attribute of the shape.
+     * 
+     * @returns {String}
+     * @since 2.8.0
+     */
+    getPath: function(){
+        return this.path;
+    },
+    
+<span id='draw2d-shape-basic-Image-method-repaint'>   /**
+</span>    * @method
+    * propagate all attributes like color, stroke,... to the shape element
+    **/
+    repaint : function(attributes)
+    {
+        if (this.repaintBlocked===true || this.shape === null){
+            return;
+        }
+
+        if(typeof attributes === &quot;undefined&quot; ){
+            attributes = {};
+        }
+
+        attributes.x = this.getAbsoluteX();
+        attributes.y = this.getAbsoluteY();
+        attributes.width = this.getWidth();
+        attributes.height = this.getHeight();
+        attributes.src = this.path;
+        
+        this._super(attributes);
+    },
+
+<span id='draw2d-shape-basic-Image-method-createShapeElement'>    /**
+</span>     * @method
+     * 
+     * @inheritdoc
+     */
+    createShapeElement : function()
+    {
+       return this.canvas.paper.image(this.path,this.getX(),this.getY(),this.getWidth(), this.getHeight());
+    },
+    
+
+<span id='draw2d-shape-basic-Image-method-getPersistentAttributes'>    /**
+</span>     * @method 
+     * Return an objects with all important attributes for XML or JSON serialization
+     * 
+     * @returns {Object}
+     */
+    getPersistentAttributes : function()
+    {
+        var memento = this._super();
+        
+        memento.path = this.path;
+        
+        return memento;
+    },
+    
+<span id='draw2d-shape-basic-Image-method-setPersistentAttributes'>    /**
+</span>     * @method 
+     * Read all attributes from the serialized properties and transfer them into the shape.
+     * 
+     * @param {Object} memento
+     * @returns 
+     */
+    setPersistentAttributes : function(memento)
+    {
+        this._super(memento);
+        if(typeof memento.path !==&quot;undefined&quot;){
+            this.setPath(memento.path);
+        }
+    }
+
+});
+
+</pre>
+</body>
+</html>

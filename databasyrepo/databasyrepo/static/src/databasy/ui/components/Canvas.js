@@ -12,6 +12,8 @@ databasy.ui.components.Canvas = draw2d.Canvas.extend({
         this.canvasNode = model.val_as_node('canvases', model)[0];
 
         this._observer = new databasy.utils.events.Observer();
+        this._componentsByReprId = {};
+        this._componentsByElementId = {};
 
         this.setEditable(false);
         this.initComponents();
@@ -28,17 +30,28 @@ databasy.ui.components.Canvas = draw2d.Canvas.extend({
     },
 
     drawComponent:function (repr) {
+        var drawFunction;
         var reprCode = repr.code();
+
         if (reprCode === databasy.model.core.reprs.TableRepr.CODE) {
-            this.drawTable(repr);
+            drawFunction = this.drawTable;
         } else {
             throw Error('Unknown reprCode ' + reprCode);
+        }
+        //noinspection UnnecessaryLocalVariableJS
+        var component = drawFunction.call(this, repr);
+
+        this._componentsByReprId[repr.id()] = component;
+        var elementId = repr.elementId();
+        if (elementId !== null) {
+            this._componentsByElementId[elementId] = component;
         }
     },
 
     drawTable:function (repr) {
         var component = new databasy.ui.components.Table(this.gateway, repr);
         component.draw(this);
+        return component;
     },
 
     setEditable:function (editable) {
@@ -48,6 +61,35 @@ databasy.ui.components.Canvas = draw2d.Canvas.extend({
         } else {
             canvasPane.addClass('readonly');
         }
+    },
+
+    componentByReprId:function(reprId) {
+        return this._componentsByReprId[reprId];
+    },
+
+    componentByElementId:function(elementId) {
+        return this._componentsByElementId[elementId];
+    },
+
+    scrollTo:function(centerX, centerY) {
+        var viewport = this.getScrollArea().parent();
+        var w = viewport.width();
+        var h = viewport.height();
+
+        var left = centerX - w / 2;
+        if (left < 0) {left = 0;}
+
+        var top = centerY - h / 2;
+        if (top < 0) {top = 0;}
+
+        viewport.scrollTop(top);
+        viewport.scrollLeft(left)
+    },
+
+    scrollToComponent:function(component) {
+        var centerX = component.x + component.width / 2;
+        var centerY = component.y + component.height / 2;
+        this.scrollTo(centerX, centerY);
     },
 
     fire:function(event) {

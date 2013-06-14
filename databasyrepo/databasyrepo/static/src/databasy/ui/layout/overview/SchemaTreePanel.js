@@ -59,13 +59,26 @@ databasy.ui.layout.overview.SchemaTreePanel = Class.extend({
         var that = this;
 
         var tables = this.gateway.model.val_as_node('tables', this.gateway.model);
-        $.each(tables, function (index, table) {
-            that.createTableNode(table);
-        });
+        if (tables.length > 0) {
+            $.each(tables, function (index, table) {
+                that.createTableNode(table);
+            });
+            that.schemaTree.jstree('open_node', '#schemaTreeTables');
+        }
+
         
         this.schemaTree.find('li').on('dblclick', function () {
+            // Open/close node on double click.
             if (!that.schemaTree.jstree('is_leaf', this)) {
                 that.schemaTree.jstree('toggle_node', this);
+            }
+            var elementId = $(this).attr('elementId');
+            if (elementId !== undefined) {
+                var canvas = that.gateway.layout.canvas;
+                var component = canvas.componentByElementId(elementId);
+                if (component !== undefined) {
+                    canvas.scrollToComponent(component);
+                }
             }
             return false;
         });
@@ -86,7 +99,6 @@ databasy.ui.layout.overview.SchemaTreePanel = Class.extend({
                 class:'notSortable',
                 rel:'dir'
             },
-            state:'open',
             children:[
 
             ]
@@ -127,7 +139,7 @@ databasy.ui.layout.overview.SchemaTreePanel = Class.extend({
                 title:tableName
             },
             attr:{
-                id:'schemaTreeTable_' + tableId,
+                elementId:tableId,
                 rel:'table'
             },
             children:null
