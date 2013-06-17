@@ -1,5 +1,6 @@
 @import "basic.css";
-@import "canvas/canvas.css";
-@import "menu/menu.css";
-@import "toolbar/toolbar.css";
-@import "overview/overview.css";
+@import "canvas.css";
+@import "menu.css";
+@import "toolbar.css";
+@import "overview.css";
+@import "property.css";

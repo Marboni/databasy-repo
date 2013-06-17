@@ -17,9 +17,11 @@ databasy.model.core.models.Model = databasy.model.core.nodes.Node.extend({
         )
     },
     commands:function () {
+        var coreCommands = databasy.model.core.commands;
         return [
-            databasy.model.core.commands.CreateTable,
-            databasy.model.core.commands.MoveTableRepr
+            coreCommands.CreateTable,
+            coreCommands.RenameTable,
+            coreCommands.MoveTableRepr
         ]
     },
     checkers:function () {

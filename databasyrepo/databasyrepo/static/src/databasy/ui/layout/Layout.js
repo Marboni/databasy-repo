@@ -9,7 +9,7 @@ databasy.ui.layout.Layout = Class.extend({
         this.canvas = new databasy.ui.components.Canvas(this.gateway, 'canvas');
         this.menuPanel = new databasy.ui.layout.MenuPanel(this.gateway);
         this.toolbar = new databasy.ui.layout.Toolbar(this.gateway);
-        this.propertyPanel = new databasy.ui.layout.PropertyPanel(this.gateway, this);
+        this.propertyPanel = new databasy.ui.layout.property.PropertyPanel(this.gateway, this);
         this.overviewPanel = new databasy.ui.layout.overview.OverviewPanel(this.gateway);
     },
 

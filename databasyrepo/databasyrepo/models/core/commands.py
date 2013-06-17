@@ -61,7 +61,7 @@ class HistoryCommand(Command):
 
     def validate_predicates(self, model):
         super(HistoryCommand, self).validate_predicates(model)
-        client_version = self['source_version']
+        client_version = self.val('source_version')
         server_version = model.version
         if client_version != server_version:
             raise IllegalCommand('Client model version %s not equals to server model version %s.' % (client_version, server_version))
@@ -89,6 +89,8 @@ class Redo(HistoryCommand):
         actions = executor.model.revision_stack.redo()
         for action in actions:
             executor.execute(action)
+
+# =================== TABLE ===================
 
 class CreateTable(Command):
     def fields(self):
@@ -127,6 +129,28 @@ class CreateTable(Command):
         ).do(executor)
 
 
+class RenameTable(Command):
+    def fields(self):
+        fields = super(RenameTable, self).fields()
+        fields.update({
+            'table_id': basestring,
+            'new_name': basestring
+        })
+        return fields
+
+    def validators(self, model):
+        validators = super(RenameTable, self).validators(model)
+        validators.update({
+            'table_id': Always(NodeClass(model, Table)),
+            'new_name': Always(Length(1, 512))
+        })
+        return validators
+
+    def do(self, executor):
+        executor.execute(Set(self.val('table_id'), 'name', self.val('new_name')))
+
+# =================== TABLE REPR ===================
+
 class CreateTableRepr(Command):
     """ Is not used separately, only as part of CreateTable command.
     """
@@ -151,14 +175,14 @@ class CreateTableRepr(Command):
         return validators
 
     def do(self, executor):
-        table = executor.model.node(self['table_id'], Table)
-        canvas = executor.model.node(self['canvas_id'], Canvas)
+        table = executor.model.node(self.val('table_id'), Table)
+        canvas = executor.model.node(self.val('canvas_id'), Canvas)
 
         table_repr = TableRepr(self.val('table_repr_id'))
         table_repr.set('table', table.ref())
         table_repr.set('position', self.val('position'))
-        executor.execute(Register(node=table_repr))
-        executor.execute(AppendItem(node_id=canvas.id, field='reprs', item=table_repr))
+        executor.execute(Register(table_repr))
+        executor.execute(AppendItem(canvas.id, 'reprs', table_repr))
 
 
 class MoveTableRepr(Command):
@@ -179,4 +203,4 @@ class MoveTableRepr(Command):
         return validators
 
     def do(self, executor):
-        executor.execute(Set(self['table_repr_id'], 'position', self['new_position']))
+        executor.execute(Set(self.val('table_repr_id'), 'position', self.val('new_position')))

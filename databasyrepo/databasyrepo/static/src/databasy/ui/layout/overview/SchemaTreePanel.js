@@ -42,12 +42,12 @@ databasy.ui.layout.overview.SchemaTreePanel = Class.extend({
                     types:{
                         schema:{
                             icon:{
-                                image:'/static/src/css/overview/schema.png'
+                                image:'/static/src/img/schema16x16.png'
                             }
                         },
                         table:{
                             icon:{
-                                image:'/static/src/css/overview/table.png'
+                                image:'/static/src/img/table16x16.png'
                             }
                         }
                     }
@@ -55,7 +55,7 @@ databasy.ui.layout.overview.SchemaTreePanel = Class.extend({
             });
     },
 
-    initSchemaTree:function() {
+    initSchemaTree:function () {
         var that = this;
 
         var tables = this.gateway.model.val_as_node('tables', this.gateway.model);
@@ -66,7 +66,7 @@ databasy.ui.layout.overview.SchemaTreePanel = Class.extend({
             that.schemaTree.jstree('open_node', '#schemaTreeTables');
         }
 
-        
+
         this.schemaTree.find('li').on('dblclick', function () {
             // Open/close node on double click.
             if (!that.schemaTree.jstree('is_leaf', this)) {
@@ -152,14 +152,29 @@ databasy.ui.layout.overview.SchemaTreePanel = Class.extend({
         this.schemaTree.jstree('create', '#schemaTreeTables', 'last', tableNode, false, true);
     },
 
+    treeNode:function(modelNodeId) {
+        return this.schemaTree.find('li[elementid="' + modelNodeId + '"]');
+    },
+
     onModelChanged:function (event) {
         var modelEvent = event.modelEvent;
         if (modelEvent instanceof databasy.model.core.events.ItemInserted &&
             modelEvent.val('node_id') === null &&
             modelEvent.val('field') === 'tables') {
+
             // Table inserted to the model.
             var table = modelEvent.val('item');
             this.createTableNode(table);
+        } else if (modelEvent instanceof databasy.model.core.events.PropertyChanged &&
+            modelEvent.val('field') === 'name') {
+
+            var node = this.gateway.model.node(modelEvent.val('node_id'));
+            if (node instanceof databasy.model.core.elements.Table) {
+                // Table name changed.
+                var newName = modelEvent.val('new_value');
+                var treeNode = this.treeNode(node.id());
+                this.schemaTree.jstree('rename_node', treeNode, newName);
+            }
         }
     }
 });

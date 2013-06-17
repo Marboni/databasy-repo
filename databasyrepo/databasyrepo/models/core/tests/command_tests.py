@@ -38,25 +38,6 @@ def query_node(model, **kwargs):
     return None
 
 class CommandTest(ODMTest):
-    def test_create_table(self):
-        model = create_model()
-        canvas = default_canvas(model)
-
-        execute_command(model, CreateTable,
-            table_id = str(uuid4()),
-            default_table_repr_id = str(uuid4()),
-            name='Table',
-            canvas_id=canvas.id,
-            position = [1, 1]
-        )
-
-        table = query_node(model, _code=Table.code(), name='Table', columns=[])
-        self.assertIsNotNone(table)
-        self.assertTrue(table.ref() in model.val('tables'))
-
-        table_repr = query_node(model, _code=TableRepr.code(), table=table.ref(), position=[1,1])
-        self.assertTrue(table_repr.ref() in canvas.val('reprs'))
-
     def test_undo_redo(self):
         model = create_model()
         # v1 - Empty model.
@@ -89,6 +70,47 @@ class CommandTest(ODMTest):
         execute_command(model, Redo)
         # v4 = v2 - Model with table.
         self.assertEqual(nodes_v2, model.val('nodes'))
+
+    def test_create_table(self):
+        model = create_model()
+        canvas = default_canvas(model)
+
+        execute_command(model, CreateTable,
+            table_id = str(uuid4()),
+            default_table_repr_id = str(uuid4()),
+            name='Table',
+            canvas_id=canvas.id,
+            position = [1, 1]
+        )
+
+        table = query_node(model, _code=Table.code(), name='Table', columns=[])
+        self.assertIsNotNone(table)
+        self.assertTrue(table.ref() in model.val('tables'))
+
+        table_repr = query_node(model, _code=TableRepr.code(), table=table.ref(), position=[1,1])
+        self.assertTrue(table_repr.ref() in canvas.val('reprs'))
+
+
+    def test_rename_table(self):
+        model = create_model()
+        canvas = default_canvas(model)
+
+        execute_command(model, CreateTable,
+            table_id = str(uuid4()),
+            default_table_repr_id = str(uuid4()),
+            name='Table',
+            canvas_id=canvas.id,
+            position = [1, 1]
+        )
+
+        table = query_node(model, _code=Table.code(), name='Table', columns=[])
+
+        new_name = 'NewName'
+        execute_command(model, RenameTable,
+            table_id = table.id,
+            new_name=new_name
+        )
+        self.assertEqual(new_name, table.val('name'))
 
 
     def test_move_table_repr(self):

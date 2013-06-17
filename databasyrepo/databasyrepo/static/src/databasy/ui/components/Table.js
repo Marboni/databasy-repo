@@ -35,8 +35,17 @@ databasy.ui.components.Table = draw2d.shape.basic.Rectangle.extend({
         if (modelEvent instanceof databasy.model.core.events.PropertyChanged &&
             modelEvent.val('node_id') === this.tableRepr.id() &&
             modelEvent.val('field') === 'position') {
+
+            // Table representation's position changed.
             var newPosition = modelEvent.val('new_value');
             this.setPosition(newPosition[0], newPosition[1]);
+        } else if (modelEvent instanceof databasy.model.core.events.PropertyChanged &&
+            modelEvent.val('node_id') === this.table.id() &&
+            modelEvent.val('field') === 'name') {
+
+            // Table name changed.
+            var newName = modelEvent.val('new_value');
+            this.label.setText(newName);
         }
     }
 });

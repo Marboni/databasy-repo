@@ -71,6 +71,24 @@ databasy.model.core.commands.CreateTable = databasy.model.core.commands.Command.
     CODE:'core.commands.CreateTable'
 });
 
+databasy.model.core.commands.RenameTable = databasy.model.core.commands.Command.extend({
+    fields:function () {
+        return this._super().concat(
+            'table_id',
+            'new_name'
+        )
+    },
+    do:function (executor) {
+        executor.execute(new databasy.model.core.actions.Set({
+            node_id:this.val('table_id'),
+            field:'name',
+            value:this.val('new_name')
+        }));
+    }
+}, {
+    CODE:'core.commands.RenameTable'
+});
+
 
 databasy.model.core.commands.CreateTableRepr = databasy.model.core.commands.Command.extend({
     fields:function () {

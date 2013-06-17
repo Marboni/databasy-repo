@@ -5,6 +5,11 @@ html, body {
     margin: 0;
     overflow: auto; /* when page gets too small */
     font-size: 10pt;
+    color: #292929;
+}
+
+.clearfix {
+    clear: both;
 }
 
 #application {
@@ -17,7 +22,7 @@ html, body {
     display: none; /* will appear when layout inits */
 }
 
-#contentPanel.ui-layout-pane{
+#contentPanel.ui-layout-pane {
     padding: 0 !important;
     border: none !important;
     overflow: hidden;
@@ -26,4 +31,16 @@ html, body {
 /* JQuery UI dialogs without title. */
 .noTitleDialog .ui-dialog-titlebar {
     display: none;
+}
+
+.ui-icon.ui-icon-table {
+    background-image: url(../img/table16x16.png);
+}
+
+.ui-icon.ui-icon-pointer-32 {
+    background-image: url(../img/pointer32x32.png);
+}
+
+.ui-icon.ui-icon-table-32 {
+    background-image: url(../img/table32x32.png);
 }

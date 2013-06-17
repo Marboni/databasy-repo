@@ -1,0 +1,23 @@
+#propertyPanel.ui-layout-pane {
+    padding: 0 !important;
+    font-size: 12pt;
+}
+
+#propertyPanel .editable {
+    border-bottom: 1px dotted #292929;
+}
+
+#propertyPanel.readonly .editable {
+    border-bottom: none;
+}
+
+#propertyPanel .tableProperties .titlePanel {
+    margin: 0.5em;
+    border-bottom: 1px solid #292929;
+    line-height: 1.5em;
+}
+
+#propertyPanel .tableProperties .title {
+    font-weight: bold;
+}
+

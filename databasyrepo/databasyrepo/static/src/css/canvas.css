@@ -1,0 +1,11 @@
+#canvasWrapper.ui-layout-pane {
+    padding: 0 !important;
+}
+
+#canvas {
+    background: transparent url(../img/canvas.png) !important;
+}
+
+#canvas.readonly {
+    background: transparent url(../img/canvas_readonly.png) !important;
+}
