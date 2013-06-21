@@ -1,5 +1,5 @@
-databasy.ui.components.Canvas = draw2d.Canvas.extend({
-    NAME:"databasy.ui.components.Canvas",
+databasy.ui.layout.canvas.Canvas = draw2d.Canvas.extend({
+    NAME:"databasy.ui.layout.canvas.Canvas",
 
     init:function (gateway, domNodeId) {
         this._super(domNodeId);
@@ -11,24 +11,26 @@ databasy.ui.components.Canvas = draw2d.Canvas.extend({
         var model = this.gateway.model;
         this.canvasNode = model.val_as_node('canvases', model)[0];
 
-        this._componentsByReprId = {};
-        this._componentsByElementId = {};
+        this._figuresByReprId = {};
+        this._figuresByElementId = {};
 
         this.setEditable(false);
-        this.initComponents();
+        this.initFigures();
+
+        this.contextMenu = new databasy.ui.layout.canvas.ContextMenu(this.gateway);
 
         this.installEditPolicy(new databasy.ui.policy.canvas.ToolActionPolicy());
     },
 
-    initComponents:function () {
+    initFigures:function () {
         var reprs = this.canvasNode.val_as_node('reprs', this.gateway.model);
         var that = this;
         $.each(reprs, function (index, repr) {
-            that.drawComponent(repr);
+            that.drawFigure(repr);
         });
     },
 
-    drawComponent:function (repr) {
+    drawFigure:function (repr) {
         var drawFunction;
         var reprCode = repr.code();
 
@@ -38,19 +40,19 @@ databasy.ui.components.Canvas = draw2d.Canvas.extend({
             throw Error('Unknown reprCode ' + reprCode);
         }
         //noinspection UnnecessaryLocalVariableJS
-        var component = drawFunction.call(this, repr);
+        var figure = drawFunction.call(this, repr);
 
-        this._componentsByReprId[repr.id()] = component;
+        this._figuresByReprId[repr.id()] = figure;
         var elementId = repr.elementId();
         if (elementId !== null) {
-            this._componentsByElementId[elementId] = component;
+            this._figuresByElementId[elementId] = figure;
         }
     },
 
     drawTable:function (repr) {
-        var component = new databasy.ui.components.Table(this.gateway, repr);
-        component.draw(this);
-        return component;
+        var figure = new databasy.ui.figures.Table(this.gateway, repr);
+        figure.draw(this);
+        return figure;
     },
 
     setEditable:function (editable) {
@@ -62,33 +64,41 @@ databasy.ui.components.Canvas = draw2d.Canvas.extend({
         }
     },
 
-    componentByReprId:function(reprId) {
-        return this._componentsByReprId[reprId];
+    figureByReprId:function (reprId) {
+        return this._figuresByReprId[reprId];
     },
 
-    componentByElementId:function(elementId) {
-        return this._componentsByElementId[elementId];
+    figureByElementId:function (elementId) {
+        return this._figuresByElementId[elementId];
     },
 
-    scrollTo:function(centerX, centerY) {
+    scrollTo:function (centerX, centerY) {
         var viewport = this.getScrollArea().parent();
         var w = viewport.width();
         var h = viewport.height();
 
         var left = centerX - w / 2;
-        if (left < 0) {left = 0;}
+        if (left < 0) {
+            left = 0;
+        }
 
         var top = centerY - h / 2;
-        if (top < 0) {top = 0;}
+        if (top < 0) {
+            top = 0;
+        }
 
         viewport.scrollTop(top);
         viewport.scrollLeft(left)
     },
 
-    scrollToComponent:function(component) {
-        var centerX = component.x + component.width / 2;
-        var centerY = component.y + component.height / 2;
+    scrollToFigure:function (figure) {
+        var centerX = figure.x + figure.width / 2;
+        var centerY = figure.y + figure.height / 2;
         this.scrollTo(centerX, centerY);
+    },
+
+    showContextMenu: function(figure, x, y) {
+        this.contextMenu.show(figure, x, y);
     },
 
     onRuntimeChanged:function (event) {
@@ -102,7 +112,8 @@ databasy.ui.components.Canvas = draw2d.Canvas.extend({
             modelEvent.val('node_id') === this.canvasNode.id() &&
             modelEvent.val('field') === 'reprs') {
             // New repr added, drawing.
-            this.drawComponent(modelEvent.val('item'));
+            var repr = modelEvent.val('item').ref_node(this.gateway.model);
+            this.drawFigure(repr);
         }
     }
 });

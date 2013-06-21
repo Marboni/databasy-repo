@@ -12,7 +12,7 @@ databasy.model.core.commands.Command = databasy.model.core.serializing.Serializa
             'source_version'
         )
     },
-    validate_predicates:function (model) {
+    pre_validation:function (model) {
         if ($.inArray(this.constructor, model.commands()) == -1) {
             throw new Error('Command ' + this.code() + ' can not be executed on model ' + model.code() + '.')
         }
@@ -21,7 +21,7 @@ databasy.model.core.commands.Command = databasy.model.core.serializing.Serializa
         throw new Error('Not implemented');
     },
     execute:function (model) {
-        this.validate_predicates(model);
+        this.pre_validation(model);
         var executor = new databasy.model.core.actions.Executor(model);
         this.do(executor);
         if (this.require_checks()) {
@@ -89,6 +89,39 @@ databasy.model.core.commands.RenameTable = databasy.model.core.commands.Command.
     CODE:'core.commands.RenameTable'
 });
 
+databasy.model.core.commands.DeleteTable = databasy.model.core.commands.Command.extend({
+    fields:function () {
+        return this._super().concat(
+            'table_id'
+        )
+    },
+    do:function (executor) {
+        var core = databasy.model.core;
+        var model = executor.model;
+
+        var table_id = this.val('table_id');
+        var table = model.node(table_id);
+
+        var canvases = model.val_as_node('canvases', model);
+        $.each(canvases, function(index, canvas) {
+            var reprs = canvas.val_as_node('reprs', model);
+            //noinspection FunctionWithInconsistentReturnsJS
+            $.each(reprs, function(index, repr) {
+                if (table_id == repr.val('table').val('ref_id')) {
+                    new core.commands.DeleteTableRepr({
+                        table_repr_id: repr.id()
+                    }).do(executor);
+                    return false;
+                }
+            });
+        });
+
+        executor.execute(new core.actions.FindAndDeleteItem({field:'tables', item:table}));
+        executor.execute(new core.actions.Unregister({node_id:table_id}));
+    }
+}, {
+    CODE:'core.commands.DeleteTable'
+});
 
 databasy.model.core.commands.CreateTableRepr = databasy.model.core.commands.Command.extend({
     fields:function () {
@@ -131,4 +164,42 @@ databasy.model.core.commands.MoveTableRepr = databasy.model.core.commands.Comman
     }
 }, {
     CODE:'core.commands.MoveTableRepr'
+});
+
+databasy.model.core.commands.DeleteTableRepr = databasy.model.core.commands.Command.extend({
+    fields:function () {
+        return this._super().concat(
+            'table_repr_id'
+        )
+    },
+    do:function (executor) {
+        var model = executor.model;
+        var table_repr_id = this.val('table_repr_id');
+
+        var deleted = false;
+
+        var canvases = model.val_as_node('canvases', model);
+        //noinspection FunctionWithInconsistentReturnsJS
+        $.each(canvases, function(index, canvas) {
+            var repr_refs = canvas.val('reprs');
+            //noinspection FunctionWithInconsistentReturnsJS
+            $.each(repr_refs, function(index, repr_ref) {
+                if (table_repr_id == repr_ref.ref_id()) {
+                    executor.execute(new databasy.model.core.actions.DeleteItem({node_id:canvas.id(), field:'reprs', index:index}));
+                    executor.execute(new databasy.model.core.actions.Unregister({node_id:table_repr_id}));
+                    deleted = true;
+                    return false;
+                }
+            });
+            if (deleted) {
+                return false;
+            }
+        });
+
+        if (!deleted) {
+            throw new Error('Table repr with ID ' + table_repr_id + ' was not removed.')
+        }
+    }
+}, {
+    CODE:'core.commands.DeleteTableRepr'
 });

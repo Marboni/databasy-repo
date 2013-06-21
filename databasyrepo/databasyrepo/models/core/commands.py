@@ -1,4 +1,4 @@
-from databasyrepo.models.core.actions import Set, Executor, Register, AppendItem
+from databasyrepo.models.core.actions import Set, Executor, Register, AppendItem, Unregister, FindAndDeleteItem, DeleteItem
 from databasyrepo.models.core.elements import Table
 from databasyrepo.models.core.errors import IllegalCommand
 from databasyrepo.models.core.reprs import Canvas, TableRepr
@@ -14,7 +14,7 @@ class Command(Serializable):
             'source_version': long
         }
 
-    def validate_predicates(self, model):
+    def pre_validation(self, model):
         if self.__class__ not in model.commands():
             raise IllegalCommand('Command %s can not be executed on model %s.' % (self.code(), model.code()))
 
@@ -22,6 +22,11 @@ class Command(Serializable):
         return {
             'source_version': Always(CorrectVersion(model))
         }
+
+    def post_validation(self, model):
+        """ Custom validation logic. Starts after all validators done. Should raise IllegalCommand in case of error.
+        """
+        pass
 
     def _validate(self, model):
         for field, field_validator in self.validators(model).iteritems():
@@ -34,6 +39,8 @@ class Command(Serializable):
             except InvalidStateError, e:
                 raise IllegalCommand('Field "%s" is incorrect: %s' % (field, e.message))
 
+        self.post_validation(model)
+
     def require_checks(self):
         return True
 
@@ -43,7 +50,7 @@ class Command(Serializable):
             checker(executor).modify_errors()
 
     def execute(self, model):
-        self.validate_predicates(model)
+        self.pre_validation(model)
         self._validate(model)
         executor = Executor(model)
         self.do(executor)
@@ -59,8 +66,8 @@ class HistoryCommand(Command):
     def require_checks(self):
         return False
 
-    def validate_predicates(self, model):
-        super(HistoryCommand, self).validate_predicates(model)
+    def pre_validation(self, model):
+        super(HistoryCommand, self).pre_validation(model)
         client_version = self.val('source_version')
         server_version = model.version
         if client_version != server_version:
@@ -68,8 +75,8 @@ class HistoryCommand(Command):
 
 
 class Undo(HistoryCommand):
-    def validate_predicates(self, model):
-        super(Undo, self).validate_predicates(model)
+    def pre_validation(self, model):
+        super(Undo, self).pre_validation(model)
         if not model.revision_stack.can_undo():
             raise IllegalCommand('Nothing to undo.')
 
@@ -80,8 +87,8 @@ class Undo(HistoryCommand):
 
 
 class Redo(HistoryCommand):
-    def validate_predicates(self, model):
-        super(Redo, self).validate_predicates(model)
+    def pre_validation(self, model):
+        super(Redo, self).pre_validation(model)
         if not model.revision_stack.can_redo():
             raise IllegalCommand('Nothing to redo.')
 
@@ -149,11 +156,40 @@ class RenameTable(Command):
     def do(self, executor):
         executor.execute(Set(self.val('table_id'), 'name', self.val('new_name')))
 
+
+class DeleteTable(Command):
+    def fields(self):
+        fields = super(DeleteTable, self).fields()
+        fields.update({
+            'table_id': basestring,
+        })
+        return fields
+
+    def validators(self, model):
+        validators = super(DeleteTable, self).validators(model)
+        validators.update({
+            'table_id': Always(NodeClass(model, Table)),
+        })
+        return validators
+
+    def do(self, executor):
+        table_id = self.val('table_id')
+        table = executor.model.node(table_id)
+
+        for canvas in executor.model.val_as_node('canvases', executor.model):
+            for repr in canvas.val_as_node('reprs', executor.model):
+                if repr.val('table').ref_id == table_id:
+                    DeleteTableRepr(
+                        table_repr_id=repr.id
+                    ).do(executor)
+                    break
+
+        executor.execute(FindAndDeleteItem(None, 'tables', table))
+        executor.execute(Unregister(table_id))
+
 # =================== TABLE REPR ===================
 
 class CreateTableRepr(Command):
-    """ Is not used separately, only as part of CreateTable command.
-    """
     def fields(self):
         fields = super(CreateTableRepr, self).fields()
         fields.update({
@@ -173,6 +209,14 @@ class CreateTableRepr(Command):
             'position': Always(Iterable(2, 2))
         })
         return validators
+
+    def post_validation(self, model):
+        super(CreateTableRepr, self).post_validation(model)
+        canvas = model.node(self.val('canvas_id'))
+        for repr in canvas.val_as_node('reprs', model):
+            if repr.val('table').ref_id == self.val('table_id'):
+                raise IllegalCommand('Canvas %s already has representation of table %s.' %
+                                     (self.val('canvas_id'), self.val('table_id')))
 
     def do(self, executor):
         table = executor.model.node(self.val('table_id'), Table)
@@ -204,3 +248,31 @@ class MoveTableRepr(Command):
 
     def do(self, executor):
         executor.execute(Set(self.val('table_repr_id'), 'position', self.val('new_position')))
+
+
+class DeleteTableRepr(Command):
+    def fields(self):
+        fields = super(DeleteTableRepr, self).fields()
+        fields.update({
+            'table_repr_id': basestring
+        })
+        return fields
+
+    def validators(self, model):
+        validators = super(DeleteTableRepr, self).validators(model)
+        validators.update({
+            'table_repr_id': Always(NodeClass(model, TableRepr)),
+        })
+        return validators
+
+    def do(self, executor):
+        table_repr_id = self.val('table_repr_id')
+
+        for canvas in executor.model.val_as_node('canvases', executor.model):
+            for repr_index, repr_ref in enumerate(canvas.val('reprs')):
+                if repr_ref.ref_id == table_repr_id:
+                    executor.execute(DeleteItem(canvas.id, 'reprs', repr_index))
+                    executor.execute(Unregister(table_repr_id))
+                    return
+
+        raise ValueError('Table repr with ID %s was not removed.' % table_repr_id)

@@ -60,16 +60,18 @@ class ModelsNamespace(BaseNamespace):
             self.log('Loaded model %s.' % self.model_id)
 
     def on_exec(self, command):
-        command = deserialize(command, Command)
-        command_version = command.val('source_version')
         try:
+            if not self.mm.runtime.is_editor(self.user_id):
+                raise Exception('User is not an editor.')
+            command = deserialize(command, Command)
+            command_version = command.val('source_version')
             with self.mm.lock:
                 self.mm.execute_command(command, self.user_id)
                 self.emit('exec_done', command_version)
                 self.emit_to_other('exec', command)
                 self.log('Successfully executed command: \n\n%s\n' % json.dumps(command, indent=4))
         except Exception, e:
-            self.emit('exec_fail', command_version)
+            self.emit('exec_fail')
             self.log('Failed to execute command: \n\n%s\nCause: %s\n' % (json.dumps(command, indent=4), e.message))
 
     def on_request_control(self):

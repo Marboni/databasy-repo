@@ -1,11 +1,11 @@
 databasy.gateway.CommandQueue = Class.extend({
-    init:function (gw) {
-        this.gw = gw;
-        this.socket = gw.socket;
+    init:function (gateway) {
+        this.gateway = gateway;
+        this.socket = gateway.socket;
         this._commandInProgress = null;
         this._pendingCommands = [];
 
-        databasy.utils.socket.registerListeners(gw.socket, this);
+        databasy.utils.socket.registerListeners(gateway.socket, this);
     },
     push:function (command) {
         if (this._commandInProgress === null) {
@@ -16,7 +16,7 @@ databasy.gateway.CommandQueue = Class.extend({
     },
     send:function (command) {
         this._commandInProgress = command;
-        this.gw.socket.emit('exec', command.serialize());
+        this.gateway.socket.emit('exec', command.serialize());
     },
     reset: function() {
         this._commandInProgress = null;
@@ -31,6 +31,8 @@ databasy.gateway.CommandQueue = Class.extend({
         }
     },
     on_exec_fail: function() {
-        alert("FUCK!");
+        alert("Error occurred. Click OK to reconnect.");
+        databasy.utils.preloader.openPreloader(false);
+        this.gateway.enter();
     }
 });

@@ -80,10 +80,10 @@ databasy.ui.layout.overview.SchemaTreePanel = Class.extend({
                 var propertyPanel = that.gateway.layout.propertyPanel;
 
                 var element = that.gateway.model.node(elementId);
-                var component = canvas.componentByElementId(elementId);
+                var component = canvas.figureByElementId(elementId);
                 if (component) {
                     propertyPanel.refreshProperties(element);
-                    canvas.scrollToComponent(component);
+                    canvas.scrollToFigure(component);
                 }
             }
             return false;
@@ -164,7 +164,7 @@ databasy.ui.layout.overview.SchemaTreePanel = Class.extend({
             modelEvent.val('field') === 'tables') {
 
             // Table inserted to the model.
-            var table = modelEvent.val('item');
+            var table = modelEvent.val('item').ref_node(this.gateway.model);
             this.createTableNode(table);
         } else if (modelEvent instanceof databasy.model.core.events.PropertyChanged &&
             modelEvent.val('field') === 'name') {
@@ -176,6 +176,13 @@ databasy.ui.layout.overview.SchemaTreePanel = Class.extend({
                 var treeNode = this.treeNode(node.id());
                 this.schemaTree.jstree('rename_node', treeNode, newName);
             }
+        } else if (modelEvent instanceof databasy.model.core.events.ItemDeleted &&
+            modelEvent.val('node_id') === null &&
+            modelEvent.val('field') === 'tables') {
+
+            // Table deleted.
+            var tableId = modelEvent.val('item').ref_id();
+            this.schemaTree.jstree('delete_node', this.treeNode(tableId));
         }
     }
 });

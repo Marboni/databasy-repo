@@ -71,7 +71,7 @@ databasy.model.core.actions.CRUDAction = databasy.model.core.actions.Action.exte
         }
     },
     _ref_or_value:function(obj) {
-        return (obj instanceof databasy.model.core.nodes.NodeRef) ? obj.ref(): obj;
+        return (obj instanceof databasy.model.core.nodes.Node) ? obj.ref(): obj;
     }
 });
 

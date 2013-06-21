@@ -2,9 +2,12 @@ databasy.utils.events.Observer = Class.extend({
     init: function() {
         this._listeners = [];
     },
+    reset: function() {
+        this._listeners = [];
+    },
     fire:function(event) {
         var listenerFunc = 'on' + event.eventName;
-        $.each(this._listeners, function(i, listener) {
+        $.each(this._listeners.slice(), function(i, listener) {
             if (listener[listenerFunc] !== undefined) {
                 listener[listenerFunc](event);
             }

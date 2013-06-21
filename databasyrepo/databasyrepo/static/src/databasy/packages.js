@@ -24,13 +24,14 @@ var databasy = {
     ui: {
         layout: {
             overview: {},
-            property: {}
+            property: {},
+            canvas: {}
         },
         locators: {},
-        components: {},
+        figures: {},
         policy: {
             canvas: {},
-            components: {}
+            figures: {}
         },
         events: {}
     },

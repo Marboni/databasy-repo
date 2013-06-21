@@ -1,5 +1,5 @@
-databasy.ui.components.Table = draw2d.shape.basic.Rectangle.extend({
-    NAME:"databasy.ui.components.Table",
+databasy.ui.figures.Table = draw2d.shape.basic.Rectangle.extend({
+    NAME:"databasy.ui.figures.Table",
 
     init:function (gateway, tableRepr) {
         this._super(126, 30);
@@ -8,7 +8,7 @@ databasy.ui.components.Table = draw2d.shape.basic.Rectangle.extend({
         this.table = tableRepr.val_as_node('table', this.gateway.model);
 
         this.gateway.addListener(this);
-        this.installEditPolicy(new databasy.ui.policy.components.TablePolicy());
+        this.installEditPolicy(new databasy.ui.policy.figures.TablePolicy());
 
         this.setBackgroundColor('#00bfff');
         this.setColor('#009acd');
@@ -22,14 +22,24 @@ databasy.ui.components.Table = draw2d.shape.basic.Rectangle.extend({
         this.addFigure(this.label, new draw2d.layout.locator.CenterLocator(this));
 
         this.label.onDoubleClick = $.proxy(this.onDoubleClick, this);
+        this.label.onContextMenu = $.proxy(this.onContextMenu, this);
     },
+
     draw:function (canvas) {
         var position = this.tableRepr.val('position');
         canvas.addFigure(this, position[0], position[1]);
     },
+
     onDoubleClick:function () {
         this.gateway.layout.propertyPanel.refreshProperties(this.table);
     },
+
+    onContextMenu:function (x, y) {
+        if (this.gateway.runtime.isEditor()) {
+            this.canvas.showContextMenu(this, x, y);
+        }
+    },
+
     onModelChanged:function (event) {
         var modelEvent = event.modelEvent;
         if (modelEvent instanceof databasy.model.core.events.PropertyChanged &&
@@ -46,6 +56,18 @@ databasy.ui.components.Table = draw2d.shape.basic.Rectangle.extend({
             // Table name changed.
             var newName = modelEvent.val('new_value');
             this.label.setText(newName);
+        } else if (modelEvent instanceof databasy.model.core.events.ItemDeleted &&
+            modelEvent.val('node_id') === this.canvas.canvasNode.id() &&
+            modelEvent.val('field') === 'reprs' &&
+            modelEvent.val('item').ref_id() === this.tableRepr.id()) {
+
+            // Table repr removed.
+            this.destroy();
         }
+    },
+
+    destroy:function () {
+        this.gateway.removeListener(this);
+        this.canvas.removeFigure(this);
     }
 });

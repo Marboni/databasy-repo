@@ -2,7 +2,7 @@ databasy.ui.policy.canvas.ToolActionPolicy = draw2d.policy.canvas.CanvasPolicy.e
     NAME:"databasy.ui.policy.canvas.ToolActionPolicy",
 
     onInstall:function(canvas) {
-        if (canvas instanceof databasy.ui.components.Canvas) {
+        if (canvas instanceof databasy.ui.layout.canvas.Canvas) {
             this.gateway = canvas.gateway;
         } else {
             throw new Error("ToolActionPolicy can't be installed on this canvas.")
@@ -15,7 +15,7 @@ databasy.ui.policy.canvas.ToolActionPolicy = draw2d.policy.canvas.CanvasPolicy.e
         }
         var toolbar = this.gateway.layout.toolbar;
         var currentTool = toolbar.getCurrentTool();
-        var pos = [x, y];
+        var pos = [Math.round(x), Math.round(y)];
         var selectDefaultTool = this.applyTool(currentTool, canvas, pos);
         if (selectDefaultTool) {
             toolbar.selectDefault();

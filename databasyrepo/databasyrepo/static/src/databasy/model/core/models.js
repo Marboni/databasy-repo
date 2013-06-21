@@ -21,7 +21,10 @@ databasy.model.core.models.Model = databasy.model.core.nodes.Node.extend({
         return [
             coreCommands.CreateTable,
             coreCommands.RenameTable,
-            coreCommands.MoveTableRepr
+            coreCommands.DeleteTable,
+
+            coreCommands.MoveTableRepr,
+            coreCommands.DeleteTableRepr
         ]
     },
     checkers:function () {

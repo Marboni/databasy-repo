@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, minimum-scale=1.0"/>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
 
-<link rel="stylesheet" href="/static/libs/draw2d_GPL_2.9.0-dev/css/contextmenu.css" type="text/css"
+<link rel="stylesheet" href="/static/libs/jeegoocontext/skins/cm_default/style.css" type="text/css"
       media="screen, projection">
 <link rel="stylesheet" href="/static/libs/jquery-ui-1.8.23/themes/base/jquery-ui.css" type="text/css"
       media="screen, projection">
@@ -26,14 +26,14 @@ $(function () {
 
             .script("/static/libs/socket.io.min.js")
 
-            .script("/static/libs/jquery-1.8.1.min.js")
-            .script("/static/libs/jquery-1.8.1.min.js")
+            .script("/static/libs/jquery-1.8.1.js")
             .script("/static/libs/jquery-ui-1.8.23/ui/minified/jquery-ui.min.js")
             .script("/static/libs/jquery-buttonsetv.js")
             .script("/static/libs/jquery.layout.js")
             .script("/static/libs/jquery.simplemodal.1.4.4.min.js")
             .script("/static/libs/jquery.jeditable.js")
             .script("/static/libs/jstree/jquery.jstree.js")
+            .script("/static/libs/jeegoocontext/jquery.jeegoocontext.js")
 
             .script("/static/libs/draw2d_GPL_2.9.0-dev/lib/shifty.js")
             .script("/static/libs/draw2d_GPL_2.9.0-dev/lib/raphael.js")
@@ -431,16 +431,17 @@ $(function () {
             .script("/static/src/databasy/ui/layout/Layout.js")
             .script("/static/src/databasy/ui/layout/MenuPanel.js")
             .script("/static/src/databasy/ui/layout/Toolbar.js")
+            .script("/static/src/databasy/ui/layout/canvas/Canvas.js")
+            .script("/static/src/databasy/ui/layout/canvas/ContextMenu.js")
             .script("/static/src/databasy/ui/layout/property/PropertyPanel.js")
             .script("/static/src/databasy/ui/layout/property/TablePropertyPanel.js")
             .script("/static/src/databasy/ui/layout/overview/OverviewPanel.js")
             .script("/static/src/databasy/ui/layout/overview/SchemaTreePanel.js")
 
-            .script("/static/src/databasy/ui/policy/components/TablePolicy.js")
+            .script("/static/src/databasy/ui/policy/figures/TablePolicy.js")
             .script("/static/src/databasy/ui/policy/canvas/ToolActionPolicy.js")
 
-            .script("/static/src/databasy/ui/components/Canvas.js")
-            .script("/static/src/databasy/ui/components/Table.js")
+            .script("/static/src/databasy/ui/figures/Table.js")
 
             .script("/static/src/databasy/ui/events/ComponentDblClicked.js")
             // UI end

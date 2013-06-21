@@ -6,7 +6,7 @@ databasy.ui.layout.Layout = Class.extend({
         this.recreateHtml();
         this.createLayout();
 
-        this.canvas = new databasy.ui.components.Canvas(this.gateway, 'canvas');
+        this.canvas = new databasy.ui.layout.canvas.Canvas(this.gateway, 'canvas');
         this.menuPanel = new databasy.ui.layout.MenuPanel(this.gateway);
         this.toolbar = new databasy.ui.layout.Toolbar(this.gateway);
         this.propertyPanel = new databasy.ui.layout.property.PropertyPanel(this.gateway, this);
