@@ -56,6 +56,12 @@ databasy.ui.layout.overview.SchemaTreePanel = Class.extend({
     },
 
     initSchemaTree:function () {
+        this.initContextMenus();
+        this.initDblClickListener();
+        this.initTableNodes();
+    },
+
+    initTableNodes:function () {
         var that = this;
 
         var tables = this.gateway.model.val_as_node('tables', this.gateway.model);
@@ -65,9 +71,12 @@ databasy.ui.layout.overview.SchemaTreePanel = Class.extend({
             });
             that.schemaTree.jstree('open_node', '#schemaTreeTables');
         }
+    },
 
+    initDblClickListener:function () {
+        var that = this;
 
-        this.schemaTree.find('li').on('dblclick', function () {
+        this.schemaTree.on('dblclick', 'li', function () {
             // Open/close node on double click.
             if (!that.schemaTree.jstree('is_leaf', this)) {
                 that.schemaTree.jstree('toggle_node', this);
@@ -89,8 +98,13 @@ databasy.ui.layout.overview.SchemaTreePanel = Class.extend({
 
             return false;
         });
+    },
 
-        this.createContextMenu('schemaTreeTable', 'table', {
+    initContextMenus:function () {
+        var that = this;
+        this.contextMenusByNodeType = {};
+
+        this.createContextMenu('table', {
             deleteTable:{
                 name:'Delete Table',
                 handler:function (table) {
@@ -99,6 +113,40 @@ databasy.ui.layout.overview.SchemaTreePanel = Class.extend({
                     });
                     that.gateway.executeCommand(command);
                 }
+            }
+        });
+    },
+
+    createContextMenu:function (nodeType, items) {
+        var that = this;
+        var menuId = 'schemaTree' + nodeType.charAt(0).toUpperCase() + nodeType.slice(1) + 'Cm';
+
+        var menu = $('<ul id="' + menuId + '" class="jeegoocontext cm_default"></ul>');
+        for (var code in items) {
+            var opts = items[code];
+            $('<li code="' + code + '">' + opts.name + '</li>').appendTo(menu);
+        }
+        menu.appendTo('body');
+
+        this.contextMenusByNodeType[nodeType] = {
+            menuId:menuId,
+            items:items
+        }
+    },
+
+    bindContextMenu:function (treeNode) {
+        var that = this;
+        var contextMenu = this.contextMenusByNodeType[treeNode.attr('rel')];
+
+        treeNode.jeegoocontext(contextMenu.menuId, {
+            onShow:function (e, context) {
+                return that.gateway.runtime.isEditor();
+            },
+            onSelect:function (e, context) {
+                var code = $(e.currentTarget).attr('code');
+                var elementId = $(context).attr('elementid');
+                var modelNode = that.gateway.model.node(elementId);
+                contextMenu.items[code].handler(modelNode);
             }
         });
     },
@@ -163,34 +211,12 @@ databasy.ui.layout.overview.SchemaTreePanel = Class.extend({
             },
             children:null
         };
-        this.schemaTree.jstree('create', '#schemaTreeTables', 'last', tableNode, false, true);
+        var node = this.schemaTree.jstree('create', '#schemaTreeTables', 'last', tableNode, false, true);
+        this.bindContextMenu(node);
     },
 
     treeNode:function (modelNodeId) {
         return this.schemaTree.find('li[elementid="' + modelNodeId + '"]');
-    },
-
-    createContextMenu:function (idPrefix, nodeType, items) {
-        var that = this;
-        var menu = $('<ul id="' + idPrefix + 'Cm" class="jeegoocontext cm_default"></ul>');
-        for (var code in items) {
-            var opts = items[code];
-            $('<li code="' + code + '">' + opts.name + '</li>').appendTo(menu);
-        }
-        menu.appendTo('body');
-
-        //noinspection FunctionWithInconsistentReturnsJS
-        this.schemaTree.find('li[rel="' + nodeType + '"]').jeegoocontext(idPrefix + 'Cm', {
-            onShow: function(e, context) {
-                return that.gateway.runtime.isEditor();
-            },
-            onSelect:function (e, context) {
-                var code = $(e.currentTarget).attr('code');
-                var elementId = $(context).attr('elementid');
-                var modelNode = that.gateway.model.node(elementId);
-                items[code].handler(modelNode);
-            }
-        });
     },
 
     onModelChanged:function (event) {

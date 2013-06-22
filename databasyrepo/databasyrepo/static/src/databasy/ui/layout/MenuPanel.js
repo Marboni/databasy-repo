@@ -50,13 +50,13 @@ databasy.ui.layout.MenuPanel = Class.extend({
         this.controlPassDialog.append('<p class="title"></p>');
         this.controlPassDialog.append('<table class="applicants" width="100%" cellspacing="0" cellpadding="0"></table>');
 
-        var notNowRow = '';
-        notNowRow += '<tr class="notNowRow">';
-        notNowRow += '    <td></td>';
-        notNowRow += '    <td width="100px">';
-        notNowRow += '        <a class="notNow" href="#">Not now</a>';
-        notNowRow += '    </td>';
-        notNowRow += '</tr>';
+        var notNowRow = ''
+            + '<tr class="notNowRow">'
+            + '    <td></td>'
+            + '    <td width="100px">'
+            + '        <a class="notNow" href="#">Not now</a>'
+            + '    </td>'
+            + '</tr>';
 
         this.controlPassDialog.find('table').append(notNowRow);
         this.controlPassDialog.find('.notNow').click(function () {
@@ -111,14 +111,14 @@ databasy.ui.layout.MenuPanel = Class.extend({
             table.prepend(applicantRow);
         }
         var that = this;
-        $('.applicant').click(function() {
+        $('.applicant').click(function () {
             var uid = $(this).attr('uid');
             that.gateway.passControl(uid);
         });
         this.controlPassDialog.dialog('open');
     },
 
-    closeControlPassDialog:function() {
+    closeControlPassDialog:function () {
         this.controlPassDialog.dialog('close');
     },
 
