@@ -66,13 +66,10 @@ databasy.ui.layout.Layout = Class.extend({
     },
 
     recreateHtml:function() {
-        //noinspection JSJQueryEfficiency
-        var body = $('body');
-        body.empty();
-        body.append('<div id="application"></div>');
+        $('#application').remove();
 
-        //noinspection JSJQueryEfficiency
-        var application = $('#application');
+        var application = $('<div id="application"></div>');
+        application.appendTo('body');
 
         application.append('<div id="menuPanel"></div>');
         application.append('<div id="chatPanel"></div>');

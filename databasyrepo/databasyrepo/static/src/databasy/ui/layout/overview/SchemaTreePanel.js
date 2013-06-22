@@ -86,7 +86,20 @@ databasy.ui.layout.overview.SchemaTreePanel = Class.extend({
                     canvas.scrollToFigure(component);
                 }
             }
+
             return false;
+        });
+
+        this.createContextMenu('schemaTreeTable', 'table', {
+            deleteTable:{
+                name:'Delete Table',
+                handler:function (table) {
+                    var command = new databasy.model.core.commands.DeleteTable({
+                        table_id:table.id()
+                    });
+                    that.gateway.executeCommand(command);
+                }
+            }
         });
     },
 
@@ -153,8 +166,31 @@ databasy.ui.layout.overview.SchemaTreePanel = Class.extend({
         this.schemaTree.jstree('create', '#schemaTreeTables', 'last', tableNode, false, true);
     },
 
-    treeNode:function(modelNodeId) {
+    treeNode:function (modelNodeId) {
         return this.schemaTree.find('li[elementid="' + modelNodeId + '"]');
+    },
+
+    createContextMenu:function (idPrefix, nodeType, items) {
+        var that = this;
+        var menu = $('<ul id="' + idPrefix + 'Cm" class="jeegoocontext cm_default"></ul>');
+        for (var code in items) {
+            var opts = items[code];
+            $('<li code="' + code + '">' + opts.name + '</li>').appendTo(menu);
+        }
+        menu.appendTo('body');
+
+        //noinspection FunctionWithInconsistentReturnsJS
+        this.schemaTree.find('li[rel="' + nodeType + '"]').jeegoocontext(idPrefix + 'Cm', {
+            onShow: function(e, context) {
+                return that.gateway.runtime.isEditor();
+            },
+            onSelect:function (e, context) {
+                var code = $(e.currentTarget).attr('code');
+                var elementId = $(context).attr('elementid');
+                var modelNode = that.gateway.model.node(elementId);
+                items[code].handler(modelNode);
+            }
+        });
     },
 
     onModelChanged:function (event) {
