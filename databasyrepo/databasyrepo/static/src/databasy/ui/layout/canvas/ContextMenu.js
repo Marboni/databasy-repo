@@ -5,7 +5,7 @@ databasy.ui.layout.canvas.ContextMenu = Class.extend({
 
         var that = this;
 
-        this.createContextMenu('table', databasy.ui.figures.Table, {
+        this.createContextMenu('canvasTable', databasy.ui.figures.Table, {
             deleteFigure:{
                 name:'Delete Figure',
                 handler:function (figure) {

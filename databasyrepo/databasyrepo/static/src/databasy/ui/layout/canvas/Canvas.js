@@ -17,7 +17,10 @@ databasy.ui.layout.canvas.Canvas = draw2d.Canvas.extend({
         this.setEditable(false);
         this.initFigures();
 
-        this.contextMenu = new databasy.ui.layout.canvas.ContextMenu(this.gateway);
+        if (!this.constructor.contextMenu) {
+            // Context menu is common for all canvas.
+            this.constructor.contextMenu = new databasy.ui.layout.canvas.ContextMenu(this.gateway);
+        }
 
         this.installEditPolicy(new databasy.ui.policy.canvas.ToolActionPolicy());
     },
@@ -98,7 +101,7 @@ databasy.ui.layout.canvas.Canvas = draw2d.Canvas.extend({
     },
 
     showContextMenu: function(figure, x, y) {
-        this.contextMenu.show(figure, x, y);
+        this.constructor.contextMenu.show(figure, x, y);
     },
 
     onRuntimeChanged:function (event) {
