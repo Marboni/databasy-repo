@@ -20,6 +20,9 @@ class Config(object):
     MONGO_URI = None
     MONGO_DATABASE_NAME = None
 
+    HOST = ''
+    PORT = 8000
+
     SECRET_KEY = 'yxS3bDAEOF60OibRXbO5rcMUG6cyNezEwrQMKgsg'
 
 class DevelopmentConfig(Config):
@@ -67,4 +70,4 @@ def config_by_mode(config_mode):
             if config_mode == config.ENV:
                 return config
         else:
-            raise ValueError('Profile "%s" not defined. Check ODM_API_ENV environment variable.' % config_mode)
+            raise ValueError('Profile "%s" not defined. Check DATABASY_ENV environment variable.' % config_mode)
