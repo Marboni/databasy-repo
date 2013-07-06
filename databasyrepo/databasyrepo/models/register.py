@@ -22,6 +22,8 @@ class Register(object):
         for subclass in commons.itersubclasses(Serializable):
             self._codes_and_classes[subclass.code()] = subclass
 
+        self._superclasses_and_classes = {}
+
     def get(self, code, superclass=None):
         try:
             clazz = self._codes_and_classes[code]
@@ -30,5 +32,14 @@ class Register(object):
         if superclass and not (superclass == clazz or issubclass(clazz, superclass)):
             raise ValueError('Class with code %s is not subclass of %s.' % (code, superclass))
         return clazz
+
+    def by_type(self, superclass):
+        if superclass not in self._superclasses_and_classes:
+            subclasses = []
+            for cls in self._codes_and_classes.values():
+                if issubclass(cls, superclass):
+                    subclasses.append(cls)
+            self._superclasses_and_classes[superclass] = subclasses
+        return self._superclasses_and_classes[superclass]
 
 register = Register()

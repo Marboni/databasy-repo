@@ -177,10 +177,10 @@ class Length(FieldValidator):
             raise InvalidStateError('Maximum length of this field is %s symbols.' % self.max_length)
 
 
-class ConditionIsFalse(FieldValidator):
-    def __init__(self, condition_func, message):
+class NotExists(FieldValidator):
+    def __init__(self, exists_func, message):
         FieldValidator.__init__(self)
-        self.exists_func = condition_func
+        self.exists_func = exists_func
         self.message = message
 
     def __call__(self, field, field_values):
@@ -188,10 +188,10 @@ class ConditionIsFalse(FieldValidator):
             raise InvalidStateError(self.message)
 
 
-class ConditionIsTrue(FieldValidator):
-    def __init__(self, condition_func, message):
+class Exists(FieldValidator):
+    def __init__(self, exists_func, message):
         FieldValidator.__init__(self)
-        self.exists_func = condition_func
+        self.exists_func = exists_func
         self.message = message
 
 

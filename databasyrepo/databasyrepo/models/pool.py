@@ -26,20 +26,6 @@ class ModelsPool(object):
         finally:
             self._lock.release_write()
 
-    def _create(self, model_id, user_id):
-        """ Creates model.
-        """
-        mm = ModelManager(self)
-        mm.create(model_id, user_id)
-        self._lock.acquire_write()
-        try:
-            # Check again - may be some other thread already loaded it.
-            if not self._model_managers.has_key(model_id):
-                self._model_managers[model_id] = mm
-                self.log('ModelManager:%s was added to the pool.' % model_id)
-            return self._model_managers[model_id]
-        finally:
-            self._lock.release_write()
 
     def _remove(self, model_id):
         self._lock.acquire_write()
@@ -61,10 +47,7 @@ class ModelsPool(object):
     def connect(self, model_id, user_id, socket):
         mm = self.get(model_id)
         if not mm:
-            try:
-                mm = self._load(model_id)
-            except ModelNotFound:
-                mm = self._create(model_id, user_id)
+            mm = self._load(model_id)
         with mm.lock:
             mm.runtime.add_user(user_id, socket)
 
@@ -78,6 +61,12 @@ class ModelsPool(object):
                 self._remove(model_id)
                 self.log('ModelManager:%s had no online users and was removed from the pool.' % model_id)
 
+    def model_ids(self):
+        self._lock.acquire_read()
+        try:
+            return self._model_managers.keys()
+        finally:
+            self._lock.release_read()
 
     def log(self, message):
         self.app.logger.info("[Pool] %s" % message)

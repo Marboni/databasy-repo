@@ -2,13 +2,22 @@ import threading
 from databasyrepo.mg import mg
 from databasyrepo.models.core import serializing
 from databasyrepo.models.core.errors import ModelNotFound
-from databasyrepo.models.core.models import Model
-from databasyrepo.models.register import register
 from databasyrepo.utils import dateutils, geventutils
 
 __author__ = 'Marboni'
 
 MODELS_NS = '/models'
+
+def retrieve_model(model_id, conn):
+    serialized_model = conn.models.find_one({'model_id': model_id})
+    if not serialized_model:
+        raise ModelNotFound(model_id)
+    model = serializing.deserialize(serialized_model)
+    model.inject_connection(conn)
+    return model
+
+def model_exists(model_id, conn):
+    return bool(conn.models.find({'model_id': model_id}).limit(1))
 
 class ModelManager(object):
     ONLINE_TIMEOUT = 10
@@ -55,36 +64,11 @@ class ModelManager(object):
         if requires_runtime_emit:
             self.emit_runtime()
 
-    def create(self, model_id, user_id):
-        self.model_id = model_id
-
-        serial = self.code_by_id(model_id)
-        # TODO Handle case when model not found.
-        model_class = register.get(serial, Model)
-        self._model = model_class.create(model_id, user_id)
-        self._model.inject_connection(mg())
-        self._model.save()
-        self._init_runtime()
-
-    @staticmethod
-    def code_by_id(model_id):
-        # TODO Should take it from some source.
-        from databasyrepo.models.postgres.models import PostgresModel
-
-        return PostgresModel.code()
-
-    @staticmethod
-    def retrieve_model(model_id, conn):
-        serialized_model = conn.models.find_one({'model_id': model_id})
-        if not serialized_model:
-            raise ModelNotFound(model_id)
-        model = serializing.deserialize(serialized_model)
-        model.inject_connection(conn)
-        return model
 
     def reload(self):
-        self._model = self.retrieve_model(self.model_id, mg())
+        self._model = retrieve_model(self.model_id, mg())
         self._init_runtime()
+
 
     def execute_command(self, command, user_id):
         self._check_model()
@@ -95,8 +79,10 @@ class ModelManager(object):
             self.reload()
             raise e
 
+
     def emit_runtime(self):
         self.emit_to_users('runtime_changed', self.serialize_runtime())
+
 
     def emit_to_users(self, event, *args):
         pkt = dict(type='event', name=event, args=args, endpoint=MODELS_NS)

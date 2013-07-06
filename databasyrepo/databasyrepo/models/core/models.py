@@ -8,6 +8,12 @@ from databasyrepo.models.core.elements import Table
 
 __author__ = 'Marboni'
 
+def model_codes():
+    """ Returns all model types.
+    """
+    from databasyrepo.models.register import register
+    return [model_class.code() for model_class in register.by_type(Model) if model_class.Meta.creatable]
+
 class Model(Node):
     class Meta:
         # Possibility to create this model on Production.
