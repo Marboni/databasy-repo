@@ -20,6 +20,8 @@ class Config(object):
     MONGO_URI = None
     MONGO_DATABASE_NAME = None
 
+    FACADE_RPC_ADDRESS = 'tcp://localhost:5555'
+
     HOST = ''
     PORT = 8000
 
