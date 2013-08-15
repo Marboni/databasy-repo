@@ -4,7 +4,7 @@ from flask import Flask
 import os
 from socketio.server import SocketIOServer
 import sys
-from databasyrepo import config, mg
+from databasyrepo import config, mg, rpc
 from databasyrepo.models.pool import ModelsPool
 
 def load_modules(app):
@@ -42,6 +42,9 @@ def configure_logging(app):
 def create_models_pool(app):
     app.pool = ModelsPool(app)
 
+def init_rpc_client(app):
+    rpc.init_facade_rpc_client(app.config['FACADE_RPC_ADDRESS'])
+
 def create_app():
     app = Flask('databasyrepo')
     app.config.from_object(config.config_by_mode(os.environ.get('ODM_API_ENV')))
@@ -50,6 +53,7 @@ def create_app():
     wrap_into_middlewares(app)
     configure_logging(app)
     create_models_pool(app)
+    init_rpc_client(app)
     return app
 
 app = create_app()

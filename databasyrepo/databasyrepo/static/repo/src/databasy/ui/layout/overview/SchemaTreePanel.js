@@ -42,12 +42,12 @@ databasy.ui.layout.overview.SchemaTreePanel = Class.extend({
                     types:{
                         schema:{
                             icon:{
-                                image:'/static/src/img/schema16x16.png'
+                                image:'/static/repo/src/img/schema16x16.png'
                             }
                         },
                         table:{
                             icon:{
-                                image:'/static/src/img/table16x16.png'
+                                image:'/static/repo/src/img/table16x16.png'
                             }
                         }
                     }

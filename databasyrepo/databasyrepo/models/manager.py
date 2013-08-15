@@ -2,6 +2,9 @@ import threading
 from databasyrepo.mg import mg
 from databasyrepo.models.core import serializing
 from databasyrepo.models.core.errors import ModelNotFound
+from databasyrepo.models.core.models import Model
+from databasyrepo.models.register import register
+from databasyrepo.rpc import facade_rpc
 from databasyrepo.utils import dateutils, geventutils
 
 __author__ = 'Marboni'
@@ -64,6 +67,24 @@ class ModelManager(object):
         if requires_runtime_emit:
             self.emit_runtime()
 
+    def create(self, model_id, user_id):
+        self.model_id = model_id
+
+        serial = self.code_by_id(model_id)
+        model_class = register.get(serial, Model)
+        if not model_class:
+            raise Exception('No model found for serial code %s.' % serial)
+        self._model = model_class.create(model_id, user_id)
+        self._model.inject_connection(mg())
+        self._model.save()
+        self._init_runtime()
+
+    @staticmethod
+    def code_by_id(model_id):
+        database_type = facade_rpc('database_type', model_id)
+        if database_type is None:
+            raise ModelNotFound
+        return database_type
 
     def reload(self):
         self._model = retrieve_model(self.model_id, mg())
