@@ -1,10 +1,13 @@
 from logging import StreamHandler, Formatter
 import logging
-from flask import Flask
+import types
+from flask import Flask, request, current_app
+from flask.ext.login import LoginManager
 import os
 from socketio.server import SocketIOServer
 import sys
 from databasyrepo import config, mg, rpc
+from databasyrepo.auth import load_user
 from databasyrepo.models.pool import ModelsPool
 
 def load_modules(app):
@@ -45,6 +48,22 @@ def create_models_pool(app):
 def init_rpc_client(app):
     rpc.init_facade_rpc_client(app.config['FACADE_RPC_ADDRESS'])
 
+class PatchedLoginManager(LoginManager):
+    def _load_user(self):
+        if request.path.startswith(current_app.static_url_path):
+            return
+        super(PatchedLoginManager, self)._load_user()
+
+
+def init_login_manager(app):
+    login_manager = PatchedLoginManager()
+    #noinspection PyTypeChecker
+    login_manager.user_loader(load_user)
+    login_manager.login_view = app.config['LOGIN_VIEW']
+    login_manager.login_message = app.config['LOGIN_MESSAGE']
+
+    login_manager.init_app(app)
+
 def create_app():
     app = Flask('databasyrepo')
     app.config.from_object(config.config_by_mode(os.environ.get('ODM_API_ENV')))
@@ -54,6 +73,7 @@ def create_app():
     configure_logging(app)
     create_models_pool(app)
     init_rpc_client(app)
+    init_login_manager(app)
     return app
 
 app = create_app()

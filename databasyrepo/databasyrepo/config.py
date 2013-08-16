@@ -11,9 +11,13 @@ class Config(object):
     SITE_NAME = 'Databasy.com'
 
     MODULES = {
+        '/auth': 'databasyrepo.api.auth',
         '/models': 'databasyrepo.api.models',
         '/socket.io': 'databasyrepo.api.socket',
     }
+
+    LOGIN_VIEW = 'auth.login'
+    LOGIN_MESSAGE = None
 
     MIDDLEWARES = ()
 
