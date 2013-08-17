@@ -1,11 +1,12 @@
 import threading
+import gevent
 from databasyrepo.mg import mg
 from databasyrepo.models.core import serializing
 from databasyrepo.models.core.errors import ModelNotFound
 from databasyrepo.models.core.models import Model
 from databasyrepo.models.register import register
-from databasyrepo.rpc import facade_rpc
-from databasyrepo.utils import dateutils, geventutils
+from databasyrepo.mq import facade_rpc
+from databasyrepo.utils import dateutils
 
 __author__ = 'Marboni'
 
@@ -19,8 +20,10 @@ def retrieve_model(model_id, conn):
     model.inject_connection(conn)
     return model
 
+
 def model_exists(model_id, conn):
     return bool(conn.models.find({'model_id': model_id}).limit(1))
+
 
 class ModelManager(object):
     ONLINE_TIMEOUT = 10
@@ -32,6 +35,7 @@ class ModelManager(object):
         self.pool = pool
         self.model_id = model_id
         self.runtime = None
+        self.scheduler = None
         self.lock = threading.Lock()
 
     def _check_model(self):
@@ -40,32 +44,45 @@ class ModelManager(object):
 
     def _init_runtime(self):
         self.runtime = Runtime()
-        geventutils.schedule(self.ONLINE_STATUS_CHECK_PERIOD, self.update_users_activity)
+        self._update_users_activity_periodically()
+
+    def _update_users_activity_periodically(self):
+        gevent.spawn_later(0, self.update_users_activity)
+        self.scheduler = gevent.spawn_later(self.ONLINE_STATUS_CHECK_PERIOD, self._update_users_activity_periodically)
 
     def update_users_activity(self):
-        requires_runtime_emit = False
+        users_to_disconnect = []
 
-        for user_id in self.runtime.users.keys():
-            now = dateutils.now()
-            user_info = self.runtime.users[user_id]
+        with self.lock:
+            runtime_changed = False
+            for user_id in self.runtime.users.keys():
+                now = dateutils.now()
+                user_info = self.runtime.users[user_id]
 
-            if now - user_info.last_online > self.ONLINE_TIMEOUT * 1000:
-                # Checking online / offline.
-                self.runtime.user_socket(user_id).disconnect(silent=True)
-                requires_runtime_emit = False # Disconnect emits runtime itself.
+                if now - user_info.last_online > self.ONLINE_TIMEOUT * 1000:
+                    # Checking online / offline.
+                    users_to_disconnect.append(user_id)
+                elif now - user_info.last_activity > self.ACTIVE_TIMEOUT * 1000 and user_info.active:
+                    # Checking activity.
+                    user_info.active = False
+                    if user_id == self.runtime.editor and self.runtime.applicants:
+                        # Editor is inactive and other users requested control - passing control.
+                        applicant_id = self.runtime.applicants[0]
+                        self.runtime.pass_control(user_id, applicant_id)
+                        self.log('Editor %s is inactive, control passed to user %s.' % (user_id, applicant_id))
+                    runtime_changed = True
 
-            elif now - user_info.last_activity > self.ACTIVE_TIMEOUT * 1000 and user_info.active:
-                # Checking activity.
-                user_info.active = False
-                if user_id == self.runtime.editor and self.runtime.applicants:
-                    # Editor is inactive and other users requested control - passing control.
-                    applicant_id = self.runtime.applicants[0]
-                    self.runtime.pass_control(user_id, applicant_id)
-                    self.log('Editor %s is inactive, control passed to user %s.' % (user_id, applicant_id))
-                requires_runtime_emit = True
+            if runtime_changed:
+                self.emit_runtime()
 
-        if requires_runtime_emit:
-            self.emit_runtime()
+        for user_id in users_to_disconnect:
+            try:
+                socket = self.runtime.user_socket(user_id)
+            except ValueError:
+                continue
+            else:
+                socket.disconnect(silent=True)
+
 
     def create(self, model_id, user_id):
         self.model_id = model_id
@@ -78,6 +95,11 @@ class ModelManager(object):
         self._model.inject_connection(mg())
         self._model.save()
         self._init_runtime()
+
+    def delete(self):
+        self._check_model()
+        with self.lock:
+            self._model.delete()
 
     @staticmethod
     def code_by_id(model_id):
@@ -100,10 +122,8 @@ class ModelManager(object):
             self.reload()
             raise e
 
-
     def emit_runtime(self):
         self.emit_to_users('runtime_changed', self.serialize_runtime())
-
 
     def emit_to_users(self, event, *args):
         pkt = dict(type='event', name=event, args=args, endpoint=MODELS_NS)
@@ -120,6 +140,9 @@ class ModelManager(object):
     def log(self, message):
         self.pool.app.logger.info("[ModelManager:%s] %s" % (self.model_id, message))
 
+    def close(self):
+        if self.scheduler:
+            self.scheduler.kill()
 
 class Runtime(dict):
     def __init__(self):
@@ -207,6 +230,7 @@ class Runtime(dict):
             return self.users[user_id].socket
         except KeyError:
             raise ValueError('User %s is not online.' % user_id)
+
 
 class UserInfo(dict):
     def __init__(self, user_id, socket):

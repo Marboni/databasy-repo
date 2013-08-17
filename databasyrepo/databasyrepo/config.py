@@ -11,6 +11,7 @@ class Config(object):
     SITE_NAME = 'Databasy.com'
 
     MODULES = {
+        '/': 'databasyrepo.api.root',
         '/auth': 'databasyrepo.api.auth',
         '/models': 'databasyrepo.api.models',
         '/socket.io': 'databasyrepo.api.socket',
@@ -25,6 +26,7 @@ class Config(object):
     MONGO_DATABASE_NAME = None
 
     FACADE_RPC_ADDRESS = 'tcp://localhost:5555'
+    FACADE_PUB_ADDRESS = 'tcp://localhost:5556'
 
     HOST = ''
     PORT = 8000

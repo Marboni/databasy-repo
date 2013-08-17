@@ -1,5 +1,5 @@
 from flask.ext.login import UserMixin
-from databasyrepo.rpc import facade_rpc
+from databasyrepo.mq import facade_rpc
 
 __author__ = 'Marboni'
 

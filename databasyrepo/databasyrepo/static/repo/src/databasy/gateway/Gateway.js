@@ -35,6 +35,10 @@ databasy.gateway.Gateway = Class.extend({
     on_connect:function () {
         this.enter();
     },
+    on_server_disconnect: function() {
+        this.socket.disconnect();
+        window.location.href = '/';
+    },
     on_reconnect:function () {
     },
     on_reconnecting:function () {

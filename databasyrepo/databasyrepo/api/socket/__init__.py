@@ -22,20 +22,16 @@ def socketio(remaining):
 
 class ModelsNamespace(BaseNamespace):
     def __init__(self, environ, ns_name, request=None):
-        self.context = None
         if request:
             # Hack: initialize context with app that was set instead of request. Then miss it in parent constructor call.
-            app = request
-            self.context = app.request_context(environ)
-            self.context.push()
-            app.preprocess_request()
+            self.app = request
         super(ModelsNamespace, self).__init__(environ, ns_name)
 
     def get_initial_acl(self):
-        return ['recv_connect', 'on_enter']
+        return ['recv_connect', 'on_enter', 'recv_disconnect']
 
     def log(self, message):
-        self.context.app.logger.info("[SocketSession:%s] [uid:%s] %s" % (self.socket.sessid, self.user_id, message))
+        self.app.logger.info("[SocketSession:%s] [uid:%s] %s" % (self.socket.sessid, self.user_id, message))
 
     def on_enter(self, model_id, user_id):
         user_id = long(user_id)
@@ -44,7 +40,7 @@ class ModelsNamespace(BaseNamespace):
         self.session['user_id'] = user_id
         self.session['model_id'] = model_id
 
-        self.context.app.pool.connect(model_id, user_id, self.socket)
+        self.app.pool.connect(model_id, user_id, self.socket)
         self.lift_acl_restrictions()
 
         self.mm.emit_runtime()
@@ -108,15 +104,10 @@ class ModelsNamespace(BaseNamespace):
 
     def disconnect(self, *args, **kwargs):
         if 'user_id' in self.session:
-            self.context.app.pool.disconnect(self.model_id, self.user_id)
+            self.app.pool.disconnect(self.model_id, self.user_id)
             if self.mm:
                 # This user was not last, model was not removed from pool.
                 self.mm.emit_runtime()
-            if self.context:
-                try:
-                    self.context.pop()
-                except:
-                    pass
         super(ModelsNamespace, self).disconnect(*args, **kwargs)
         self.log('Disconnected from model %s.' % self.model_id)
 
@@ -130,7 +121,7 @@ class ModelsNamespace(BaseNamespace):
 
     @property
     def mm(self):
-        return self.context.app.pool.get(self.model_id)
+        return self.app.pool.get(self.model_id)
 
     def emit_to_all(self, event, *args):
         user_ids = self.mm.runtime.users.keys()

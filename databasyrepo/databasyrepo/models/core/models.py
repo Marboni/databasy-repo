@@ -150,6 +150,9 @@ class Model(Node):
     def save(self):
         self._conn.models.save(self)
 
+    def delete(self):
+        self._conn.models.remove({'model_id': self.val('model_id')})
+
     def deserialize(self, serialized_obj):
         super(Model, self).deserialize(serialized_obj)
         self.revision_stack.inject_model(self)

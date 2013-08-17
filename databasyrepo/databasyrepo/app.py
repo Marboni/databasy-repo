@@ -1,12 +1,11 @@
 from logging import StreamHandler, Formatter
 import logging
-import types
 from flask import Flask, request, current_app
 from flask.ext.login import LoginManager
 import os
 from socketio.server import SocketIOServer
 import sys
-from databasyrepo import config, mg, rpc
+from databasyrepo import config, mg, mq
 from databasyrepo.auth import load_user
 from databasyrepo.models.pool import ModelsPool
 
@@ -45,8 +44,8 @@ def configure_logging(app):
 def create_models_pool(app):
     app.pool = ModelsPool(app)
 
-def init_rpc_client(app):
-    rpc.init_facade_rpc_client(app.config['FACADE_RPC_ADDRESS'])
+def init_facade_clients(app):
+    mq.init_facade_clients(app.config['FACADE_RPC_ADDRESS'], app.config['FACADE_PUB_ADDRESS'])
 
 class PatchedLoginManager(LoginManager):
     def _load_user(self):
@@ -72,7 +71,7 @@ def create_app():
     wrap_into_middlewares(app)
     configure_logging(app)
     create_models_pool(app)
-    init_rpc_client(app)
+    init_facade_clients(app)
     init_login_manager(app)
     return app
 
