@@ -6,7 +6,7 @@ __author__ = 'Marboni'
 class UserInfo(UserMixin):
     def __init__(self, info):
         super(UserInfo, self).__init__()
-        self.user_id = info['user_id']
+        self.id = info['user_id']
         self.name = info['name']
         self.email = info['email']
         self.active = info['active']

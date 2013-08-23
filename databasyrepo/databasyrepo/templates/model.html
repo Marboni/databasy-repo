@@ -459,7 +459,7 @@ $(function () {
                 try {
                     databasy.utils.preloader.openPreloader(true);
                     var userId = new Date().getTime();
-                    new databasy.gateway.Gateway({{ model_id }}, userId);
+                    new databasy.gateway.Gateway({{ model_id }}, {{ user.id }});
                 }
                 catch (error) {
                     console.log(error);

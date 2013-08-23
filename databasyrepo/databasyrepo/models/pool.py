@@ -82,10 +82,16 @@ class ModelsPool(object):
         if not mm:
             return
         with mm.lock:
-            mm.runtime.remove_user(user_id)
-            if not mm.runtime.users:
-                self._remove(model_id)
-                self.log('ModelManager:%s had no online users and was removed from the pool.' % model_id)
+            try:
+                socket = mm.runtime.user_socket(user_id)
+            except ValueError:
+                pass
+            else:
+                socket_utils.emit('/models', socket, 'server_disconnect')
+                mm.runtime.remove_user(user_id)
+                if not mm.runtime.users:
+                    self._remove(model_id)
+                    self.log('ModelManager:%s had no online users and was removed from the pool.' % model_id)
 
     def delete_model(self, model_id):
         model_info = facade_rpc('delete_model', model_id)

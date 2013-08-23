@@ -173,7 +173,7 @@ class Runtime(dict):
 
     def remove_user(self, user_id):
         if not self.users.has_key(user_id):
-            raise ValueError('User %s is not online.' % user_id)
+            return
         if self.is_editor(user_id):
             self.pass_control(user_id, None)
         elif self.is_applicant(user_id):
