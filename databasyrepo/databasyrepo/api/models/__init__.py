@@ -37,5 +37,5 @@ def delete_model(model_id):
 def give_up(model_id):
     user_id = current_user.id
     current_app.pool.disconnect(model_id, user_id)
-    facade_rpc('give_up_model', model_id, user_id)
+    facade_rpc('delete_role', model_id, user_id)
     return redirect(url_for('root.home'))
