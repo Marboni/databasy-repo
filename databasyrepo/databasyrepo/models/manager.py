@@ -82,6 +82,7 @@ class ModelManager(object):
                 continue
             else:
                 socket.disconnect(silent=True)
+                self.log('User %s went offline and was disconnected.' % user_id)
 
 
     def create(self, model_id, user_id):

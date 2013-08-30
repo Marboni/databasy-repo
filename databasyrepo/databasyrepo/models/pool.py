@@ -69,12 +69,17 @@ class ModelsPool(object):
         return mm
 
     def connect(self, model_id, user_id, socket):
-        # TODO Check permissions.
         try:
             mm = self.get_or_load(model_id)
         except ModelNotFound:
             mm = self._create(model_id, user_id)
         with mm.lock:
+            try:
+                old_socket = mm.runtime.user_socket(user_id)
+            except ValueError:
+                pass
+            else:
+                socket_utils.emit('/models', old_socket, 'server_disconnect')
             mm.runtime.add_user(user_id, socket)
 
     def disconnect(self, model_id, user_id):

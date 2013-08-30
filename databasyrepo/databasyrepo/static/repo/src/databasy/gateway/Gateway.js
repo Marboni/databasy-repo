@@ -1,8 +1,5 @@
 databasy.gateway.Gateway = Class.extend({
-    init:function (modelId, userId) {
-        this.modelId = modelId;
-        this.userId = userId;
-
+    init:function () {
         this._observer = new databasy.utils.events.Observer();
 
         this.socket = this.createSocket();
@@ -33,7 +30,7 @@ databasy.gateway.Gateway = Class.extend({
 
     // SOCKET CALLBACKS
     on_connect:function () {
-        this.enter();
+        this.socket.emit('enter');
     },
     on_server_disconnect: function() {
         this.socket.disconnect();
@@ -44,11 +41,13 @@ databasy.gateway.Gateway = Class.extend({
     on_reconnecting:function () {
         databasy.utils.preloader.openPreloader(false);
     },
-    on_error:function (e) {
-        console.log('ERROR: ' + e.toString());
-        this.enter();
+    on_error:function (error, message) {
+        alert(error + ': ' + message + '\n\n' + 'Model will be reloaded.');
+        window.location.href = '/models/' + this.modelId;
     },
-    on_enter_done:function () {
+    on_enter_done:function (modelId, userId) {
+        this.modelId = modelId;
+        this.userId = userId;
         this.socket.emit('load');
     },
     on_load_done:function (serializedModel, serializedRuntime) {
@@ -61,10 +60,6 @@ databasy.gateway.Gateway = Class.extend({
     on_exec:function(serializedCommand) {
         var command = databasy.model.core.serializing.Serializable.deserialize(serializedCommand);
         this._applyCommand(command);
-    },
-
-    enter: function() {
-        this.socket.emit('enter', this.modelId, this.userId);
     },
 
     executeCommand:function (command) {

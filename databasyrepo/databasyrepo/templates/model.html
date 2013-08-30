@@ -32,6 +32,7 @@ $(function () {
             .script("{{ url_for('static', filename='repo/libs/jquery.layout.js') }}")
             .script("{{ url_for('static', filename='repo/libs/jquery.simplemodal.1.4.4.min.js') }}")
             .script("{{ url_for('static', filename='repo/libs/jquery.jeditable.js') }}")
+            .script("{{ url_for('static', filename='repo/libs/jquery.cookie.js') }}")
             .script("{{ url_for('static', filename='repo/libs/jstree/jquery.jstree.js') }}")
             .script("{{ url_for('static', filename='repo/libs/jeegoocontext/jquery.jeegoocontext.js') }}")
 
@@ -458,8 +459,7 @@ $(function () {
             .wait(function () {
                 try {
                     databasy.utils.preloader.openPreloader(true);
-                    var userId = new Date().getTime();
-                    new databasy.gateway.Gateway({{ model_id }}, {{ user.id }});
+                    new databasy.gateway.Gateway();
                 }
                 catch (error) {
                     console.log(error);
