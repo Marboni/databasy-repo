@@ -92,7 +92,7 @@ class ModelsNamespace(BaseNamespace):
 
         self.on_activity(True)
         self.mm.emit_runtime()
-        self.emit('enter_done', self.model_id, self.user_id)
+        self.emit('enter_done', self.model_id, self.user_id, self.role.role)
 
         self.log('Connected to model %s.' % self.model_id)
 

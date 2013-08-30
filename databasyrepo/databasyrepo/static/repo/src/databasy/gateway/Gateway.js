@@ -45,9 +45,11 @@ databasy.gateway.Gateway = Class.extend({
         alert(error + ': ' + message + '\n\n' + 'Model will be reloaded.');
         window.location.href = '/models/' + this.modelId;
     },
-    on_enter_done:function (modelId, userId) {
+    on_enter_done:function (modelId, userId, role) {
         this.modelId = modelId;
         this.userId = userId;
+        this.role = new databasy.gateway.ModelRole(role);
+
         this.socket.emit('load');
     },
     on_load_done:function (serializedModel, serializedRuntime) {

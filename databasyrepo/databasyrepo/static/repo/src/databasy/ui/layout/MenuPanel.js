@@ -74,6 +74,9 @@ databasy.ui.layout.MenuPanel = Class.extend({
     },
 
     controlButtonClick:function () {
+        if (!this.gateway.role.includes(databasy.gateway.ModelRole.DEVELOPER)) {
+            return;
+        }
         var runtime = this.gateway.runtime;
         if (runtime.isEditor()) {
             this.gateway.passControl(null);
@@ -123,41 +126,51 @@ databasy.ui.layout.MenuPanel = Class.extend({
     },
 
     onRuntimeChanged:function (event) {
+        var role = this.gateway.role;
         var runtime = event.runtime;
-        var isEditor = runtime.isEditor();
 
-        this.closeControlPassDialog();
+        if (role.includes(databasy.gateway.ModelRole.DEVELOPER)) {
+            var isEditor = runtime.isEditor();
 
-        if (isEditor) {
-            this.controlButton.button('option', {disabled:false, label:this.CONTROL_BTN_LABEL_EDITING_DONE});
-            this.controlStatusMsg.text(this.USER_EDITING_MSG);
+            this.closeControlPassDialog();
 
-            if (runtime.applicants.length > 0) {
-                this.openControlPassDialog(runtime);
-            }
-        } else {
-            if (runtime.passingControl) {
-                this.controlButton.button('option', {disabled:true});
-                this.controlStatusMsg.text(this.PASSING_CONTROL_MSG);
+            if (isEditor) {
+                this.controlButton.button('option', {disabled:false, label:this.CONTROL_BTN_LABEL_EDITING_DONE});
+                this.controlStatusMsg.text(this.USER_EDITING_MSG);
 
-            } else if (runtime.requestingControl) {
-                this.controlButton.button('option', {disabled:true});
-                this.controlStatusMsg.text(this.REQUESTING_CONTROL_MSG);
-
-            } else if (runtime.editor !== null) {
-                if (runtime.isApplicant()) {
-                    this.controlButton.button('option', {disabled:false, label:this.CONTROL_BTN_LABEL_CANCEL_REQUEST});
-                    this.controlStatusMsg.text(this.OTHER_USER_EDITING_MSG);
-
-                } else {
-                    this.controlButton.button('option', {disabled:false, label:this.CONTROL_BTN_LABEL_REQUEST_CONTROL});
-                    this.controlStatusMsg.text(this.OTHER_USER_EDITING_MSG);
-
+                if (runtime.applicants.length > 0) {
+                    this.openControlPassDialog(runtime);
                 }
             } else {
-                this.controlButton.button('option', {disabled:false, label:this.CONTROL_BTN_LABEL_EDIT});
-                this.controlStatusMsg.text(this.NOBODY_EDITING_MSG);
+                if (runtime.passingControl) {
+                    this.controlButton.button('option', {disabled:true});
+                    this.controlStatusMsg.text(this.PASSING_CONTROL_MSG);
 
+                } else if (runtime.requestingControl) {
+                    this.controlButton.button('option', {disabled:true});
+                    this.controlStatusMsg.text(this.REQUESTING_CONTROL_MSG);
+
+                } else if (runtime.editor !== null) {
+                    if (runtime.isApplicant()) {
+                        this.controlButton.button('option', {disabled:false, label:this.CONTROL_BTN_LABEL_CANCEL_REQUEST});
+                        this.controlStatusMsg.text(this.OTHER_USER_EDITING_MSG);
+
+                    } else {
+                        this.controlButton.button('option', {disabled:false, label:this.CONTROL_BTN_LABEL_REQUEST_CONTROL});
+                        this.controlStatusMsg.text(this.OTHER_USER_EDITING_MSG);
+
+                    }
+                } else {
+                    this.controlButton.button('option', {disabled:false, label:this.CONTROL_BTN_LABEL_EDIT});
+                    this.controlStatusMsg.text(this.NOBODY_EDITING_MSG);
+                }
+            }
+        } else {
+            this.controlButton.button('option', {disabled:true, label:this.CONTROL_BTN_LABEL_EDIT});
+            if (runtime.editor === null) {
+                this.controlStatusMsg.text(this.NOBODY_EDITING_MSG);
+            } else {
+                this.controlStatusMsg.text(this.OTHER_USER_EDITING_MSG);
             }
         }
     }
