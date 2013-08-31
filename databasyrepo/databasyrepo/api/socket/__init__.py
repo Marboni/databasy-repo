@@ -1,6 +1,6 @@
 from flask import Blueprint, request, Response, current_app
 import json
-from flask.ext.login import current_user
+from flask.ext.login import current_user, login_required
 import re
 from socketio import socketio_manage
 from socketio.namespace import BaseNamespace
@@ -25,6 +25,7 @@ def error_handler(socket, error_name, error_message, endpoint, msg_id, quiet):
 
 
 @bp.route('/<path:remaining>')
+@login_required
 def socketio(remaining):
     try:
         http_referer = request.environ['HTTP_REFERER']
@@ -33,8 +34,8 @@ def socketio(remaining):
     m = re.match('.*/models/(\d+).*', http_referer)
     if not m:
         raise BadRequest
-    model_id = long(m.group(1))
     user_id = current_user.id
+    model_id = long(m.group(1))
     role = get_role(model_id)
     if not role:
         raise Unauthorized

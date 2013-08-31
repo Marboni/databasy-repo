@@ -26,7 +26,7 @@ class UserInfo(UserMixin):
     def __init__(self, info):
         super(UserInfo, self).__init__()
         self.id = info['user_id']
-        self.name = info['name']
+        self.username = info['username']
         self.email = info['email']
         self.active = info['active']
 
