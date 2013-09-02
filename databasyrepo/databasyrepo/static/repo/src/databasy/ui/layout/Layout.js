@@ -46,7 +46,7 @@ databasy.ui.layout.Layout = Class.extend({
                         paneSelector:"#toolbar",
                         fxName: 'slide',
                         initClosed: true,
-                        size:47,
+                        size:44,
                         spacing_open:0,
                         spacing_closed:0,
                         closable:true

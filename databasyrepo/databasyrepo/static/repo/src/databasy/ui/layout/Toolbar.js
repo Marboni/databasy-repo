@@ -10,10 +10,8 @@ databasy.ui.layout.Toolbar = Class.extend({
         this.toolbar.append(this.toolPanel);
 
         var constant = databasy.ui.layout.Toolbar;
-        this.createToolbarButton(constant.POINTER, 'ui-icon-pointer-32', 'Select');
-        this.createToolbarButton(constant.CREATE_TABLE, 'ui-icon-table-32', 'Create Table');
-
-        this.toolPanel.buttonsetv();
+        this.createToolbarButton(constant.POINTER, 'icn-pointer', 'Select');
+        this.createToolbarButton(constant.CREATE_TABLE, 'icn-table', 'Create Table');
 
         this.selectDefault();
     },
@@ -22,44 +20,47 @@ databasy.ui.layout.Toolbar = Class.extend({
         this.toolbar.empty();
     },
     createEditToolbar:function () {
-        this.toolPanel = $('<div id="toolPanel"></div>');
+        this.toolPanel = $('<div id="toolPanel" class="btn-group btn-group-vertical" data-toggle="buttons-radio"></div>');
     },
     createToolbarButton:function (toolName, icon, tooltip) {
         var buttonId = toolName + 'ToolbarButton';
         var button = $(
-            '<input type="radio" id="' + buttonId + '" name="tools" tool="' + toolName + '" />' +
-                '<label for="' + buttonId + '">' + tooltip + '</label>'
-        );
+            '<button id="' + buttonId + '" type="button" class="btn" name="tools" data-tool="' + toolName +
+                '" data-toggle="tooltip" data-original-title="' + tooltip + '">' +
+                '<i class="icn ' + icon + '"></i>' +
+                '</button>');
 
         this.toolPanel.append(button);
 
         var that = this;
-        $('#' + buttonId).button({
-            icons:{primary:icon},
-            text:false
-        }).click(function () {
-                var tool = $(this).attr('tool');
+        $('#' + buttonId)
+            .tooltip({
+                placement: 'right',
+                delay: 500,
+                container: 'body'
+            })
+            .click(function () {
+                var tool = $(this).data('tool');
                 if (tool === that._currentTool) {
                     that.selectDefault();
                 } else {
                     that._currentTool = tool;
                 }
             });
-        button.css({width: '40px', 'padding-top': '5px', 'padding-bottom': '5px'});
         return button;
     },
-    select:function(tool) {
+    select:function (tool) {
         this._currentTool = tool;
-        $('#toolPanel').find('input[tool=' + tool + ']').prop('checked', true);
-        this.toolPanel.buttonset('refresh');
+        this.toolPanel.find('button').removeClass('active');
+        this.toolPanel.find('button[data-tool=' + tool + ']').addClass('active');
     },
-    selectDefault: function() {
+    selectDefault:function () {
         this.select(this._defaultTool);
     },
-    getCurrentTool:function() {
+    getCurrentTool:function () {
         return this._currentTool;
     }
 }, {
-    POINTER: 'pointer',
-    CREATE_TABLE: 'createTable'
+    POINTER:'pointer',
+    CREATE_TABLE:'createTable'
 });
