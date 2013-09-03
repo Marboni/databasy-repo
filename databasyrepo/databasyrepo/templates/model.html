@@ -463,7 +463,7 @@ $(function () {
             .wait(function () {
                 try {
                     databasy.utils.preloader.openPreloader(true);
-                    new databasy.gateway.Gateway();
+                    new databasy.gateway.Gateway({{ model_id }});
                 }
                 catch (error) {
                     console.log(error);

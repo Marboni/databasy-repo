@@ -83,8 +83,8 @@ databasy.ui.layout.overview.SchemaTreePanel = Class.extend({
             }
 
             // Show properties for model elements.
-            var elementId = $(this).attr('elementId');
-            if (elementId !== undefined) {
+            var elementId = $(this).data('elementid');
+            if (elementId !== null) {
                 var canvas = that.gateway.layout.canvas;
                 var propertyPanel = that.gateway.layout.propertyPanel;
 
@@ -144,7 +144,7 @@ databasy.ui.layout.overview.SchemaTreePanel = Class.extend({
             },
             onSelect:function (e, context) {
                 var code = $(e.currentTarget).attr('code');
-                var elementId = $(context).attr('elementid');
+                var elementId = $(context).data('elementid');
                 var modelNode = that.gateway.model.node(elementId);
                 contextMenu.items[code].handler(modelNode);
             }
@@ -206,17 +206,17 @@ databasy.ui.layout.overview.SchemaTreePanel = Class.extend({
                 title:tableName
             },
             attr:{
-                elementId:tableId,
                 rel:'table'
             },
             children:null
         };
         var node = this.schemaTree.jstree('create', '#schemaTreeTables', 'last', tableNode, false, true);
+        node.data('elementid', tableId);
         this.bindContextMenu(node);
     },
 
     treeNode:function (modelNodeId) {
-        return this.schemaTree.find('li[elementid="' + modelNodeId + '"]');
+        return this.schemaTree.find('li[data-elementid="' + modelNodeId + '"]');
     },
 
     onModelChanged:function (event) {

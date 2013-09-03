@@ -1,5 +1,7 @@
 databasy.gateway.Gateway = Class.extend({
-    init:function () {
+    init:function (modelId) {
+        this.modelId = modelId;
+
         this._observer = new databasy.utils.events.Observer();
 
         this.socket = this.createSocket();
@@ -9,7 +11,8 @@ databasy.gateway.Gateway = Class.extend({
 
     createSocket:function () {
         var socket = io.connect('/models', {
-            'reconnection limit': 4000
+            'reconnection limit': 4000,
+            query: 'modelid=' + this.modelId
         });
 
         $(window).bind('beforeunload', function() {
@@ -45,8 +48,7 @@ databasy.gateway.Gateway = Class.extend({
         alert(error + ': ' + message + '\n\n' + 'Model will be reloaded.');
         window.location.href = '/models/' + this.modelId;
     },
-    on_enter_done:function (modelId, userId, role) {
-        this.modelId = modelId;
+    on_enter_done:function (userId, role) {
         this.userId = userId;
         this.role = new databasy.gateway.ModelRole(role);
 

@@ -27,15 +27,15 @@ def error_handler(socket, error_name, error_message, endpoint, msg_id, quiet):
 @bp.route('/<path:remaining>')
 @login_required
 def socketio(remaining):
+    user_id = current_user.id
     try:
-        http_referer = request.environ['HTTP_REFERER']
+        model_id = request.values['modelid']
     except KeyError:
         raise BadRequest
-    m = re.match('.*/models/(\d+).*', http_referer)
-    if not m:
+    try:
+        model_id = long(model_id)
+    except ValueError:
         raise BadRequest
-    user_id = current_user.id
-    model_id = long(m.group(1))
     role = get_role(model_id)
     if not role:
         raise Unauthorized

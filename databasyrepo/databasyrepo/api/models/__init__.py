@@ -16,7 +16,7 @@ bp = Blueprint('models', __name__)
 def model(model_id):
     if not manager.model_exists(model_id, mg()):
         raise NotFound
-    return render_template('model.html')
+    return render_template('model.html', model_id=model_id)
 
 @bp.route('/<int:model_id>/delete/', methods=['GET'])
 @has_role(ModelRole.OWNER)
