@@ -12,7 +12,7 @@ databasy.gateway.Gateway = Class.extend({
     createSocket:function () {
         var socket = io.connect('/models', {
             'reconnection limit': 4000,
-            query: 'modelid=' + this.modelId
+            query: 'm=' + this.modelId
         });
 
         $(window).bind('beforeunload', function() {
