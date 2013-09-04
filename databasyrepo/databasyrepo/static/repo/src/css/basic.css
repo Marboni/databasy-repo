@@ -38,18 +38,37 @@ html, body {
 }
 
 .icn {
-    background-image: url(../img/sprite24.png);
+    background-image: url(../img/sprite.png);
     background-repeat: no-repeat;
-    width: 24px;
-    height: 24px;
-    line-height: 24px;
     display: inline-block;
 }
 
-.icn-pointer {
+.icn-database16 {
     background-position: 0 0;
+    width: 16px;
+    height: 16px;
 }
 
-.icn-table {
-    background-position: 0 -74px;
+.icn-dir16 {
+    background-position: 0 -66px;
+    width: 16px;
+    height: 16px;
+}
+
+.icn-table16 {
+    background-position: 0 -206px;
+    width: 16px;
+    height: 16px;
+}
+
+.icn-pointer24 {
+    background-position: 0 -132px;
+    width: 24px;
+    height: 24px;
+}
+
+.icn-table24 {
+    background-position: 0 -272px;
+    width: 24px;
+    height: 24px;
 }

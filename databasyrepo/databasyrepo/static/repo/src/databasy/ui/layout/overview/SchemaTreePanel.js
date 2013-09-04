@@ -42,12 +42,20 @@ databasy.ui.layout.overview.SchemaTreePanel = Class.extend({
                     types:{
                         schema:{
                             icon:{
-                                image:'/static/repo/src/img/schema16x16.png'
+                                image:'/static/repo/src/img/sprite.png',
+                                position: '0 0'
+                            }
+                        },
+                        dir: {
+                            icon:{
+                                image:'/static/repo/src/img/sprite.png',
+                                position: '0 -66px'
                             }
                         },
                         table:{
                             icon:{
-                                image:'/static/repo/src/img/table16x16.png'
+                                image:'/static/repo/src/img/sprite.png',
+                                position: '0 -206px'
                             }
                         }
                     }
