@@ -110,7 +110,7 @@ class ModelManager(object):
             raise ModelNotFound
         return database_type
 
-    def reload(self):
+    def reinit(self):
         self._model = retrieve_model(self.model_id, mg())
         self._init_runtime()
 
@@ -137,13 +137,26 @@ class ModelManager(object):
                 self.emit_runtime()
                 return True
 
+    def change_role(self, user_id):
+        with self.lock:
+            try:
+                socket = self.runtime.user_socket(user_id)
+            except ValueError:
+                return False
+            else:
+                if self.runtime.is_editor(user_id):
+                    self.runtime.pass_control(user_id, None)
+                    self.emit_runtime()
+                socket_utils.emit('/models', socket, 'reload', 'role_changed')
+                return True
+
     def execute_command(self, command, user_id):
         self._check_model()
         try:
             actions = self._model.execute_command(command, user_id)
             return actions
         except Exception, e:
-            self.reload()
+            self.reinit()
             raise e
 
     def emit_runtime(self):

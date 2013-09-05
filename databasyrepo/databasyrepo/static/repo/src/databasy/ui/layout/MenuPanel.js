@@ -35,6 +35,9 @@ databasy.ui.layout.MenuPanel = Class.extend({
             .text(this.CONTROL_BTN_LABEL_EDIT)
             .click($.proxy(this.controlButtonClick, this));
         this.controlPanel.append(this.controlButton);
+        if (!this.gateway.role.includes(databasy.gateway.ModelRole.DEVELOPER)) {
+            this.controlButton.attr('disabled', true);
+        }
     },
 
     createStatusMsg:function () {
@@ -141,7 +144,7 @@ databasy.ui.layout.MenuPanel = Class.extend({
             if (isEditor) {
                 this.controlButton.text(this.CONTROL_BTN_LABEL_EDITING_DONE);
                 this.changeControlButtonClass('btn-success');
-                this.controlButton.prop('disabled', false);
+                this.controlButton.attr('disabled', false);
                 this.controlStatusMsg.text(this.USER_EDITING_MSG);
 
                 if (runtime.applicants.length > 0) {
@@ -149,36 +152,36 @@ databasy.ui.layout.MenuPanel = Class.extend({
                 }
             } else {
                 if (runtime.passingControl) {
-                    this.controlButton.prop('disabled', true);
+                    this.controlButton.attr('disabled', true);
                     this.controlStatusMsg.text(this.PASSING_CONTROL_MSG);
 
                 } else if (runtime.requestingControl) {
-                    this.controlButton.prop('disabled', true);
+                    this.controlButton.attr('disabled', true);
                     this.controlStatusMsg.text(this.REQUESTING_CONTROL_MSG);
 
                 } else if (runtime.editor !== null) {
                     if (runtime.isApplicant()) {
                         this.controlButton.text(this.CONTROL_BTN_LABEL_CANCEL_REQUEST);
                         this.changeControlButtonClass('btn-info');
-                        this.controlButton.prop('disabled', false);
+                        this.controlButton.attr('disabled', false);
                         this.controlStatusMsg.text(this.OTHER_USER_EDITING_MSG);
                     } else {
                         this.controlButton.text(this.CONTROL_BTN_LABEL_REQUEST_CONTROL);
                         this.changeControlButtonClass('btn-info');
-                        this.controlButton.prop('disabled', false);
+                        this.controlButton.attr('disabled', false);
                         this.controlStatusMsg.text(this.OTHER_USER_EDITING_MSG);
 
                     }
                 } else {
                     this.controlButton.text(this.CONTROL_BTN_LABEL_EDIT);
                     this.changeControlButtonClass('btn-info');
-                    this.controlButton.prop('disabled', false);
+                    this.controlButton.attr('disabled', false);
                     this.controlStatusMsg.text(this.NOBODY_EDITING_MSG);
                 }
             }
         } else {
             this.controlButton.text(this.CONTROL_BTN_LABEL_EDIT);
-            this.controlButton.prop('disabled', true);
+            this.controlButton.attr('disabled', true);
             if (runtime.editor === null) {
                 this.controlStatusMsg.text(this.NOBODY_EDITING_MSG);
             } else {

@@ -65,6 +65,15 @@ databasy.gateway.Gateway = Class.extend({
     on_runtime_changed:function (runtime) {
         this.changeRuntime(runtime);
     },
+    on_reload: function(cause) {
+        if ('role_changed' == cause) {
+            alert('Model owner changed your permissions. Model will be reloaded.');
+        } else {
+            alert('Server forced model reload.')
+        }
+        this.disconnecting = true;
+        window.location.href = '/models/' + this.modelId;
+    },
     on_exec:function(serializedCommand) {
         var command = databasy.model.core.serializing.Serializable.deserialize(serializedCommand);
         this._applyCommand(command);

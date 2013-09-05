@@ -32,7 +32,7 @@ class ModelsPool(object):
     def _load(self, model_id):
         # Creating manager and loading model in non-blocking code.
         mm = ModelManager(self, model_id)
-        mm.reload()
+        mm.reinit()
         self._lock.acquire_write()
         try:
             # Check again - may be some other thread already loaded it.
@@ -141,6 +141,12 @@ class ModelsPool(object):
                 self.log('ModelManager:%s had no online users and was removed from the pool.' % model_id)
 
         return removed
+
+    def change_role(self, model_id, user_id):
+        mm = self.get(model_id)
+        if not mm:
+            return False
+        return mm.change_role(user_id)
 
     def disconnect_all(self, user_id):
         for x in range(50):

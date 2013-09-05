@@ -10,5 +10,8 @@ class FacadeSubscriber(Subscriber):
     def handle_logout(self, user_id):
         self.app.pool.disconnect_all(user_id)
 
+    def handle_change_role(self, model_id, user_id):
+        self.app.pool.change_role(model_id, user_id)
+
     def error_handler(self, e):
         print 'ERROR: %s' % e
