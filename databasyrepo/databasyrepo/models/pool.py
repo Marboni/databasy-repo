@@ -1,4 +1,3 @@
-from databasyrepo.api.socket import socket_utils
 from databasyrepo.models.core.errors import ModelNotFound
 from databasyrepo.models.manager import ModelManager
 from databasyrepo.mq import facade_rpc
@@ -12,6 +11,7 @@ class ModelsPool(object):
 
         self.app = app
         self._model_managers = {} # IDs and model managers.
+        self._user_models = {} # User ID and list of user's models IDs.
         self._lock = ReadWriteLock()
 
     def _create(self, model_id, user_id):
@@ -54,6 +54,56 @@ class ModelsPool(object):
         finally:
             self._lock.release_write()
 
+    def bind_user_to_model(self, user_id, model_id):
+        self._lock.acquire_write()
+        try:
+            try:
+                model_ids = self._user_models[user_id]
+            except KeyError:
+                model_ids = set()
+                self._user_models[user_id] = model_ids
+            model_ids.add(model_id)
+        finally:
+            self._lock.release_write()
+
+    def unbind_user_from_model(self, user_id, model_id):
+        self._lock.acquire_read()
+        try:
+            try:
+                model_ids = self._user_models[user_id]
+            except KeyError:
+                return
+            if model_id not in model_ids:
+                return
+        finally:
+            self._lock.release_read()
+
+        self._lock.acquire_write()
+        try:
+            try:
+                model_ids = self._user_models[user_id]
+            except KeyError:
+                return
+            try:
+                model_ids.remove(model_id)
+            except KeyError:
+                pass
+            else:
+                if not model_ids:
+                    del self._user_models[user_id]
+        finally:
+            self._lock.release_write()
+
+    def user_model_ids(self, user_id):
+        self._lock.acquire_read()
+        try:
+            try:
+                return self._user_models[user_id]
+            except KeyError:
+                return set()
+        finally:
+            self._lock.release_read()
+
     def get(self, model_id):
         self._lock.acquire_read()
         try:
@@ -73,30 +123,36 @@ class ModelsPool(object):
             mm = self.get_or_load(model_id)
         except ModelNotFound:
             mm = self._create(model_id, user_id)
-        with mm.lock:
-            try:
-                old_socket = mm.runtime.user_socket(user_id)
-            except ValueError:
-                pass
-            else:
-                socket_utils.emit('/models', old_socket, 'server_disconnect')
-            mm.runtime.add_user(user_id, socket)
+
+        mm.add_user(user_id, socket)
+        self.bind_user_to_model(user_id, model_id)
 
     def disconnect(self, model_id, user_id):
         mm = self.get(model_id)
         if not mm:
-            return
-        with mm.lock:
-            try:
-                socket = mm.runtime.user_socket(user_id)
-            except ValueError:
-                pass
-            else:
-                socket_utils.emit('/models', socket, 'server_disconnect')
-                mm.runtime.remove_user(user_id)
-                if not mm.runtime.users:
-                    self._remove(model_id)
-                    self.log('ModelManager:%s had no online users and was removed from the pool.' % model_id)
+            return False
+
+        removed = mm.remove_user(user_id)
+        if removed:
+            self.unbind_user_from_model(user_id, model_id)
+
+            if not mm.runtime.users:
+                self._remove(model_id)
+                self.log('ModelManager:%s had no online users and was removed from the pool.' % model_id)
+
+        return removed
+
+    def disconnect_all(self, user_id):
+        for x in range(50):
+            model_ids = set(self.user_model_ids(user_id))
+            if not model_ids:
+                self.log('User %s disconnected from all models.' % user_id)
+                break
+            for model_id in model_ids:
+                self.disconnect(model_id, user_id)
+        else:
+            raise Exception('User still has not been disconnected from all its models after 50 tries.')
+
 
     def delete_model(self, model_id):
         model_info = facade_rpc('delete_model', model_id)
@@ -105,13 +161,15 @@ class ModelsPool(object):
         except ModelNotFound:
             pass
         else:
-            for user_id in list(mm.runtime.users.keys()):
-                try:
-                    socket = mm.runtime.user_socket(user_id)
-                except ValueError:
-                    continue
-
-                socket_utils.emit('/models', socket, 'server_disconnect')
+            for x in range(50):
+                user_ids = list(mm.runtime.users.keys())
+                if not user_ids:
+                    break
+                for user_id in user_ids:
+                    mm.remove_user()
+                    self.unbind_user_from_model(user_id, model_id)
+            else:
+                raise Exception('Model users still has not been disconnected from all its models after 50 tries.')
 
             mm.delete()
             self._remove(model_id)

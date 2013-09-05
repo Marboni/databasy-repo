@@ -1,5 +1,6 @@
 import threading
 import gevent
+from databasyrepo.api.socket import socket_utils
 from databasyrepo.mg import mg
 from databasyrepo.models.core import serializing
 from databasyrepo.models.core.errors import ModelNotFound
@@ -113,6 +114,28 @@ class ModelManager(object):
         self._model = retrieve_model(self.model_id, mg())
         self._init_runtime()
 
+    def add_user(self, user_id, socket):
+        with self.lock:
+            try:
+                old_socket = self.runtime.user_socket(user_id)
+            except ValueError:
+                pass
+            else:
+                socket_utils.emit('/models', old_socket, 'server_disconnect')
+            self.runtime.add_user(user_id, socket)
+
+    def remove_user(self, user_id):
+        with self.lock:
+            try:
+                socket = self.runtime.user_socket(user_id)
+            except ValueError:
+                return False
+            else:
+                self.runtime.remove_user(user_id)
+                socket_utils.emit('/models', socket, 'server_disconnect')
+                socket.disconnect(silent=True)
+                self.emit_runtime()
+                return True
 
     def execute_command(self, command, user_id):
         self._check_model()
@@ -231,6 +254,9 @@ class Runtime(dict):
             return self.users[user_id].socket
         except KeyError:
             raise ValueError('User %s is not online.' % user_id)
+
+    def has_user(self, user_id):
+        return self.users.has_key(user_id)
 
 
 class UserInfo(dict):

@@ -158,12 +158,11 @@ class ModelsNamespace(BaseNamespace):
 
     def disconnect(self, *args, **kwargs):
         if 'user_id' in self.session:
-            self.app.pool.disconnect(self.model_id, self.user_id)
-            if self.mm:
-                # This user was not last, model was not removed from pool.
-                self.mm.emit_runtime()
+            if self.mm.runtime.has_user(self.user_id):
+                self.app.pool.disconnect(self.model_id, self.user_id)
+            else:
+                self.log('Disconnected from model %s.' % self.model_id)
         super(ModelsNamespace, self).disconnect(*args, **kwargs)
-        self.log('Disconnected from model %s.' % self.model_id)
 
     @property
     def user_id(self):

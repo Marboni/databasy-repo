@@ -45,7 +45,7 @@ def create_models_pool(app):
     app.pool = ModelsPool(app)
 
 def init_facade_clients(app):
-    mq.init_facade_clients(app.config['FACADE_RPC_ADDRESS'], app.config['FACADE_PUB_ADDRESS'])
+    mq.init_facade_clients(app, app.config['FACADE_RPC_ADDRESS'], app.config['FACADE_PUB_ADDRESS'])
 
 class PatchedLoginManager(LoginManager):
     def _load_user(self):

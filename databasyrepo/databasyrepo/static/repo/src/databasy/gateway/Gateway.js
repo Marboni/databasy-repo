@@ -1,6 +1,7 @@
 databasy.gateway.Gateway = Class.extend({
     init:function (modelId) {
         this.modelId = modelId;
+        this.disconnecting = false;
 
         this._observer = new databasy.utils.events.Observer();
 
@@ -36,8 +37,8 @@ databasy.gateway.Gateway = Class.extend({
         this.socket.emit('enter');
     },
     on_server_disconnect: function() {
-        this.socket.disconnect();
-        window.location.href = '/';
+        this.disconnecting = true;
+        setTimeout("document.location.href='/'", 300);
     },
     on_reconnect:function () {
     },
@@ -45,6 +46,9 @@ databasy.gateway.Gateway = Class.extend({
         databasy.utils.preloader.openPreloader(false);
     },
     on_error:function (error, message) {
+        if (this.disconnecting) {
+            return;
+        }
         alert(error + ': ' + message + '\n\n' + 'Model will be reloaded.');
         window.location.href = '/models/' + this.modelId;
     },

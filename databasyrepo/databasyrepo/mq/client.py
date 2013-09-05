@@ -1,5 +1,5 @@
-import threading
-import zmq
+import gevent
+import zmq.green as zmq
 
 __author__ = 'Marboni'
 
@@ -29,40 +29,35 @@ class Subscriber(object):
     """ Subclasses should define methods exec_<command>(*args) to handle commands. If no method found,
         exec(command, *args) will be called.
     """
-
     def __init__(self, address):
         super(Subscriber, self).__init__()
         self.address = address
-        context = zmq.Context()
-        self.socket = context.socket(zmq.SUB)
-        self.socket.setsockopt(zmq.SUBSCRIBE, '')
-        self.socket.connect(address)
+        self.context = zmq.Context()
 
     def subscribe(self):
+        socket = self.context.socket(zmq.SUB)
+        socket.setsockopt(zmq.SUBSCRIBE, '')
+        socket.connect(self.address)
+
         while True:
-            command_and_args = self.socket.recv_pyobj()
+            command_and_args = socket.recv_pyobj()
             command = command_and_args['command']
             args = command_and_args['args']
             try:
                 try:
-                    method = getattr(self, 'exec_%s' % command)
+                    method = getattr(self, 'handle_%s' % command)
                 except AttributeError:
-                    self.execute(command, *args)
+                    self.handle(command, *args)
                 else:
                     method(*args)
             except Exception, e:
                 self.error_handler(e)
 
-    def execute(self, command, *args):
+    def handle(self, command, *args):
         pass
 
     def error_handler(self, e):
         pass
 
     def run(self):
-        t = threading.Thread(target=self.subscribe, name='subscriber')
-        t.daemon = True
-        t.start()
-
-    def disconnect(self):
-        self.socket.disconnect(self.address)
+        gevent.spawn(self.subscribe)
