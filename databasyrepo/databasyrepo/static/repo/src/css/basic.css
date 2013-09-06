@@ -33,10 +33,6 @@ html, body {
     display: none;
 }
 
-.ui-icon-table {
-    background-image: url(../img/table16x16.png);
-}
-
 .icn {
     background-image: url(../img/sprite.png);
     background-repeat: no-repeat;

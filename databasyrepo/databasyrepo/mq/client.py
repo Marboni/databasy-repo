@@ -29,6 +29,7 @@ class Subscriber(object):
     """ Subclasses should define methods exec_<command>(*args) to handle commands. If no method found,
         exec(command, *args) will be called.
     """
+
     def __init__(self, address):
         super(Subscriber, self).__init__()
         self.address = address
