@@ -432,6 +432,8 @@ $(function () {
             // Model end
 
             // UI
+            .script("{{ url_for('static', filename='repo/src/databasy/ui/utils.js') }}")
+
             .script("{{ url_for('static', filename='repo/src/databasy/ui/layout/Layout.js') }}")
             .script("{{ url_for('static', filename='repo/src/databasy/ui/layout/MenuPanel.js') }}")
             .script("{{ url_for('static', filename='repo/src/databasy/ui/layout/Toolbar.js') }}")

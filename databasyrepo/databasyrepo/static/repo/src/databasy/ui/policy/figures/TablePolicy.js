@@ -39,6 +39,10 @@ databasy.ui.policy.figures.TablePolicy = draw2d.policy.figure.RectangleSelection
     },
 
     adjustDimension: function(figure, width, height) {
-        return this._super(figure, figure.getWidth(), figure.getHeight());
+        if (!figure.sizeRecalc) {
+            width = figure.getWidth();
+            height = figure.getHeight();
+        }
+        return this._super(figure, width, height);
     }
 });

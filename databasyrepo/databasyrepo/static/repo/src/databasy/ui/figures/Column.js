@@ -1,9 +1,10 @@
 databasy.ui.figures.Column = draw2d.shape.basic.Rectangle.extend({
     NAME:"databasy.ui.figures.Column",
 
-    init:function (gateway, name) {
-        this._super(178, 25);
-        this.gateway = gateway;
+    init:function (tableFigure, name) {
+        this._super(178, 20);
+        this.tableFigure = tableFigure;
+        this.gateway = tableFigure.gateway;
 
         this.gateway.addListener(this);
 
@@ -12,16 +13,21 @@ databasy.ui.figures.Column = draw2d.shape.basic.Rectangle.extend({
         this.setRadius(0);
         this.setStroke(0);
 
-        this.createName();
-        this.setName(name);
+        databasy.ui.utils.delegateContextMenu(this, this.tableFigure);
+        databasy.ui.utils.delegateDoubleClick(this, this.tableFigure);
+
+        this.createName(name);
     },
 
-    createName: function() {
-        this.label = new draw2d.shape.basic.Label();
+    createName: function(name) {
+        this.label = new draw2d.shape.basic.Label(name);
         this.label.setStroke(0);
         this.label.setColor("#0d0d0d");
         this.label.setFontSize(12);
         this.label.setFontColor("#0d0d0d");
+        databasy.ui.utils.delegateContextMenu(this.label, this.tableFigure);
+        databasy.ui.utils.delegateDoubleClick(this.label, this.tableFigure);
+
         this.addFigure(this.label, new databasy.ui.locators.InnerVerticalCenterLocator(this, 20));
     },
 

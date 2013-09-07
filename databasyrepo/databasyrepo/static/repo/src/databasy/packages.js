@@ -33,7 +33,8 @@ var databasy = {
             canvas: {},
             figures: {}
         },
-        events: {}
+        events: {},
+        utils: {}
     },
     utils: {
         events: {},
