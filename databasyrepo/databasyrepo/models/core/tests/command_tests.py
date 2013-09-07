@@ -17,6 +17,34 @@ def create_model():
     model.inject_connection(mg())
     return model
 
+def create_table(model):
+    canvas = default_canvas(model)
+    table_id = str(uuid4())
+    table_repr_id = str(uuid4())
+
+    execute_command(model, CreateTable,
+        table_id=table_id,
+        default_table_repr_id=table_repr_id,
+        name='Table',
+        canvas_id=canvas.id,
+        position = [1, 2]
+    )
+
+    return model.node(table_id)
+
+def create_column(model, table):
+    column_id = str(uuid4())
+
+    execute_command(model, CreateColumn,
+        table_id=table.id,
+        column_id=column_id,
+        name='Column',
+        index=table.items_count('columns')
+    )
+
+    return model.node(column_id)
+
+
 def execute_command(model, command_cls, **kwargs):
     if not kwargs.has_key('source_version'):
         kwargs['source_version'] = model.version
@@ -93,17 +121,7 @@ class CommandTest(ODMTest):
 
     def test_rename_table(self):
         model = create_model()
-        canvas = default_canvas(model)
-
-        execute_command(model, CreateTable,
-            table_id = str(uuid4()),
-            default_table_repr_id = str(uuid4()),
-            name='Table',
-            canvas_id=canvas.id,
-            position = [1, 2]
-        )
-
-        table = query_node(model, _code=Table.code(), name='Table', columns=[])
+        table = create_table(model)
 
         new_name = 'NewName'
         execute_command(model, RenameTable,
@@ -138,6 +156,81 @@ class CommandTest(ODMTest):
         self.assertFalse(model.exists(table_id))
         self.assertFalse(model.exists(table_repr_id))
         self.assertEqual(0, len(canvas.val('reprs')))
+
+    def test_create_column(self):
+        model = create_model()
+        table = create_table(model)
+        table_id = table.id
+
+        column_1_id = str(uuid4())
+        column_2_id = str(uuid4())
+        column_3_id = str(uuid4())
+
+        execute_command(model, CreateColumn,
+            table_id=table_id,
+            column_id=column_2_id,
+            name='Column2',
+            index=0
+        )
+
+        execute_command(model, CreateColumn,
+            table_id=table_id,
+            column_id=column_1_id,
+            name='Column1',
+            index=0
+        )
+
+        execute_command(model, CreateColumn,
+            table_id=table_id,
+            column_id=column_3_id,
+            name='Column3',
+            index=2
+        )
+
+        column1 = query_node(model, _id=column_1_id, _code=Column.code(), table=table.ref(), name='Column1')
+        self.assertIsNotNone(column1)
+        column2 = query_node(model, _id=column_2_id, _code=Column.code(), table=table.ref(), name='Column2')
+        self.assertIsNotNone(column2)
+        column3 = query_node(model, _id=column_3_id, _code=Column.code(), table=table.ref(), name='Column3')
+        self.assertIsNotNone(column3)
+
+        columns = table.val('columns')
+        self.assertEqual(3, len(columns))
+        self.assertEqual(columns[0], column1.ref())
+        self.assertEqual(columns[1], column2.ref())
+        self.assertEqual(columns[2], column3.ref())
+
+        with self.assertRaises(IllegalCommand):
+            execute_command(model, CreateColumn,
+                table_id=table_id,
+                column_id=str(uuid4()),
+                name='OutOfBoundsColumn',
+                index=4
+            )
+
+    def test_rename_column(self):
+        model = create_model()
+        table = create_table(model)
+        column = create_column(model, table)
+
+        execute_command(model, RenameColumn,
+            column_id=column.id,
+            new_name='NewName',
+        )
+
+        self.assertEqual('NewName', column.val('name'))
+
+    def test_delete_column(self):
+        model = create_model()
+        table = create_table(model)
+        column = create_column(model, table)
+
+        execute_command(model, DeleteColumn,
+            column_id=column.id,
+        )
+
+        self.assertEqual(0, table.items_count('columns'))
+        self.assertFalse(model.exists(column.id))
 
 
     def test_create_table_repr(self):

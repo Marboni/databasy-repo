@@ -28,7 +28,7 @@ class UniqueID(FieldValidator):
 
 class CorrectVersion(Integer):
     def __init__(self, model):
-        FieldValidator.__init__(self)
+        super(CorrectVersion, self).__init__()
         self.current_version = model.version
 
     def __call__(self, field, field_values):

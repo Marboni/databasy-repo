@@ -106,8 +106,7 @@ class Always(FieldValidator):
         self.message = kwargs.get('message') or 'This field is required.'
 
     def __call__(self, field, field_values):
-        value = field_values.get(field)
-        if not value:
+        if not field_values.has_key(field):
             raise InvalidStateError('Field is required.')
         for validator in self.validators:
             validator(field, field_values)
@@ -148,11 +147,20 @@ class IfOtherNone(FieldValidator):
 
 
 class Integer(FieldValidator):
+    def __init__(self, min_value=None, max_value=None):
+        super(Integer, self).__init__()
+        self.min_value = min_value
+        self.max_value = max_value
+
     def __call__(self, field, field_values):
         try:
-            int(self.get(field, field_values))
+            value = int(self.get(field, field_values))
         except ValueError:
             raise InvalidStateError('Field must be integer.')
+        if self.min_value and value < self.min_value:
+            raise InvalidStateError('Minimum value of this field is %s.' % self.min_value)
+        if self.max_value and value > self.max_value:
+            raise InvalidStateError('Maximum value of this field is %s.' % self.max_value)
 
 
 class Boolean(FieldValidator):

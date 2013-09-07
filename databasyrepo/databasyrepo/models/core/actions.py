@@ -142,7 +142,6 @@ class InsertItem(CRUDAction):
     def __init__(self, node_id=None, field=None, index=None, item=None):
         super(InsertItem, self).__init__(node_id, field, index=index, item=_ref_or_value(item))
 
-
     def fields(self):
         fields = super(InsertItem, self).fields()
         fields.update({

@@ -1,10 +1,10 @@
-from databasyrepo.models.core.actions import Set, Executor, Register, AppendItem, Unregister, FindAndDeleteItem, DeleteItem
-from databasyrepo.models.core.elements import Table
+from databasyrepo.models.core.actions import Set, Executor, Register, AppendItem, Unregister, FindAndDeleteItem, DeleteItem, InsertItem
+from databasyrepo.models.core.elements import Table, Column
 from databasyrepo.models.core.errors import IllegalCommand
 from databasyrepo.models.core.reprs import Canvas, TableRepr
 from databasyrepo.models.core.serializing import Serializable
 from databasyrepo.models.core.validators import NodeClass, CorrectVersion, UniqueID
-from databasyrepo.utils.validators import InvalidStateError, Always, Length, Iterable, NotEqual
+from databasyrepo.utils.validators import InvalidStateError, Always, Length, Iterable, NotEqual, Integer
 
 __author__ = 'Marboni'
 
@@ -186,6 +186,84 @@ class DeleteTable(Command):
 
         executor.execute(FindAndDeleteItem(None, 'tables', table))
         executor.execute(Unregister(table_id))
+
+
+class CreateColumn(Command):
+    def fields(self):
+        fields = super(CreateColumn, self).fields()
+        fields.update({
+            'table_id': basestring,
+            'column_id': basestring,
+            'name': basestring,
+            'index': int
+        })
+        return fields
+
+    def validators(self, model):
+        validators = super(CreateColumn, self).validators(model)
+        validators.update({
+            'table_id': Always(NodeClass(model, Table)),
+            'column_id': Always(UniqueID(model)),
+            'name': Always(Length(1, 512)),
+            'index': Always(Integer(min_value=0, max_value=model.node(self.val('table_id')).items_count('columns')))
+            })
+        return validators
+
+    def do(self, executor):
+        table_id = self.val('table_id')
+        table = executor.model.node(table_id)
+
+        column = Column(self.val('column_id'))
+        column.set('name', self.val('name'))
+        column.set('table', table.ref())
+
+        executor.execute(Register(node=column))
+        executor.execute(InsertItem(table_id, 'columns', self.val('index'), column))
+
+
+class RenameColumn(Command):
+    def fields(self):
+        fields = super(RenameColumn, self).fields()
+        fields.update({
+            'column_id': basestring,
+            'new_name': basestring
+        })
+        return fields
+
+    def validators(self, model):
+        validators = super(RenameColumn, self).validators(model)
+        validators.update({
+            'column_id': Always(NodeClass(model, Column)),
+            'new_name': Always(Length(1, 512))
+        })
+        return validators
+
+    def do(self, executor):
+        executor.execute(Set(self.val('column_id'), 'name', self.val('new_name')))
+
+
+class DeleteColumn(Command):
+    def fields(self):
+        fields = super(DeleteColumn, self).fields()
+        fields.update({
+            'column_id': basestring,
+            })
+        return fields
+
+    def validators(self, model):
+        validators = super(DeleteColumn, self).validators(model)
+        validators.update({
+            'column_id': Always(NodeClass(model, Column)),
+            })
+        return validators
+
+    def do(self, executor):
+        column_id = self.val('column_id')
+        column = executor.model.node(column_id)
+
+        executor.execute(FindAndDeleteItem(column.val('table').ref_id, 'columns', column))
+        executor.execute(Unregister(column_id))
+
 
 # =================== TABLE REPR ===================
 
