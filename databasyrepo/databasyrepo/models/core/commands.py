@@ -218,7 +218,7 @@ class CreateColumn(Command):
         column.set('table', table.ref())
 
         executor.execute(Register(node=column))
-        executor.execute(InsertItem(table_id, 'columns', self.val('index'), column))
+        executor.execute(InsertItem(node_id=table_id, field='columns', index=self.val('index'), item=column))
 
 
 class RenameColumn(Command):
@@ -261,8 +261,8 @@ class DeleteColumn(Command):
         column_id = self.val('column_id')
         column = executor.model.node(column_id)
 
-        executor.execute(FindAndDeleteItem(column.val('table').ref_id, 'columns', column))
-        executor.execute(Unregister(column_id))
+        executor.execute(FindAndDeleteItem(node_id=column.val('table').ref_id, field='columns', item=column))
+        executor.execute(Unregister(node_id=column_id))
 
 
 # =================== TABLE REPR ===================

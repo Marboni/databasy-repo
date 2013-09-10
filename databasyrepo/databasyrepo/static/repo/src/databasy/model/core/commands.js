@@ -123,6 +123,69 @@ databasy.model.core.commands.DeleteTable = databasy.model.core.commands.Command.
     CODE:'core.commands.DeleteTable'
 });
 
+databasy.model.core.commands.CreateColumn = databasy.model.core.commands.Command.extend({
+    fields:function () {
+        return this._super().concat(
+            'table_id',
+            'column_id',
+            'name',
+            'index'
+        )
+    },
+    do:function (executor) {
+        var core = databasy.model.core;
+
+        var table = executor.model.node(this.val('table_id'), core.elements.Table);
+
+        var column = new core.elements.Column(this.val('column_id'));
+        column.set('name', this.val('name'));
+        column.set('table', table.ref());
+
+        executor.execute(new core.actions.Register({node:column}));
+        executor.execute(new core.actions.InsertItem({node_id:table.id(), field:'columns', index:this.val('index'), item:column}));
+    }
+}, {
+    CODE:'core.commands.CreateColumn'
+});
+
+databasy.model.core.commands.RenameColumn = databasy.model.core.commands.Command.extend({
+    fields:function () {
+        return this._super().concat(
+            'column_id',
+            'new_name'
+        )
+    },
+    do:function (executor) {
+        executor.execute(new databasy.model.core.actions.Set({
+            node_id:this.val('column_id'),
+            field:'name',
+            value:this.val('new_name')
+        }));
+    }
+}, {
+    CODE:'core.commands.RenameColumn'
+});
+
+databasy.model.core.commands.DeleteColumn = databasy.model.core.commands.Command.extend({
+    fields:function () {
+        return this._super().concat(
+            'column_id'
+        )
+    },
+    do:function (executor) {
+        var core = databasy.model.core;
+        var model = executor.model;
+
+        var column_id = this.val('column_id');
+        var column = model.node(column_id);
+
+        executor.execute(new core.actions.FindAndDeleteItem({node_id:column.val('table').ref_id(), field:'columns', item:column}));
+        executor.execute(new core.actions.Unregister({node_id:column_id}));
+    }
+}, {
+    CODE:'core.commands.DeleteTable'
+});
+
 databasy.model.core.commands.CreateTableRepr = databasy.model.core.commands.Command.extend({
     fields:function () {
         return this._super().concat(
