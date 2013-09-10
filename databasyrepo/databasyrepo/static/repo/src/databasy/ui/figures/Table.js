@@ -23,7 +23,7 @@ databasy.ui.figures.Table = draw2d.shape.basic.Rectangle.extend({
         this.createColumnPanel();
     },
 
-    createTitle: function() {
+    createTitle:function () {
         this.title = new draw2d.shape.basic.Rectangle(180, 30);
         this.title.setRadius(8);
         this.title.setAlpha(0);
@@ -39,30 +39,32 @@ databasy.ui.figures.Table = draw2d.shape.basic.Rectangle.extend({
 
         this.title.addFigure(this.icon, new databasy.ui.locators.InnerVerticalCenterLocator(this.title, 8));
 
-
         this.label = new draw2d.shape.basic.Label(this.table.val('name'));
         this.label.setStroke(0);
         this.label.setColor("#0d0d0d");
         this.label.setFontSize(13);
         this.label.setFontColor("#0d0d0d");
         this.label.setBold(true);
+        this.label.installEditor(new databasy.ui.InplaceEditor(this.gateway, {
+            onCommit:$.proxy(this.renameTable, this),
+            onTabPressed:$.proxy(this.startCreateColumn, this, 0)
+        }));
         databasy.ui.utils.delegateContextMenu(this.label, this);
-        databasy.ui.utils.delegateDoubleClick(this.label, this);
 
         this.title.addFigure(this.label, new databasy.ui.locators.InnerVerticalCenterLocator(this.title, 26));
     },
 
-    createColumnPanel:function() {
+    createColumnPanel:function () {
         this.columnPanel = new databasy.ui.figures.ColumnPanel(this);
         this.addFigure(this.columnPanel, new databasy.ui.locators.InnerPositionLocator(this, 1, 30));
     },
 
-    addComment: function() {
+    addComment:function () {
         this.comment = new databasy.ui.figures.Comment(this);
         this.title.addFigure(this.comment, new databasy.ui.locators.InnerTopRightLocator(this.title, 1, -1));
     },
 
-    removeComment:function() {
+    removeComment:function () {
         this.removeFigure(this.comment);
         this.comment = undefined;
     },
@@ -72,9 +74,9 @@ databasy.ui.figures.Table = draw2d.shape.basic.Rectangle.extend({
         canvas.addFigure(this, position[0], position[1]);
     },
 
-    resetHeight: function() {
+    resetHeight:function () {
         var height = 0;
-        this.getChildren().each(function(i, child) {
+        this.getChildren().each(function (i, child) {
             height += child.height;
         });
         if (height != this.title.height) {
@@ -83,6 +85,21 @@ databasy.ui.figures.Table = draw2d.shape.basic.Rectangle.extend({
         this.sizeRecalc = true;
         this.setDimension(this.width, height);
         this.sizeRecalc = false;
+    },
+
+    renameTable: function(new_name) {
+        if (this.table.val('name') === new_name) {
+            return;
+        }
+        var command = new databasy.model.core.commands.RenameTable({
+            table_id:this.table.id(),
+            new_name:new_name
+        });
+        this.gateway.executeCommand(command);
+    },
+
+    startCreateColumn: function(index) {
+        alert('Create column ' + index);
     },
 
     onDoubleClick:function () {
@@ -126,4 +143,5 @@ databasy.ui.figures.Table = draw2d.shape.basic.Rectangle.extend({
         this.gateway.removeListener(this);
         this.canvas.removeFigure(this);
     }
-});
+})
+;

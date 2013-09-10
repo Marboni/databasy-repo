@@ -50,6 +50,7 @@ databasy.gateway.Gateway = Class.extend({
             return;
         }
         alert(error + ': ' + message + '\n\n' + 'Model will be reloaded.');
+        databasy.utils.preloader.openPreloader(false);
         window.location.href = '/models/' + this.modelId;
     },
     on_enter_done:function (userId, role) {

@@ -31,8 +31,8 @@ databasy.gateway.CommandQueue = Class.extend({
         }
     },
     on_exec_fail: function() {
-        alert("Error occurred. Click OK to reconnect.");
+        alert('Server rejected model modification.\n\nModel will be reloaded.');
         databasy.utils.preloader.openPreloader(false);
-        this.gateway.enter();
+        window.location.href = '/models/' + this.gateway.modelId;
     }
 });
