@@ -31,9 +31,12 @@ databasy.ui.figures.TableTitle = draw2d.shape.basic.Rectangle.extend({
         this.name.setFontSize(13);
         this.name.setFontColor("#0d0d0d");
         this.name.setBold(true);
+
+        var tableFigure = this.tableFigure;
         this.name.installEditor(new databasy.ui.InplaceEditor(databasy.gw, {
-            onCommit:$.proxy(this.renameTable, this),
-            onTabPressed:$.proxy(this.startCreateColumn, this, 0)
+            onCommit:function(value) {
+                tableFigure.renameTable(value);
+            }
         }));
         databasy.ui.utils.delegateContextMenu(this.name, this);
 
@@ -43,6 +46,10 @@ databasy.ui.figures.TableTitle = draw2d.shape.basic.Rectangle.extend({
     startRename: function() {
         var editor = this.name.editor;
         editor.start(this.name);
+    },
+
+    setName: function(name) {
+        this.name.setText(name);
     },
 
     onOtherFigureIsResizing: function(figure) {

@@ -108,7 +108,7 @@ databasy.ui.figures.Table = draw2d.shape.basic.Rectangle.extend({
 
             // Table name changed.
             var newName = modelEvent.val('new_value');
-            this.name.setText(newName);
+            this.title.setName(newName);
         } else if (modelEvent instanceof databasy.model.core.events.ItemDeleted &&
             modelEvent.val('node_id') === this.canvas.canvasNode.id() &&
             modelEvent.val('field') === 'reprs' &&
