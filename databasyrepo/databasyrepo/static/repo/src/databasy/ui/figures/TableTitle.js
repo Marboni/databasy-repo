@@ -25,19 +25,10 @@ databasy.ui.figures.TableTitle = draw2d.shape.basic.Rectangle.extend({
     },
 
     createName: function() {
-        this.name = new draw2d.shape.basic.Label(this.tableFigure.table.val('name'));
-        this.name.setStroke(0);
-        this.name.setColor("#0d0d0d");
-        this.name.setFontSize(13);
-        this.name.setFontColor("#0d0d0d");
-        this.name.setBold(true);
-
-        var tableFigure = this.tableFigure;
-        this.name.installEditor(new databasy.ui.InplaceEditor(databasy.gw, {
-            onCommit:function(value) {
-                tableFigure.renameTable(value);
-            }
-        }));
+        this.name = new databasy.ui.figures.Label(this.width - 35, this.tableFigure.table.val('name'));
+        this.name.onCommit = $.proxy(function(value) {
+            this.tableFigure.renameTable(value);
+        }, this);
         databasy.ui.utils.delegateContextMenu(this.name, this);
 
         this.addFigure(this.name, new databasy.ui.locators.InnerVerticalCenterLocator(this, 26));
