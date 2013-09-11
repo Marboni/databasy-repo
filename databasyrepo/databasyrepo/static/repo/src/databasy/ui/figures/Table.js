@@ -21,37 +21,13 @@ databasy.ui.figures.Table = draw2d.shape.basic.Rectangle.extend({
 
         this.createTitle();
         this.createColumnPanel();
+
+        this.addComment();
     },
 
     createTitle:function () {
-        this.title = new draw2d.shape.basic.Rectangle(180, 30);
-        this.title.setRadius(8);
-        this.title.setAlpha(0);
-        databasy.ui.utils.delegateContextMenu(this.title, this);
-        databasy.ui.utils.delegateDoubleClick(this.title, this);
-
+        this.title = new databasy.ui.figures.TableTitle(this);
         this.addFigure(this.title, new databasy.ui.locators.InnerPositionLocator(this, 0, 0));
-
-
-        this.icon = new draw2d.shape.basic.Image('/static/repo/src/img/sprite/table16.png', 16, 16);
-        databasy.ui.utils.delegateContextMenu(this.icon, this);
-        databasy.ui.utils.delegateDoubleClick(this.icon, this);
-
-        this.title.addFigure(this.icon, new databasy.ui.locators.InnerVerticalCenterLocator(this.title, 8));
-
-        this.name = new draw2d.shape.basic.Label(this.table.val('name'));
-        this.name.setStroke(0);
-        this.name.setColor("#0d0d0d");
-        this.name.setFontSize(13);
-        this.name.setFontColor("#0d0d0d");
-        this.name.setBold(true);
-        this.name.installEditor(new databasy.ui.InplaceEditor(this.gateway, {
-            onCommit:$.proxy(this.renameTable, this),
-            onTabPressed:$.proxy(this.startCreateColumn, this, 0)
-        }));
-        databasy.ui.utils.delegateContextMenu(this.name, this);
-
-        this.title.addFigure(this.name, new databasy.ui.locators.InnerVerticalCenterLocator(this.title, 26));
     },
 
     createColumnPanel:function () {
@@ -99,8 +75,7 @@ databasy.ui.figures.Table = draw2d.shape.basic.Rectangle.extend({
     },
 
     startRename: function() {
-        var editor = this.name.editor;
-        editor.start(this.name);
+        this.title.startRename();
     },
 
     startCreateColumn: function(index) {

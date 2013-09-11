@@ -1,5 +1,7 @@
 databasy.gateway.Gateway = Class.extend({
     init:function (modelId) {
+        databasy.gw = this;
+
         this.modelId = modelId;
         this.disconnecting = false;
 
