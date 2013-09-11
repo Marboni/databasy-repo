@@ -26,9 +26,16 @@ databasy.ui.figures.TableTitle = draw2d.shape.basic.Rectangle.extend({
 
     createName: function() {
         this.name = new databasy.ui.figures.Label(this.width - 35, this.tableFigure.table.val('name'));
+
         this.name.onCommit = $.proxy(function(value) {
             this.tableFigure.renameTable(value);
         }, this);
+
+        this.name.onOtherFigureIsResizing = $.proxy(function(tableTitle) {
+            this.setWidth(tableTitle.width - 35);
+        }, this.name);
+        this.attachResizeListener(this.name);
+
         databasy.ui.utils.delegateContextMenu(this.name, this);
 
         this.addFigure(this.name, new databasy.ui.locators.InnerVerticalCenterLocator(this, 26));

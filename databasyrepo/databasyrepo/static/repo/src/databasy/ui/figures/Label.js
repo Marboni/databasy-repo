@@ -2,7 +2,7 @@ databasy.ui.figures.Label = draw2d.shape.basic.Rectangle.extend({
     NAME:"databasy.ui.figures.Label",
 
     init: function(width, text) {
-        this._super(width, 10);
+        this._super(width, 10); // Height will be recalculated according to label height on repaint.
 
         this.setStroke(0);
 
@@ -26,20 +26,24 @@ databasy.ui.figures.Label = draw2d.shape.basic.Rectangle.extend({
         this.addFigure(this.label, new databasy.ui.locators.InnerPositionLocator(this, 0, 0));
     },
 
-    repaint: function(attributes) {
-        if (this.label !== undefined) {
-            this.setDimension(this.width, this.label.height);
-        }
-        this._super(attributes);
-    },
-
     setText: function(text) {
         this.label.setText(text);
+    },
+
+    setWidth: function(width) {
+        this.setDimension(width, 10); // Height will be recalculated according to label height on repaint.
     },
 
     onCommit: function(value) {
     },
 
     onCancel: function() {
+    },
+
+    repaint: function(attributes) {
+        if (this.label !== undefined) {
+            this.setDimension(this.width, this.label.height);
+        }
+        this._super(attributes);
     }
 });

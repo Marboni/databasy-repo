@@ -40,7 +40,6 @@ databasy.ui.policy.figures.TablePolicy = draw2d.policy.figure.RectangleSelection
 
     adjustDimension: function(figure, width, height) {
         if (!figure.sizeRecalc) {
-            width = figure.getWidth();
             height = figure.getHeight();
         }
         return this._super(figure, width, height);
