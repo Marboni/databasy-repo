@@ -39,19 +39,19 @@ databasy.ui.figures.Table = draw2d.shape.basic.Rectangle.extend({
 
         this.title.addFigure(this.icon, new databasy.ui.locators.InnerVerticalCenterLocator(this.title, 8));
 
-        this.label = new draw2d.shape.basic.Label(this.table.val('name'));
-        this.label.setStroke(0);
-        this.label.setColor("#0d0d0d");
-        this.label.setFontSize(13);
-        this.label.setFontColor("#0d0d0d");
-        this.label.setBold(true);
-        this.label.installEditor(new databasy.ui.InplaceEditor(this.gateway, {
+        this.name = new draw2d.shape.basic.Label(this.table.val('name'));
+        this.name.setStroke(0);
+        this.name.setColor("#0d0d0d");
+        this.name.setFontSize(13);
+        this.name.setFontColor("#0d0d0d");
+        this.name.setBold(true);
+        this.name.installEditor(new databasy.ui.InplaceEditor(this.gateway, {
             onCommit:$.proxy(this.renameTable, this),
             onTabPressed:$.proxy(this.startCreateColumn, this, 0)
         }));
-        databasy.ui.utils.delegateContextMenu(this.label, this);
+        databasy.ui.utils.delegateContextMenu(this.name, this);
 
-        this.title.addFigure(this.label, new databasy.ui.locators.InnerVerticalCenterLocator(this.title, 26));
+        this.title.addFigure(this.name, new databasy.ui.locators.InnerVerticalCenterLocator(this.title, 26));
     },
 
     createColumnPanel:function () {
@@ -98,6 +98,11 @@ databasy.ui.figures.Table = draw2d.shape.basic.Rectangle.extend({
         this.gateway.executeCommand(command);
     },
 
+    startRename: function() {
+        var editor = this.name.editor;
+        editor.start(this.name);
+    },
+
     startCreateColumn: function(index) {
         alert('Create column ' + index);
     },
@@ -128,7 +133,7 @@ databasy.ui.figures.Table = draw2d.shape.basic.Rectangle.extend({
 
             // Table name changed.
             var newName = modelEvent.val('new_value');
-            this.label.setText(newName);
+            this.name.setText(newName);
         } else if (modelEvent instanceof databasy.model.core.events.ItemDeleted &&
             modelEvent.val('node_id') === this.canvas.canvasNode.id() &&
             modelEvent.val('field') === 'reprs' &&

@@ -7,6 +7,7 @@ databasy.ui.InplaceEditor = draw2d.ui.LabelInplaceEditor.extend({
     start: function(label) {
         if (this.gateway.runtime.isEditor()) {
             this._super(label);
+            this.html.select();
         }
     }
 });

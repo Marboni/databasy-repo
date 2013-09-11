@@ -36,29 +36,19 @@ databasy.ui.policy.canvas.ToolActionPolicy = draw2d.policy.canvas.CanvasPolicy.e
         }
     },
     createTable:function(canvas, pos) {
-        var model = this.gateway.model;
-
-        // Searching for default name of table. Its format is "Table<N>" where <N> is integer. Name should be unique.
-        var tables = model.val_as_node('tables', model);
-        var tableNames = $.map(tables, function(table, i) {
-            return table.val('name');
-        });
-        var newTableNamePrefix = 'Table';
-        var newTableNameSuffix = 1;
-        var newTableName = newTableNamePrefix + newTableNameSuffix;
-        while ($.inArray(newTableName, tableNames) !== -1) {
-            newTableName = newTableNamePrefix + ++newTableNameSuffix;
-        }
-        // New name found.
-
         var uuid = databasy.model.utils.uuid;
+        var table_id = uuid();
+        var repr_id = uuid();
         var command = new databasy.model.core.commands.CreateTable({
-            table_id: uuid(),
-            default_table_repr_id: uuid(),
-            name: newTableName,
+            table_id: table_id,
+            default_table_repr_id: repr_id,
+            name: 'table',
             canvas_id: canvas.canvasNode.id(),
             position: pos
         });
         this.gateway.executeCommand(command);
+
+        var figure = canvas.figureByElementId(table_id);
+        setTimeout($.proxy(figure.startRename, figure), 100);
     }
 });
