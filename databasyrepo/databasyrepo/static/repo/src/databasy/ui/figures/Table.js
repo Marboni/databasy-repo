@@ -3,6 +3,9 @@ databasy.ui.figures.Table = draw2d.shape.basic.Rectangle.extend({
 
     init:function (gateway, tableRepr) {
         this._super(180, 30);
+
+        this.setMinWidth(65);
+
         this.gateway = gateway;
         this.tableRepr = tableRepr;
         this.table = tableRepr.val_as_node('table', this.gateway.model);

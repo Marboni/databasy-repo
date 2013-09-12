@@ -29,6 +29,7 @@ var databasy = {
         },
         locators: {},
         figures: {},
+        widgets: {},
         policy: {
             canvas: {},
             figures: {}

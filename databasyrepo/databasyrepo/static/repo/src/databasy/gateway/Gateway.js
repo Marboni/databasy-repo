@@ -45,6 +45,7 @@ databasy.gateway.Gateway = Class.extend({
     on_reconnect:function () {
     },
     on_reconnecting:function () {
+        console.log('reconnect');
         databasy.utils.preloader.openPreloader(false);
     },
     on_error:function (error, message) {

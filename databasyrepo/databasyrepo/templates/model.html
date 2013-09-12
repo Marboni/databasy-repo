@@ -432,7 +432,6 @@ $(function () {
             // Model end
 
             // UI
-            .script("{{ url_for('static', filename='repo/src/databasy/ui/InplaceEditor.js') }}")
             .script("{{ url_for('static', filename='repo/src/databasy/ui/utils.js') }}")
 
             .script("{{ url_for('static', filename='repo/src/databasy/ui/layout/Layout.js') }}")
@@ -453,12 +452,14 @@ $(function () {
             .script("{{ url_for('static', filename='repo/src/databasy/ui/policy/figures/TablePolicy.js') }}")
             .script("{{ url_for('static', filename='repo/src/databasy/ui/policy/canvas/ToolActionPolicy.js') }}")
 
-            .script("{{ url_for('static', filename='repo/src/databasy/ui/figures/Label.js') }}")
             .script("{{ url_for('static', filename='repo/src/databasy/ui/figures/Table.js') }}")
             .script("{{ url_for('static', filename='repo/src/databasy/ui/figures/TableTitle.js') }}")
             .script("{{ url_for('static', filename='repo/src/databasy/ui/figures/Comment.js') }}")
             .script("{{ url_for('static', filename='repo/src/databasy/ui/figures/ColumnPanel.js') }}")
             .script("{{ url_for('static', filename='repo/src/databasy/ui/figures/Column.js') }}")
+
+            .script("{{ url_for('static', filename='repo/src/databasy/ui/widgets/Label.js') }}")
+            .script("{{ url_for('static', filename='repo/src/databasy/ui/widgets/LabelInplaceEditor.js') }}")
 
             .script("{{ url_for('static', filename='repo/src/databasy/ui/events/ComponentDblClicked.js') }}")
             // UI end

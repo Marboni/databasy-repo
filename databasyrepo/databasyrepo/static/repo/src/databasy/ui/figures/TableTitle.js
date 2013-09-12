@@ -25,7 +25,7 @@ databasy.ui.figures.TableTitle = draw2d.shape.basic.Rectangle.extend({
     },
 
     createName: function() {
-        this.name = new databasy.ui.figures.Label(this.width - 35, this.tableFigure.table.val('name'));
+        this.name = new databasy.ui.widgets.Label(this.width - 35, this.tableFigure.table.val('name'));
 
         this.name.onCommit = $.proxy(function(value) {
             this.tableFigure.renameTable(value);
@@ -38,7 +38,7 @@ databasy.ui.figures.TableTitle = draw2d.shape.basic.Rectangle.extend({
 
         databasy.ui.utils.delegateContextMenu(this.name, this);
 
-        this.addFigure(this.name, new databasy.ui.locators.InnerVerticalCenterLocator(this, 26));
+        this.addFigure(this.name, new databasy.ui.locators.InnerVerticalCenterLocator(this, 28));
     },
 
     startRename: function() {
