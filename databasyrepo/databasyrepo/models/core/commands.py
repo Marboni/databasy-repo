@@ -4,7 +4,7 @@ from databasyrepo.models.core.errors import IllegalCommand
 from databasyrepo.models.core.reprs import Canvas, TableRepr
 from databasyrepo.models.core.serializing import Serializable
 from databasyrepo.models.core.validators import NodeClass, CorrectVersion, UniqueID
-from databasyrepo.utils.validators import InvalidStateError, Always, Length, Iterable, NotEqual, Integer
+from databasyrepo.utils.validators import InvalidStateError, Always, Length, Iterable, NotEqual, Integer, IfNotNone
 
 __author__ = 'Marboni'
 
@@ -307,25 +307,31 @@ class CreateTableRepr(Command):
         executor.execute(AppendItem(canvas.id, 'reprs', table_repr))
 
 
-class MoveTableRepr(Command):
+class UpdateTableRepr(Command):
+    CHANGEABLE_FIELDS = ['position']
+
     def fields(self):
-        fields = super(MoveTableRepr, self).fields()
+        fields = super(UpdateTableRepr, self).fields()
         fields.update({
             'table_repr_id': basestring,
-            'new_position': [int]
+            'fields': [basestring],
+            'position': [int]
         })
         return fields
 
     def validators(self, model):
-        validators = super(MoveTableRepr, self).validators(model)
+        validators = super(UpdateTableRepr, self).validators(model)
         validators.update({
             'table_repr_id': Always(NodeClass(model, TableRepr)),
-            'new_position': Always(Iterable(2, 2)),
+            'fields': Always(Iterable(min_length=1, allowed_values=self.CHANGEABLE_FIELDS)),
+            'position': IfNotNone(Iterable(2, 2)),
             })
         return validators
 
     def do(self, executor):
-        executor.execute(Set(self.val('table_repr_id'), 'position', self.val('new_position')))
+        changeable_fields = self.val('fields')
+        if 'position' in changeable_fields:
+            executor.execute(Set(self.val('table_repr_id'), 'position', self.val('position')))
 
 
 class DeleteTableRepr(Command):

@@ -1,4 +1,4 @@
-from databasyrepo.models.core.commands import Undo, Redo, CreateTable, MoveTableRepr, RenameTable, DeleteTableRepr, DeleteTable, CreateTableRepr, CreateColumn, RenameColumn, DeleteColumn
+from databasyrepo.models.core.commands import Undo, Redo, CreateTable, UpdateTableRepr, RenameTable, DeleteTableRepr, DeleteTable, CreateTableRepr, CreateColumn, RenameColumn, DeleteColumn
 from databasyrepo.models.core.events import Event
 from databasyrepo.models.core.nodes import Node
 from databasyrepo.models.core.reprs import Canvas
@@ -61,7 +61,7 @@ class Model(Node):
             DeleteColumn,
 
             CreateTableRepr,
-            MoveTableRepr,
+            UpdateTableRepr,
             DeleteTableRepr,
             ]
 

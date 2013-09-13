@@ -213,20 +213,24 @@ databasy.model.core.commands.CreateTableRepr = databasy.model.core.commands.Comm
     CODE:'core.commands.CreateTableRepr'
 });
 
-databasy.model.core.commands.MoveTableRepr = databasy.model.core.commands.Command.extend({
+databasy.model.core.commands.UpdateTableRepr = databasy.model.core.commands.Command.extend({
     fields:function () {
         return this._super().concat(
             'table_repr_id',
-            'new_position'
+            'fields',
+            'position'
         )
     },
     do:function (executor) {
-        var table_repr_id = this.val('table_repr_id');
-        var new_position = this.val('new_position');
-        executor.execute(new databasy.model.core.actions.Set({node_id:table_repr_id, field:'position', value:new_position}));
+        var fields = this.val('fields');
+        if ($.inArray(fields, 'position') != -1) {
+            var table_repr_id = this.val('table_repr_id');
+            var new_position = this.val('position');
+            executor.execute(new databasy.model.core.actions.Set({node_id:table_repr_id, field:'position', value:new_position}));
+        }
     }
 }, {
-    CODE:'core.commands.MoveTableRepr'
+    CODE:'core.commands.UpdateTableRepr'
 });
 
 databasy.model.core.commands.DeleteTableRepr = databasy.model.core.commands.Command.extend({

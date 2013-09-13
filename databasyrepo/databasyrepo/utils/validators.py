@@ -271,11 +271,12 @@ class Token(FieldValidator):
 
 
 class Iterable(FieldValidator):
-    def __init__(self, min_length=None, max_length=None, message=None):
+    def __init__(self, min_length=None, max_length=None, allowed_values=None, message=None):
         FieldValidator.__init__(self)
         self.message = message or 'Field must be iterable.'
         self.min_length = min_length
         self.max_length = max_length
+        self.allowed_values = allowed_values
 
     def __call__(self, field, field_values):
         try:
@@ -288,6 +289,10 @@ class Iterable(FieldValidator):
                 raise InvalidStateError('Field must contain at least %s elements.' % self.min_length)
             if self.max_length and length > self.max_length:
                 raise InvalidStateError('Fields must contain not more then %s elements.' % self.max_length)
+        if self.allowed_values:
+            if not set(itr).issubset(self.allowed_values):
+                raise InvalidStateError('Field must contain only following values: %s.' % self.allowed_values)
+
 
 class NotEqual(FieldValidator):
     def __init__(self, *other_fields):

@@ -44,7 +44,6 @@ def create_column(model, table):
 
     return model.node(column_id)
 
-
 def execute_command(model, command_cls, **kwargs):
     if not kwargs.has_key('source_version'):
         kwargs['source_version'] = model.version
@@ -282,7 +281,7 @@ class CommandTest(ODMTest):
             )
         
 
-    def test_move_table_repr(self):
+    def test_update_table_repr(self):
         model = create_model()
         canvas = default_canvas(model)
 
@@ -295,12 +294,13 @@ class CommandTest(ODMTest):
         )
 
         table_repr = query_node(model, _code=TableRepr.code())
-        execute_command(model, MoveTableRepr,
+        execute_command(model, UpdateTableRepr,
             table_repr_id=table_repr.id,
-            new_position=[10, 20]
+            fields=['position'],
+            position=[10, 20]
         )
-
         self.assertEqual([10, 20], table_repr.val('position'))
+
 
     def test_delete_table_repr(self):
         model = create_model()

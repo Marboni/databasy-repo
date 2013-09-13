@@ -25,9 +25,10 @@ databasy.ui.policy.figures.TablePolicy = draw2d.policy.figure.RectangleSelection
 
         var dragEndPosition = new draw2d.geo.Point(figure.getX(), figure.getY());
         if (!this._dragStartPosition.equals(dragEndPosition)) {
-            var command = new databasy.model.core.commands.MoveTableRepr({
+            var command = new databasy.model.core.commands.UpdateTableRepr({
                 table_repr_id:figure.tableRepr.id(),
-                new_position:[figure.x, figure.y]
+                fields: ['position'],
+                position:[figure.x, figure.y]
             });
             this.gateway.executeCommand(command);
         }
