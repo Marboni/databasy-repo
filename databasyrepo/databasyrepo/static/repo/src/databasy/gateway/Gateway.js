@@ -53,6 +53,7 @@ databasy.gateway.Gateway = Class.extend({
             return;
         }
         alert(error + ': ' + message + '\n\n' + 'Model will be reloaded.');
+        this.disconnecting = true;
         databasy.utils.preloader.openPreloader(false);
         window.location.href = '/models/' + this.modelId;
     },

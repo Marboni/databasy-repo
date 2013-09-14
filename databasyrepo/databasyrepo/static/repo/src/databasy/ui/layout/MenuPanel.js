@@ -120,6 +120,7 @@ databasy.ui.layout.MenuPanel = Class.extend({
         $('.applicant').click(function () {
             var uid = $(this).attr('uid');
             that.gateway.passControl(uid);
+            table.find('.applicant').remove();
         });
         this.controlPassDialog.dialog('open');
     },

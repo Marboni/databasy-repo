@@ -56,7 +56,7 @@ databasy.model.core.commands.UpdateCommand = databasy.model.core.commands.Comman
 
     do:function (executor) {
         var fields = this.val('fields');
-        for (var i = 0; i < fields; i++) {
+        for (var i = 0; i < fields.length; i++) {
             var field = fields[i];
             var obj_id = this.val(this.obj_id_field());
             var value = this.val(field);

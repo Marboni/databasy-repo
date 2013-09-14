@@ -12,7 +12,7 @@ databasy.ui.figures.Table = draw2d.shape.basic.Rectangle.extend({
 
         // If internal logic changes figure size, this flag will be true. Otherwise it's false. It allows to prevent
         // user to resize figure, but allow resizing in code.
-        this.sizeRecalc = false;
+        this.internalModification = false;
 
         this.gateway.addListener(this);
         this.installEditPolicy(new databasy.ui.policy.figures.TablePolicy());
@@ -61,9 +61,10 @@ databasy.ui.figures.Table = draw2d.shape.basic.Rectangle.extend({
         if (height != this.title.height) {
             height += 8; // Adding footer.
         }
-        this.sizeRecalc = true;
+
+        this.internalModification = true;
         this.setDimension(this.width, height);
-        this.sizeRecalc = false;
+        this.internalModification = false;
     },
 
     renameTable: function(new_name) {
@@ -86,8 +87,33 @@ databasy.ui.figures.Table = draw2d.shape.basic.Rectangle.extend({
     },
 
     onDoubleClick:function () {
-        //this.gateway.layout.propertyPanel.refreshProperties(this.table);
-        this.columnPanel.addColumn('ZZZ');
+        this.gateway.layout.propertyPanel.refreshProperties(this.table);
+    },
+
+    onDragStart:function (relativeX, relativeY) {
+        if (!this.gateway.runtime.isEditor()) {
+            return false;
+        }
+        this._super(relativeX, relativeY);
+        this._dragStartPosition = this.getPosition();
+        return true;
+    },
+
+    onDragEnd:function () {
+        if (!this.gateway.runtime.isEditor()) {
+            return;
+        }
+        this._super();
+
+        var dragEndPosition = this.getPosition();
+        if (!this._dragStartPosition.equals(dragEndPosition)) {
+            var command = new databasy.model.core.commands.UpdateTableRepr({
+                table_repr_id:this.tableRepr.id(),
+                fields: ['position'],
+                position:[dragEndPosition.getX(), dragEndPosition.getY()]
+            });
+            this.gateway.executeCommand(command);
+        }
     },
 
     onContextMenu:function (x, y) {
@@ -118,13 +144,22 @@ databasy.ui.figures.Table = draw2d.shape.basic.Rectangle.extend({
             modelEvent.val('item').ref_id() === this.tableRepr.id()) {
 
             // Table repr removed.
-            this.destroy();
+            this.gateway.removeListener(this);
+            this.canvas.removeFigure(this);
         }
     },
 
-    destroy:function () {
-        this.gateway.removeListener(this);
-        this.canvas.removeFigure(this);
+    onRuntimeChanged: function(event) {
+        var isEditor = event.runtime.isEditor();
+        if (isEditor != this.isResizeable()) {
+            this.setResizeable(isEditor);
+        }
+        if (isEditor != this.isDraggable()) {
+            this.setDraggable(isEditor);
+        }
+        if (!isEditor && this.canvas.getSelection().contains(this)) {
+            this.unselect();
+        }
     }
 })
 ;
