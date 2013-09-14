@@ -1,24 +1,28 @@
 databasy.ui.policy.canvas.ToolActionPolicy = draw2d.policy.canvas.CanvasPolicy.extend({
     NAME:"databasy.ui.policy.canvas.ToolActionPolicy",
 
-    onInstall:function(canvas) {
-        if (canvas instanceof databasy.ui.layout.canvas.Canvas) {
-            this.gateway = canvas.gateway;
-        } else {
-            throw new Error("ToolActionPolicy can't be installed on this canvas.")
-        }
-    },
-
     onMouseUp: function(canvas, x,y) {
-        if (!this.gateway.runtime.isEditor()) {
+        if (!databasy.gw.runtime.isEditor()) {
             return;
         }
-        var toolbar = this.gateway.layout.toolbar;
+
+        var toolbar = databasy.gw.layout.toolbar;
         var currentTool = toolbar.getCurrentTool();
         var pos = [Math.round(x), Math.round(y)];
         var selectDefaultTool = this.applyTool(currentTool, canvas, pos);
         if (selectDefaultTool) {
             toolbar.selectDefault();
+        }
+
+        if (databasy.context.has('tableReprWidthChanged')) {
+            var change = databasy.context.pop('tableReprWidthChanged');
+
+            var command = new databasy.model.core.commands.UpdateTableRepr({
+                table_repr_id:change.table_repr_id,
+                fields: ['width'],
+                width:change.width
+            });
+            databasy.gw.executeCommand(command);
         }
     },
 
@@ -46,7 +50,7 @@ databasy.ui.policy.canvas.ToolActionPolicy = draw2d.policy.canvas.CanvasPolicy.e
             canvas_id: canvas.canvasNode.id(),
             position: pos
         });
-        this.gateway.executeCommand(command);
+        databasy.gw.executeCommand(command);
 
         var figure = canvas.figureByElementId(table_id);
         setTimeout($.proxy(figure.startRename, figure), 100);

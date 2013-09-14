@@ -2,17 +2,18 @@ databasy.ui.figures.Table = draw2d.shape.basic.Rectangle.extend({
     NAME:"databasy.ui.figures.Table",
 
     init:function (gateway, tableRepr) {
-        this._super(180, 30);
-
-        this.setMinWidth(65);
-
         this.gateway = gateway;
         this.tableRepr = tableRepr;
         this.table = tableRepr.val_as_node('table', this.gateway.model);
 
+        this._super(this.tableRepr.val('width'), 30);
+        this.setMinWidth(65);
+
         // If internal logic changes figure size, this flag will be true. Otherwise it's false. It allows to prevent
         // user to resize figure, but allow resizing in code.
         this.internalModification = false;
+
+        this.attachResizeListener(this);
 
         this.gateway.addListener(this);
         this.installEditPolicy(new databasy.ui.policy.figures.TablePolicy());
@@ -122,6 +123,17 @@ databasy.ui.figures.Table = draw2d.shape.basic.Rectangle.extend({
         }
     },
 
+    onOtherFigureIsResizing: function(figure) {
+        if (figure === this) {
+            if (databasy.gw.runtime.isEditor()) {
+                databasy.context.put('tableReprWidthChanged', {
+                    table_repr_id: this.tableRepr.id(),
+                    width: this.width
+                });
+            }
+        }
+    },
+
     onModelChanged:function (event) {
         var modelEvent = event.modelEvent;
         if (modelEvent instanceof databasy.model.core.events.PropertyChanged &&
@@ -131,6 +143,15 @@ databasy.ui.figures.Table = draw2d.shape.basic.Rectangle.extend({
             // Table representation's position changed.
             var newPosition = modelEvent.val('new_value');
             this.setPosition(newPosition[0], newPosition[1]);
+        } else if (modelEvent instanceof databasy.model.core.events.PropertyChanged &&
+            modelEvent.val('node_id') === this.tableRepr.id() &&
+            modelEvent.val('field') === 'width') {
+
+            // Table representation's width changed.
+            var newWidth = modelEvent.val('new_value');
+            this.internalModification = true;
+            this.setDimension(newWidth, this.height);
+            this.internalModification = false;
         } else if (modelEvent instanceof databasy.model.core.events.PropertyChanged &&
             modelEvent.val('node_id') === this.table.id() &&
             modelEvent.val('field') === 'name') {

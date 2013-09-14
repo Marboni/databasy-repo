@@ -1,6 +1,7 @@
 databasy.gateway.Gateway = Class.extend({
     init:function (modelId) {
         databasy.gw = this;
+        databasy.context = new databasy.gateway.Context();
 
         this.modelId = modelId;
         this.disconnecting = false;

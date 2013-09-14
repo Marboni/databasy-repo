@@ -2,7 +2,7 @@ databasy.ui.figures.TableTitle = draw2d.shape.basic.Rectangle.extend({
     NAME:"databasy.ui.figures.TableTitle",
 
     init: function(tableFigure) {
-        this._super(180, 30);
+        this._super(tableFigure.width, 30);
 
         this.tableFigure = tableFigure;
 
