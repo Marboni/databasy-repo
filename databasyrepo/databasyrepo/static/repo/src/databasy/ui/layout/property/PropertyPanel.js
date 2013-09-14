@@ -2,6 +2,7 @@ databasy.ui.layout.property.PropertyPanel = Class.extend({
     init:function (gateway, layout) {
         this.gateway = gateway;
         this.layout = layout;
+        this.element = null;
 
         gateway.addListener(this);
 
@@ -11,9 +12,11 @@ databasy.ui.layout.property.PropertyPanel = Class.extend({
     },
 
     refreshProperties: function(element) {
-        this.propertyPanel.empty();
-        this.createProperties(element);
-        this.layout.openPropertyPanel();
+        if (element !== this.element) {
+            this.propertyPanel.empty();
+            this.createProperties(element);
+            this.element = element;
+        }
     },
 
     createProperties:function(element) {
@@ -24,6 +27,14 @@ databasy.ui.layout.property.PropertyPanel = Class.extend({
         if (element instanceof databasy.model.core.elements.Table) {
             this.properties = new databasy.ui.layout.property.TablePropertyPanel(this.gateway, element);
         }
+    },
+
+    open: function() {
+        this.gateway.layout.openPropertyPanel();
+    },
+
+    close: function() {
+        this.gateway.layout.closePropertyPanel();
     },
 
     setEditable:function(editable) {

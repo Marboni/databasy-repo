@@ -6,5 +6,10 @@ databasy.ui.policy.figures.TablePolicy = draw2d.policy.figure.RectangleSelection
             height = figure.getHeight();
         }
         return this._super(figure, width, height);
+    },
+
+    onSelect: function(canvas, figure, isPrimarySelection) {
+        databasy.gw.layout.propertyPanel.refreshProperties(figure.table);
+        this._super(canvas, figure, isPrimarySelection);
     }
 });

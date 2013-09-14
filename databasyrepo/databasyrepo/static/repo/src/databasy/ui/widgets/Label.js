@@ -30,6 +30,8 @@ databasy.ui.widgets.Label = draw2d.shape.basic.Rectangle.extend({
         this.label.onOtherFigureIsResizing = $.proxy(this.adjustLabelToWrapper, this);
         this.attachResizeListener(this.label);
 
+        databasy.ui.utils.delegateDoubleClick(this, this.label);
+
         this.addFigure(this.label, new databasy.ui.locators.InnerPositionLocator(this, 0, 0));
     },
 
@@ -70,8 +72,5 @@ databasy.ui.widgets.Label = draw2d.shape.basic.Rectangle.extend({
     },
 
     onCancel: function() {
-    },
-
-    onDoubleClick: function() {
     }
 });

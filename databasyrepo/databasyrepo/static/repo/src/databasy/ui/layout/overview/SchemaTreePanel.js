@@ -100,6 +100,7 @@ databasy.ui.layout.overview.SchemaTreePanel = Class.extend({
                 var component = canvas.figureByElementId(elementId);
                 if (component) {
                     propertyPanel.refreshProperties(element);
+                    propertyPanel.open();
                     canvas.scrollToFigure(component);
                 }
             }
