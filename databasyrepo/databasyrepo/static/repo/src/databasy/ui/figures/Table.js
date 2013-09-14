@@ -97,7 +97,7 @@ databasy.ui.figures.Table = draw2d.shape.basic.Rectangle.extend({
         this.title.startRename();
     },
 
-    startCreateColumn: function(index) {
+    createColumn: function(index, column) {
         alert('Create column ' + index);
     },
 
@@ -149,7 +149,17 @@ databasy.ui.figures.Table = draw2d.shape.basic.Rectangle.extend({
 
     onModelChanged:function (event) {
         var modelEvent = event.modelEvent;
-        if (modelEvent instanceof databasy.model.core.events.PropertyChanged &&
+
+        if (modelEvent instanceof databasy.model.core.events.ItemInserted &&
+            modelEvent.val('node_id') === this.table.id() &&
+            modelEvent.val('field') === 'columns') {
+
+            // Column added.
+            var column = modelEvent.val('item');
+            var index = modelEvent.val('index');
+
+            this.createColumn(index, column);
+        } else if (modelEvent instanceof databasy.model.core.events.PropertyChanged &&
             modelEvent.val('node_id') === this.tableRepr.id() &&
             modelEvent.val('field') === 'position') {
 

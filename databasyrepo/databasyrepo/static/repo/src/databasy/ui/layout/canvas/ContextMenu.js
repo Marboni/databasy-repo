@@ -2,18 +2,21 @@ databasy.ui.layout.canvas.ContextMenu = Class.extend({
     init:function () {
         this.contextMenuPlatforms = {};
 
-        var that = this;
-
         this.createContextMenu('canvasTable', databasy.ui.figures.Table, {
-//            deleteFigure:{
-//                name:'Delete Figure',
-//                handler:function (figure) {
-//                    var command = new databasy.model.core.commands.DeleteTableRepr({
-//                        table_repr_id:figure.tableRepr.id()
-//                    });
-//                    that.gateway.executeCommand(command);
-//                }
-//            },
+            addColumn:{
+                name:'Add Column',
+                handler:function (figure) {
+                    var uuid = databasy.model.utils.uuid;
+                    var column_id = uuid();
+                    var command = new databasy.model.core.commands.CreateColumn({
+                        table_id:figure.table.id(),
+                        column_id:column_id,
+                        name:'column',
+                        index:0
+                    });
+                    databasy.gw.executeCommand(command);
+                }
+            },
             deleteTable:{
                 name:'Delete Table',
                 handler:function (figure) {
