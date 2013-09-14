@@ -7,7 +7,7 @@ databasy.ui.widgets.Label = draw2d.shape.basic.Rectangle.extend({
         this._super(width, 10); // Height will be recalculated according to label height on repaint.
 
         this.setStroke(0);
-        this.setAlpha();
+        this.setAlpha(0);
 
         this.label = new draw2d.shape.basic.Label(text);
         this.label.setStroke(0);
