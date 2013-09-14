@@ -67,6 +67,21 @@ databasy.ui.figures.Table = draw2d.shape.basic.Rectangle.extend({
         this.internalModification = false;
     },
 
+    highlight: function() {
+        var c = this.getBackgroundColor();
+        var c2 = c.lighter(0.1);
+
+        var setColor1 = $.proxy(this.setBackgroundColor, this, c);
+        var setColor2 = $.proxy(this.setBackgroundColor, this, c2);
+
+        this.setBackgroundColor(c2);
+        setTimeout(setColor1, 150);
+        setTimeout(setColor2, 300);
+        setTimeout(setColor1, 450);
+        setTimeout(setColor2, 600);
+        setTimeout(setColor1, 750);
+    },
+
     renameTable: function(new_name) {
         if (this.table.val('name') === new_name) {
             return;
@@ -87,7 +102,6 @@ databasy.ui.figures.Table = draw2d.shape.basic.Rectangle.extend({
     },
 
     onDoubleClick:function () {
-        databasy.gw.layout.propertyPanel.refreshProperties(this.table);
     },
 
     onDragStart:function (relativeX, relativeY) {

@@ -44,6 +44,10 @@ databasy.ui.widgets.Label = draw2d.shape.basic.Rectangle.extend({
         this.adjustLabelToWrapper();
     },
 
+    startEdit: function() {
+        this.label.editor.start(this.label);
+    },
+
     setWidth: function(width) {
         this.setDimension(width, 10); // Height will be recalculated according to label height on repaint.
     },

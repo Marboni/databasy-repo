@@ -27,5 +27,8 @@ databasy.model.core.reprs.TableRepr = databasy.model.core.reprs.Repr.extend({
         return this.val('table').val('ref_id');
     }
 }, {
-    CODE:'core.reprs.TableRepr'
+    CODE:'core.reprs.TableRepr',
+    REPR_DEFAULT_WIDTH: 180,
+    REPR_MIN_WIDTH: 65,
+    REPR_MAX_WIDTH: 1000
 });

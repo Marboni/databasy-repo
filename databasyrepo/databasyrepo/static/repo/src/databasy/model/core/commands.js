@@ -229,7 +229,8 @@ databasy.model.core.commands.CreateTableRepr = databasy.model.core.commands.Comm
         var table_repr = new core.reprs.TableRepr({
             _id:this.val('table_repr_id'),
             table:table.ref(),
-            position:this.val('position')
+            position:this.val('position'),
+            width: core.reprs.TableRepr.REPR_DEFAULT_WIDTH
         });
         executor.execute(new core.actions.Register({node:table_repr}));
         executor.execute(new core.actions.AppendItem({node_id:canvas.id(), field:'reprs', item:table_repr}));

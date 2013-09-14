@@ -93,14 +93,12 @@ databasy.ui.layout.overview.SchemaTreePanel = Class.extend({
             var elementId = $(this).attr('elementid');
             if (elementId !== null) {
                 var canvas = databasy.gw.layout.canvas;
-                var propertyPanel = databasy.gw.layout.propertyPanel;
-
-                var element = databasy.gw.model.node(elementId);
-                var component = canvas.figureByElementId(elementId);
-                if (component) {
-                    propertyPanel.refreshProperties(element);
-                    propertyPanel.open();
-                    canvas.scrollToFigure(component);
+                var figure = canvas.figureByElementId(elementId);
+                if (figure) {
+                    figure.select();
+                    figure.unselect();
+                    figure.highlight();
+                    canvas.scrollToFigure(figure);
                 }
             }
 

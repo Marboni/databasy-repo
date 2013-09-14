@@ -1,5 +1,5 @@
-databasy.ui.figures.TableTitle = draw2d.shape.basic.Rectangle.extend({
-    NAME:"databasy.ui.figures.TableTitle",
+databasy.ui.figures.TableMenu = draw2d.shape.basic.Rectangle.extend({
+    NAME:"databasy.ui.figures.TableMenu",
 
     init: function(tableFigure) {
         this._super(tableFigure.width, 30);
@@ -42,7 +42,8 @@ databasy.ui.figures.TableTitle = draw2d.shape.basic.Rectangle.extend({
     },
 
     startRename: function() {
-        this.name.startEdit();
+        var editor = this.name.editor;
+        editor.start(this.name);
     },
 
     setName: function(name) {
