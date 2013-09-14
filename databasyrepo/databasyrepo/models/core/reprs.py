@@ -16,6 +16,10 @@ class Repr(Node):
     pass
 
 class TableRepr(Repr):
+    DEFAULT_REPR_WIDTH = 180
+    MIN_REPR_WIDTH = 65
+    MAX_REPR_WIDTH = 1000
+
     def __init__(self, id=None):
         super(TableRepr, self).__init__(id)
         self['position'] = None
@@ -25,5 +29,6 @@ class TableRepr(Repr):
         fields.update({
             'table': Table,
             'position': [int],
+            'width': int
         })
         return fields

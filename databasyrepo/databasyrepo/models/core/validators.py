@@ -2,6 +2,19 @@ from databasyrepo.utils.validators import FieldValidator, InvalidStateError, Int
 
 __author__ = 'Marboni'
 
+class IfInFields(FieldValidator):
+    __top__ = True
+
+    def __init__(self, *validators):
+        FieldValidator.__init__(self)
+        self.validators = validators
+
+    def __call__(self, field, field_values):
+        fields = field_values.get('fields')
+        if field in fields:
+            for validator in self.validators:
+                validator(field, field_values)
+
 class NodeClass(FieldValidator):
     def __init__(self, model, clazz):
         FieldValidator.__init__(self)

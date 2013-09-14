@@ -114,7 +114,7 @@ class CommandTest(ODMTest):
         self.assertIsNotNone(table)
         self.assertTrue(table.ref() in model.val('tables'))
 
-        table_repr = query_node(model, _code=TableRepr.code(), table=table.ref(), position=[1, 2])
+        table_repr = query_node(model, _code=TableRepr.code(), table=table.ref(), position=[1, 2], width=TableRepr.DEFAULT_REPR_WIDTH)
         self.assertTrue(table_repr.ref() in canvas.val('reprs'))
 
 
@@ -265,7 +265,8 @@ class CommandTest(ODMTest):
         
         table_repr = model.node(table_repr_id, TableRepr)
         self.assertEqual(table_id, table_repr.val_as_node('table', model).id)
-        self.assertEqual(table_repr.val('position'), [10, 20])
+        self.assertEqual([10, 20], table_repr.val('position'))
+        self.assertEqual(TableRepr.DEFAULT_REPR_WIDTH, table_repr.val('width'))
 
         reprs = canvas.val_as_node('reprs', model)
         self.assertEqual(1, len(reprs))
@@ -294,12 +295,22 @@ class CommandTest(ODMTest):
         )
 
         table_repr = query_node(model, _code=TableRepr.code())
+
+        # Position
         execute_command(model, UpdateTableRepr,
             table_repr_id=table_repr.id,
             fields=['position'],
             position=[10, 20]
         )
         self.assertEqual([10, 20], table_repr.val('position'))
+
+        # Width
+        execute_command(model, UpdateTableRepr,
+            table_repr_id=table_repr.id,
+            fields=['width'],
+            width=200
+        )
+        self.assertEqual(200, table_repr.val('width'))
 
 
     def test_delete_table_repr(self):

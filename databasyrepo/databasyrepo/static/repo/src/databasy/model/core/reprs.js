@@ -19,7 +19,8 @@ databasy.model.core.reprs.TableRepr = databasy.model.core.reprs.Repr.extend({
     fields:function() {
         return this._super().concat(
             'table',
-            'position'
+            'position',
+            'width'
         )
     },
     elementId: function() {
