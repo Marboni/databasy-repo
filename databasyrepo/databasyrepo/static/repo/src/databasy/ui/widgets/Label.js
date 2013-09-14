@@ -7,7 +7,7 @@ databasy.ui.widgets.Label = draw2d.shape.basic.Rectangle.extend({
         this._super(width, 10); // Height will be recalculated according to label height on repaint.
 
         this.setStroke(0);
-        this.setAlpha(0);
+        this.setAlpha();
 
         this.label = new draw2d.shape.basic.Label(text);
         this.label.setStroke(0);
@@ -46,12 +46,6 @@ databasy.ui.widgets.Label = draw2d.shape.basic.Rectangle.extend({
         this.setDimension(width, 10); // Height will be recalculated according to label height on repaint.
     },
 
-    onCommit: function(value) {
-    },
-
-    onCancel: function() {
-    },
-
     adjustLabelToWrapper: function() {
         var text = this.text;
         this.label.setText(text);
@@ -70,5 +64,14 @@ databasy.ui.widgets.Label = draw2d.shape.basic.Rectangle.extend({
             this.setDimension(this.width, this.label.height);
         }
         this._super(attributes);
+    },
+
+    onCommit: function(value) {
+    },
+
+    onCancel: function() {
+    },
+
+    onDoubleClick: function() {
     }
 });
