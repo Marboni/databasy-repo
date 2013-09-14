@@ -10,9 +10,8 @@ databasy.ui.layout.MenuPanel = Class.extend({
     PASSING_CONTROL_MSG:'Passing control...',
     REQUESTING_CONTROL_MSG:'Requesting control...',
 
-    init:function (gateway) {
-        this.gateway = gateway;
-        gateway.addListener(this);
+    init:function () {
+        databasy.gw.addListener(this);
 
         this.createMenuPanel();
         this.createControlPanel();
@@ -35,7 +34,7 @@ databasy.ui.layout.MenuPanel = Class.extend({
             .text(this.CONTROL_BTN_LABEL_EDIT)
             .click($.proxy(this.controlButtonClick, this));
         this.controlPanel.append(this.controlButton);
-        if (!this.gateway.role.includes(databasy.gateway.ModelRole.DEVELOPER)) {
+        if (!databasy.gw.role.includes(databasy.gateway.ModelRole.DEVELOPER)) {
             this.controlButton.attr('disabled', true);
         }
     },
@@ -64,7 +63,7 @@ databasy.ui.layout.MenuPanel = Class.extend({
         this.controlPassDialog.find('table').append(notNowRow);
         this.controlPassDialog.find('.notNow').click(function () {
             that.controlPassDialog.dialog('close');
-            that.gateway.rejectControlRequests();
+            databasy.gw.rejectControlRequests();
         });
 
         this.controlPassDialog.dialog({
@@ -77,17 +76,17 @@ databasy.ui.layout.MenuPanel = Class.extend({
     },
 
     controlButtonClick:function () {
-        if (!this.gateway.role.includes(databasy.gateway.ModelRole.DEVELOPER)) {
+        if (!databasy.gw.role.includes(databasy.gateway.ModelRole.DEVELOPER)) {
             return;
         }
-        var runtime = this.gateway.runtime;
+        var runtime = databasy.gw.runtime;
         if (runtime.isEditor()) {
-            this.gateway.passControl(null);
+            databasy.gw.passControl(null);
         } else {
             if (runtime.isApplicant()) {
-                this.gateway.cancelControlRequest();
+                databasy.gw.cancelControlRequest();
             } else {
-                this.gateway.requestControl();
+                databasy.gw.requestControl();
             }
         }
     },
@@ -119,7 +118,7 @@ databasy.ui.layout.MenuPanel = Class.extend({
         var that = this;
         $('.applicant').click(function () {
             var uid = $(this).attr('uid');
-            that.gateway.passControl(uid);
+            databasy.gw.passControl(uid);
             table.find('.applicant').remove();
         });
         this.controlPassDialog.dialog('open');
@@ -134,7 +133,7 @@ databasy.ui.layout.MenuPanel = Class.extend({
     },
 
     onRuntimeChanged:function (event) {
-        var role = this.gateway.role;
+        var role = databasy.gw.role;
         var runtime = event.runtime;
 
         if (role.includes(databasy.gateway.ModelRole.DEVELOPER)) {

@@ -1,14 +1,13 @@
 databasy.ui.layout.canvas.Canvas = draw2d.Canvas.extend({
     NAME:"databasy.ui.layout.canvas.Canvas",
 
-    init:function (gateway, domNodeId) {
+    init:function (domNodeId) {
         this._super(domNodeId);
         this.setScrollArea('#' + domNodeId);
 
-        this.gateway = gateway;
-        this.gateway.addListener(this);
+        databasy.gw.addListener(this);
 
-        var model = this.gateway.model;
+        var model = databasy.gw.model;
         this.canvasNode = model.val_as_node('canvases', model)[0];
 
         this._figuresByReprId = {};
@@ -19,14 +18,14 @@ databasy.ui.layout.canvas.Canvas = draw2d.Canvas.extend({
 
         if (!this.constructor.contextMenu) {
             // Context menu is common for all canvas.
-            this.constructor.contextMenu = new databasy.ui.layout.canvas.ContextMenu(this.gateway);
+            this.constructor.contextMenu = new databasy.ui.layout.canvas.ContextMenu();
         }
 
         this.installEditPolicy(new databasy.ui.policy.canvas.ToolActionPolicy());
     },
 
     initFigures:function () {
-        var reprs = this.canvasNode.val_as_node('reprs', this.gateway.model);
+        var reprs = this.canvasNode.val_as_node('reprs', databasy.gw.model);
         var that = this;
         $.each(reprs, function (index, repr) {
             that.drawFigure(repr);
@@ -53,7 +52,7 @@ databasy.ui.layout.canvas.Canvas = draw2d.Canvas.extend({
     },
 
     drawTable:function (repr) {
-        var figure = new databasy.ui.figures.Table(this.gateway, repr);
+        var figure = new databasy.ui.figures.Table(repr);
         figure.draw(this);
         return figure;
     },
@@ -115,7 +114,7 @@ databasy.ui.layout.canvas.Canvas = draw2d.Canvas.extend({
             modelEvent.val('node_id') === this.canvasNode.id() &&
             modelEvent.val('field') === 'reprs') {
             // New repr added, drawing.
-            var repr = modelEvent.val('item').ref_node(this.gateway.model);
+            var repr = modelEvent.val('item').ref_node(databasy.gw.model);
             this.drawFigure(repr);
         }
     }

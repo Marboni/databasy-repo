@@ -1,6 +1,5 @@
 databasy.ui.layout.canvas.ContextMenu = Class.extend({
-    init:function (gateway) {
-        this.gateway = gateway;
+    init:function () {
         this.contextMenuPlatforms = {};
 
         var that = this;
@@ -21,7 +20,7 @@ databasy.ui.layout.canvas.ContextMenu = Class.extend({
                     var command = new databasy.model.core.commands.DeleteTable({
                         table_id:figure.table.id()
                     });
-                    that.gateway.executeCommand(command);
+                    databasy.gw.executeCommand(command);
                 }
             }
         });

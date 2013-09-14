@@ -1,6 +1,5 @@
 databasy.ui.layout.Toolbar = Class.extend({
-    init:function (gateway) {
-        this.gateway = gateway;
+    init:function () {
         this._currentTool = null;
         this._defaultTool = 'pointer';
 

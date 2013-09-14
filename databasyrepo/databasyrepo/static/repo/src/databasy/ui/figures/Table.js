@@ -1,10 +1,9 @@
 databasy.ui.figures.Table = draw2d.shape.basic.Rectangle.extend({
     NAME:"databasy.ui.figures.Table",
 
-    init:function (gateway, tableRepr) {
-        this.gateway = gateway;
+    init:function (tableRepr) {
         this.tableRepr = tableRepr;
-        this.table = tableRepr.val_as_node('table', this.gateway.model);
+        this.table = tableRepr.val_as_node('table', databasy.gw.model);
 
         this._super(this.tableRepr.val('width'), 30);
         this.setMinWidth(65);
@@ -15,7 +14,7 @@ databasy.ui.figures.Table = draw2d.shape.basic.Rectangle.extend({
 
         this.attachResizeListener(this);
 
-        this.gateway.addListener(this);
+        databasy.gw.addListener(this);
         this.installEditPolicy(new databasy.ui.policy.figures.TablePolicy());
 
         this.setBackgroundColor('#00bfff');
@@ -76,7 +75,7 @@ databasy.ui.figures.Table = draw2d.shape.basic.Rectangle.extend({
             table_id:this.table.id(),
             new_name:new_name
         });
-        this.gateway.executeCommand(command);
+        databasy.gw.executeCommand(command);
     },
 
     startRename: function() {
@@ -88,11 +87,11 @@ databasy.ui.figures.Table = draw2d.shape.basic.Rectangle.extend({
     },
 
     onDoubleClick:function () {
-        this.gateway.layout.propertyPanel.refreshProperties(this.table);
+        databasy.gw.layout.propertyPanel.refreshProperties(this.table);
     },
 
     onDragStart:function (relativeX, relativeY) {
-        if (!this.gateway.runtime.isEditor()) {
+        if (!databasy.gw.runtime.isEditor()) {
             return false;
         }
         this._super(relativeX, relativeY);
@@ -101,7 +100,7 @@ databasy.ui.figures.Table = draw2d.shape.basic.Rectangle.extend({
     },
 
     onDragEnd:function () {
-        if (!this.gateway.runtime.isEditor()) {
+        if (!databasy.gw.runtime.isEditor()) {
             return;
         }
         this._super();
@@ -113,12 +112,12 @@ databasy.ui.figures.Table = draw2d.shape.basic.Rectangle.extend({
                 fields: ['position'],
                 position:[dragEndPosition.getX(), dragEndPosition.getY()]
             });
-            this.gateway.executeCommand(command);
+            databasy.gw.executeCommand(command);
         }
     },
 
     onContextMenu:function (x, y) {
-        if (this.gateway.runtime.isEditor()) {
+        if (databasy.gw.runtime.isEditor()) {
             this.canvas.showContextMenu(this, x, y);
         }
     },
@@ -165,7 +164,7 @@ databasy.ui.figures.Table = draw2d.shape.basic.Rectangle.extend({
             modelEvent.val('item').ref_id() === this.tableRepr.id()) {
 
             // Table repr removed.
-            this.gateway.removeListener(this);
+            databasy.gw.removeListener(this);
             this.canvas.removeFigure(this);
         }
     },

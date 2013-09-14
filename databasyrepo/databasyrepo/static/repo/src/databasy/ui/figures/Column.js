@@ -4,9 +4,8 @@ databasy.ui.figures.Column = draw2d.shape.basic.Rectangle.extend({
     init:function (tableFigure, name) {
         this._super(178, 20);
         this.tableFigure = tableFigure;
-        this.gateway = tableFigure.gateway;
 
-        this.gateway.addListener(this);
+        databasy.gw.addListener(this);
 
         this.setBackgroundColor('#FFFFFF');
         this.setColor('#FFFFFF');

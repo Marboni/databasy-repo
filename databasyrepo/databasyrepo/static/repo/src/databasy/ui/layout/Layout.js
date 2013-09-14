@@ -1,16 +1,15 @@
 databasy.ui.layout.Layout = Class.extend({
-    init:function (gateway) {
-        this.gateway = gateway;
-        gateway.addListener(this);
+    init:function () {
+        databasy.gw.addListener(this);
 
         this.recreateHtml();
         this.createLayout();
 
-        this.canvas = new databasy.ui.layout.canvas.Canvas(this.gateway, 'canvas');
-        this.menuPanel = new databasy.ui.layout.MenuPanel(this.gateway);
-        this.toolbar = new databasy.ui.layout.Toolbar(this.gateway);
-        this.propertyPanel = new databasy.ui.layout.property.PropertyPanel(this.gateway, this);
-        this.overviewPanel = new databasy.ui.layout.overview.OverviewPanel(this.gateway);
+        this.canvas = new databasy.ui.layout.canvas.Canvas('canvas');
+        this.menuPanel = new databasy.ui.layout.MenuPanel();
+        this.toolbar = new databasy.ui.layout.Toolbar();
+        this.propertyPanel = new databasy.ui.layout.property.PropertyPanel();
+        this.overviewPanel = new databasy.ui.layout.overview.OverviewPanel();
     },
 
     createLayout:function () {

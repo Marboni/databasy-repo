@@ -1,13 +1,12 @@
 databasy.ui.layout.property.TablePropertyPanel = Class.extend({
-    init:function (gateway, table) {
-        this.gateway = gateway;
-        this.gateway.addListener(this);
+    init:function (table) {
+        databasy.gw.addListener(this);
 
         this.table = table;
 
         this.createPanel();
 
-        this.setEditable(this.gateway.runtime.isEditor());
+        this.setEditable(databasy.gw.runtime.isEditor());
     },
 
     createPanel:function () {
@@ -29,7 +28,7 @@ databasy.ui.layout.property.TablePropertyPanel = Class.extend({
                 table_id:that.table.id(),
                 new_name:value
             });
-            that.gateway.executeCommand(command);
+            databasy.gw.executeCommand(command);
         });
         this.titlePanel.append(this.title);
     },
@@ -69,6 +68,6 @@ databasy.ui.layout.property.TablePropertyPanel = Class.extend({
     },
 
     destroy:function () {
-        this.gateway.removeListener(this);
+        databasy.gw.removeListener(this);
     }
 });

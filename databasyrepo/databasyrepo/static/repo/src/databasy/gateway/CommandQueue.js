@@ -1,11 +1,10 @@
 databasy.gateway.CommandQueue = Class.extend({
-    init:function (gateway) {
-        this.gateway = gateway;
-        this.socket = gateway.socket;
+    init:function () {
+        this.socket = databasy.gw.socket;
         this._commandInProgress = null;
         this._pendingCommands = [];
 
-        databasy.utils.socket.registerListeners(gateway.socket, this);
+        databasy.utils.socket.registerListeners(this.socket, this);
     },
     push:function (command) {
         if (this._commandInProgress === null) {
@@ -16,7 +15,7 @@ databasy.gateway.CommandQueue = Class.extend({
     },
     send:function (command) {
         this._commandInProgress = command;
-        this.gateway.socket.emit('exec', command.serialize());
+        databasy.gw.socket.emit('exec', command.serialize());
     },
     reset: function() {
         this._commandInProgress = null;
@@ -33,6 +32,6 @@ databasy.gateway.CommandQueue = Class.extend({
     on_exec_fail: function() {
         alert('Server rejected model modification.\n\nModel will be reloaded.');
         databasy.utils.preloader.openPreloader(false);
-        window.location.href = '/models/' + this.gateway.modelId;
+        window.location.href = '/models/' + databasy.gw.modelId;
     }
 });

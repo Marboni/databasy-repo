@@ -1,7 +1,6 @@
 databasy.ui.layout.overview.SchemaTreePanel = Class.extend({
-    init:function (gateway) {
-        this.gateway = gateway;
-        gateway.addListener(this);
+    init:function () {
+        databasy.gw.addListener(this);
 
         this.createSchemaTreePanel();
         this.createSchemaTree();
@@ -72,7 +71,7 @@ databasy.ui.layout.overview.SchemaTreePanel = Class.extend({
     initTableNodes:function () {
         var that = this;
 
-        var tables = this.gateway.model.val_as_node('tables', this.gateway.model);
+        var tables = databasy.gw.model.val_as_node('tables', databasy.gw.model);
         if (tables.length > 0) {
             $.each(tables, function (index, table) {
                 that.createTableNode(table);
@@ -93,10 +92,10 @@ databasy.ui.layout.overview.SchemaTreePanel = Class.extend({
             // Show properties for model elements.
             var elementId = $(this).attr('elementid');
             if (elementId !== null) {
-                var canvas = that.gateway.layout.canvas;
-                var propertyPanel = that.gateway.layout.propertyPanel;
+                var canvas = databasy.gw.layout.canvas;
+                var propertyPanel = databasy.gw.layout.propertyPanel;
 
-                var element = that.gateway.model.node(elementId);
+                var element = databasy.gw.model.node(elementId);
                 var component = canvas.figureByElementId(elementId);
                 if (component) {
                     propertyPanel.refreshProperties(element);
@@ -120,7 +119,7 @@ databasy.ui.layout.overview.SchemaTreePanel = Class.extend({
                     var command = new databasy.model.core.commands.DeleteTable({
                         table_id:table.id()
                     });
-                    that.gateway.executeCommand(command);
+                    databasy.gw.executeCommand(command);
                 }
             }
         });
@@ -149,12 +148,12 @@ databasy.ui.layout.overview.SchemaTreePanel = Class.extend({
 
         treeNode.jeegoocontext(contextMenu.menuId, {
             onShow:function (e, context) {
-                return that.gateway.runtime.isEditor();
+                return databasy.gw.runtime.isEditor();
             },
             onSelect:function (e, context) {
                 var code = $(e.currentTarget).attr('code');
                 var elementId = $(context).attr('elementid');
-                var modelNode = that.gateway.model.node(elementId);
+                var modelNode = databasy.gw.model.node(elementId);
                 contextMenu.items[code].handler(modelNode);
             }
         });
@@ -235,12 +234,12 @@ databasy.ui.layout.overview.SchemaTreePanel = Class.extend({
             modelEvent.val('field') === 'tables') {
 
             // Table inserted to the model.
-            var table = modelEvent.val('item').ref_node(this.gateway.model);
+            var table = modelEvent.val('item').ref_node(databasy.gw.model);
             this.createTableNode(table);
         } else if (modelEvent instanceof databasy.model.core.events.PropertyChanged &&
             modelEvent.val('field') === 'name') {
 
-            var node = this.gateway.model.node(modelEvent.val('node_id'));
+            var node = databasy.gw.model.node(modelEvent.val('node_id'));
             if (node instanceof databasy.model.core.elements.Table) {
                 // Table name changed.
                 var newName = modelEvent.val('new_value');

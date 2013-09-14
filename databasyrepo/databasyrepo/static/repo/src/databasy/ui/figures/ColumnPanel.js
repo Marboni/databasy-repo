@@ -4,9 +4,8 @@ databasy.ui.figures.ColumnPanel = draw2d.shape.basic.Rectangle.extend({
     init:function (tableFigure) {
         this._super();
         this.tableFigure = tableFigure;
-        this.gateway = tableFigure.gateway;
 
-        this.gateway.addListener(this);
+        databasy.gw.addListener(this);
 
         this.setBackgroundColor('#FFFFFF');
         this.setRadius(0);

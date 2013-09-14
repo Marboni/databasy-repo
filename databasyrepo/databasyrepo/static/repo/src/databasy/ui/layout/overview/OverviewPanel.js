@@ -1,11 +1,10 @@
 databasy.ui.layout.overview.OverviewPanel = Class.extend({
-    init:function (gateway) {
-        this.gateway = gateway;
-        gateway.addListener(this);
+    init:function () {
+        databasy.gw.addListener(this);
 
         this.createOverviewPanel();
 
-        this.schemaTreePanel = new databasy.ui.layout.overview.SchemaTreePanel(this.gateway);
+        this.schemaTreePanel = new databasy.ui.layout.overview.SchemaTreePanel();
     },
 
     createOverviewPanel:function () {
