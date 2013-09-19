@@ -21,6 +21,7 @@ var databasy = {
     gateway: {
         events: {}
     },
+    adapter: {},
     ui: {
         layout: {
             overview: {},

@@ -1,36 +1,38 @@
 databasy.ui.layout.property.TablePropertyPanel = Class.extend({
-    init:function (table) {
-        databasy.gw.addListener(this);
-
-        this.table = table;
+    init:function (tableId) {
+        this.tableId = tableId;
 
         this.createPanel();
+
+        databasy.gw.addListener(this);
 
         this.setEditable(databasy.gw.runtime.isEditor());
     },
 
     createPanel:function () {
         this.panel = $('<div class="tableProperties"></div>');
+        this.createTitle();
+
         $('#propertyPanel').append(this.panel);
 
-        this.createTitle();
+        this.render();
+    },
+
+    render: function() {
+        var table = databasy.gw.model.node(this.tableId);
+        this.setName(table.val('name'));
     },
 
     createTitle:function () {
-        var that = this;
-
         this.titlePanel = $('<div class="titlePanel"></div>');
         this.panel.append(this.titlePanel);
 
-        this.title = $('<span class="title">' + this.table.val('name') + '</span>');
-        this.bindEditor(this.title, function (value) {
-            var command = new databasy.model.core.commands.RenameTable({
-                table_id:that.table.id(),
-                new_name:value
-            });
-            databasy.gw.executeCommand(command);
+        this.name = $('<span class="name"></span>');
+        var that = this;
+        this.bindEditor(this.name, function (value) {
+            databasy.service.renameTable(that.tableId, value);
         });
-        this.titlePanel.append(this.title);
+        this.titlePanel.append(this.name);
     },
 
     bindEditor:function (domNode, callback) {
@@ -43,11 +45,17 @@ databasy.ui.layout.property.TablePropertyPanel = Class.extend({
         })
     },
 
+    setName: function(name) {
+        this.name.text(name);
+    },
+
     setEditable:function (editable) {
         if (editable) {
-            this.title.editable('enable');
+            this.panel.removeClass('readonly');
+            this.name.editable('enable');
         } else {
-            this.title.editable('disable');
+            this.panel.addClass('readonly');
+            this.name.editable('disable');
         }
     },
 
@@ -58,12 +66,11 @@ databasy.ui.layout.property.TablePropertyPanel = Class.extend({
 
     onModelChanged:function (event) {
         var modelEvent = event.modelEvent;
-        if (modelEvent instanceof databasy.model.core.events.PropertyChanged &&
-            modelEvent.val('node_id') === this.table.id() &&
-            modelEvent.val('field') === 'name') {
+        var eventTypes = databasy.model.core.events;
+
+        if (event.matches(eventTypes.PropertyChanged, {node_id:this.tableId, field:'name'})) {
             // Table name changed.
-            var newName = modelEvent.val('new_value');
-            this.title.text(newName);
+            this.setName(modelEvent.val('new_value'));
         }
     },
 

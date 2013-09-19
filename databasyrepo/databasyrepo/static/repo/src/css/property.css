@@ -7,7 +7,7 @@
     border-bottom: 1px dotted #292929;
 }
 
-#propertyPanel.readonly .editable {
+#propertyPanel .readonly .editable {
     border-bottom: none;
 }
 

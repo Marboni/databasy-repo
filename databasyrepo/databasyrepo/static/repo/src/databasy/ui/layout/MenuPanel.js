@@ -24,6 +24,7 @@ databasy.ui.layout.MenuPanel = Class.extend({
         this.menuPanel = $('#menuPanel');
         this.menuPanel.empty();
     },
+
     createControlPanel:function () {
         this.controlPanel = $('<div id="controlPanel"></div>');
         this.menuPanel.append(this.controlPanel);
@@ -115,7 +116,6 @@ databasy.ui.layout.MenuPanel = Class.extend({
             applicantRow += '</tr>';
             table.prepend(applicantRow);
         }
-        var that = this;
         $('.applicant').click(function () {
             var uid = $(this).attr('uid');
             databasy.gw.passControl(uid);
@@ -132,6 +132,56 @@ databasy.ui.layout.MenuPanel = Class.extend({
         this.controlButton.attr('class', 'btn ' + newClass);
     },
 
+    setEditorState: function() {
+        this.controlButton.text(this.CONTROL_BTN_LABEL_EDITING_DONE);
+        this.changeControlButtonClass('btn-success');
+        this.controlButton.attr('disabled', false);
+        this.controlStatusMsg.text(this.USER_EDITING_MSG);
+    },
+
+    setPassingControlState: function() {
+        this.controlButton.attr('disabled', true);
+        this.controlStatusMsg.text(this.PASSING_CONTROL_MSG);
+    },
+
+    setRequestingControlState: function() {
+        this.controlButton.attr('disabled', true);
+        this.controlStatusMsg.text(this.REQUESTING_CONTROL_MSG);
+    },
+
+    setApplicantState: function() {
+        this.controlButton.text(this.CONTROL_BTN_LABEL_CANCEL_REQUEST);
+        this.changeControlButtonClass('btn-info');
+        this.controlButton.attr('disabled', false);
+        this.controlStatusMsg.text(this.OTHER_USER_EDITING_MSG);
+    },
+
+    setNotApplicantState: function() {
+        this.controlButton.text(this.CONTROL_BTN_LABEL_REQUEST_CONTROL);
+        this.changeControlButtonClass('btn-info');
+        this.controlButton.attr('disabled', false);
+        this.controlStatusMsg.text(this.OTHER_USER_EDITING_MSG);
+    },
+
+    setNobodyEditingState: function() {
+        this.controlButton.text(this.CONTROL_BTN_LABEL_EDIT);
+        this.changeControlButtonClass('btn-info');
+        this.controlButton.attr('disabled', false);
+        this.controlStatusMsg.text(this.NOBODY_EDITING_MSG);
+    },
+
+    setViewerOtherUserEditingState: function() {
+        this.controlButton.text(this.CONTROL_BTN_LABEL_EDIT);
+        this.controlButton.attr('disabled', true);
+        this.controlStatusMsg.text(this.OTHER_USER_EDITING_MSG);
+    },
+
+    setViewerNobodyEditingState: function() {
+        this.controlButton.text(this.CONTROL_BTN_LABEL_EDIT);
+        this.controlButton.attr('disabled', true);
+        this.controlStatusMsg.text(this.NOBODY_EDITING_MSG);
+    },
+
     onRuntimeChanged:function (event) {
         var role = databasy.gw.role;
         var runtime = event.runtime;
@@ -142,50 +192,30 @@ databasy.ui.layout.MenuPanel = Class.extend({
             this.closeControlPassDialog();
 
             if (isEditor) {
-                this.controlButton.text(this.CONTROL_BTN_LABEL_EDITING_DONE);
-                this.changeControlButtonClass('btn-success');
-                this.controlButton.attr('disabled', false);
-                this.controlStatusMsg.text(this.USER_EDITING_MSG);
-
+                this.setEditorState();
                 if (runtime.applicants.length > 0) {
                     this.openControlPassDialog(runtime);
                 }
             } else {
                 if (runtime.passingControl) {
-                    this.controlButton.attr('disabled', true);
-                    this.controlStatusMsg.text(this.PASSING_CONTROL_MSG);
-
+                    this.setPassingControlState();
                 } else if (runtime.requestingControl) {
-                    this.controlButton.attr('disabled', true);
-                    this.controlStatusMsg.text(this.REQUESTING_CONTROL_MSG);
-
+                    this.setRequestingControlState();
                 } else if (runtime.editor !== null) {
                     if (runtime.isApplicant()) {
-                        this.controlButton.text(this.CONTROL_BTN_LABEL_CANCEL_REQUEST);
-                        this.changeControlButtonClass('btn-info');
-                        this.controlButton.attr('disabled', false);
-                        this.controlStatusMsg.text(this.OTHER_USER_EDITING_MSG);
+                        this.setApplicantState();
                     } else {
-                        this.controlButton.text(this.CONTROL_BTN_LABEL_REQUEST_CONTROL);
-                        this.changeControlButtonClass('btn-info');
-                        this.controlButton.attr('disabled', false);
-                        this.controlStatusMsg.text(this.OTHER_USER_EDITING_MSG);
-
+                        this.setNotApplicantState();
                     }
                 } else {
-                    this.controlButton.text(this.CONTROL_BTN_LABEL_EDIT);
-                    this.changeControlButtonClass('btn-info');
-                    this.controlButton.attr('disabled', false);
-                    this.controlStatusMsg.text(this.NOBODY_EDITING_MSG);
+                    this.setNobodyEditingState();
                 }
             }
         } else {
-            this.controlButton.text(this.CONTROL_BTN_LABEL_EDIT);
-            this.controlButton.attr('disabled', true);
             if (runtime.editor === null) {
-                this.controlStatusMsg.text(this.NOBODY_EDITING_MSG);
+                this.setViewerNobodyEditingState();
             } else {
-                this.controlStatusMsg.text(this.OTHER_USER_EDITING_MSG);
+                this.setViewerOtherUserEditingState();
             }
         }
     }

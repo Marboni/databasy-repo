@@ -6,6 +6,17 @@ databasy.ui.layout.overview.SchemaTreePanel = Class.extend({
         this.createSchemaTree();
     },
 
+    renderSchemaTree: function() {
+        var schemaTreePanel = this;
+        var tables = databasy.gw.model.val_as_node('tables', databasy.gw.model);
+        if (tables.length > 0) {
+            $.each(tables, function (index, table) {
+                schemaTreePanel.createTableNode(table);
+            });
+            schemaTreePanel.openTableNode();
+        }
+    },
+
     createSchemaTreePanel:function () {
         this.schemaTreePanel = $('<div id="schemaTreePanel"></div>');
         $('#overviewPanel').append(this.schemaTreePanel);
@@ -17,11 +28,12 @@ databasy.ui.layout.overview.SchemaTreePanel = Class.extend({
         this.schemaTree = $('<div id="schemaTree"></div>');
         this.schemaTreePanel.append(this.schemaTree);
 
-        var initialTree = this.modelToNode();
+        var initialTree = this.initialTree();
 
         this.schemaTree
             .bind("loaded.jstree", function (event, data) {
                 that.initSchemaTree();
+                that.renderSchemaTree();
             })
             .jstree({
                 plugins:['themes', 'json_data', 'ui', 'crrm', 'sort', 'types'],
@@ -65,66 +77,22 @@ databasy.ui.layout.overview.SchemaTreePanel = Class.extend({
     initSchemaTree:function () {
         this.initContextMenus();
         this.initDblClickListener();
-        this.initTableNodes();
-    },
-
-    initTableNodes:function () {
-        var that = this;
-
-        var tables = databasy.gw.model.val_as_node('tables', databasy.gw.model);
-        if (tables.length > 0) {
-            $.each(tables, function (index, table) {
-                that.createTableNode(table);
-            });
-            that.schemaTree.jstree('open_node', '#schemaTreeTables');
-        }
-    },
-
-    initDblClickListener:function () {
-        var that = this;
-
-        this.schemaTree.on('dblclick', 'li', function () {
-            // Open/close node on double click.
-            if (!that.schemaTree.jstree('is_leaf', this)) {
-                that.schemaTree.jstree('toggle_node', this);
-            }
-
-            // Show properties for model elements.
-            var elementId = $(this).attr('elementid');
-            if (elementId !== null) {
-                var canvas = databasy.gw.layout.canvas;
-                var figure = canvas.figureByElementId(elementId);
-                if (figure) {
-                    figure.select();
-                    figure.unselect();
-                    figure.highlight();
-                    canvas.scrollToFigure(figure);
-                }
-            }
-
-            return false;
-        });
     },
 
     initContextMenus:function () {
-        var that = this;
         this.contextMenusByNodeType = {};
 
         this.createContextMenu('table', {
             deleteTable:{
                 name:'Delete Table',
-                handler:function (table) {
-                    var command = new databasy.model.core.commands.DeleteTable({
-                        table_id:table.id()
-                    });
-                    databasy.gw.executeCommand(command);
+                handler:function (tableId) {
+                    databasy.service.deleteTable(tableId);
                 }
             }
         });
     },
 
     createContextMenu:function (nodeType, items) {
-        var that = this;
         var menuId = 'schemaTree' + nodeType.charAt(0).toUpperCase() + nodeType.slice(1) + 'Cm';
 
         var menu = $('<ul id="' + menuId + '" class="jeegoocontext cm_default"></ul>');
@@ -141,7 +109,6 @@ databasy.ui.layout.overview.SchemaTreePanel = Class.extend({
     },
 
     bindContextMenu:function (treeNode) {
-        var that = this;
         var contextMenu = this.contextMenusByNodeType[treeNode.attr('rel')];
 
         treeNode.jeegoocontext(contextMenu.menuId, {
@@ -151,10 +118,42 @@ databasy.ui.layout.overview.SchemaTreePanel = Class.extend({
             onSelect:function (e, context) {
                 var code = $(e.currentTarget).attr('code');
                 var elementId = $(context).attr('elementid');
-                var modelNode = databasy.gw.model.node(elementId);
-                contextMenu.items[code].handler(modelNode);
+                contextMenu.items[code].handler(elementId);
             }
         });
+    },
+
+    initDblClickListener:function () {
+        var that = this;
+
+        this.schemaTree.on('dblclick', 'li', function () {
+            // Open/close node on double click.
+            if (!that.schemaTree.jstree('is_leaf', this)) {
+                that.schemaTree.jstree('toggle_node', this);
+            }
+
+            // Show properties for model elements.
+            var elementId = $(this).attr('elementid');
+            if (elementId !== null) {
+                var layout = databasy.gw.layout;
+                var figure = layout.canvas.getFigureByElementId(elementId);
+                if (figure) {
+                    layout.canvas.scrollToFigure(figure);
+                    figure.select();
+                    figure.unselect();
+                    figure.highlight();
+
+                    layout.propertyPanel.refreshProperties(elementId);
+                    layout.openPropertyPanel();
+                }
+            }
+
+            return false;
+        });
+    },
+
+    openTableNode: function() {
+        this.schemaTree.jstree('open_node', '#schemaTreeTables');
     },
 
     compareNodes:function (a, b) {
@@ -164,7 +163,7 @@ databasy.ui.layout.overview.SchemaTreePanel = Class.extend({
         return this.get_text(a) > this.get_text(b) ? 1 : -1;
     },
 
-    modelToNode:function () {
+    initialTree:function () {
         var tablesNode = {
             data:'Tables',
             attr:{
@@ -221,36 +220,41 @@ databasy.ui.layout.overview.SchemaTreePanel = Class.extend({
         this.bindContextMenu(node);
     },
 
-    treeNode:function (modelNodeId) {
-        return this.schemaTree.find('li[elementid="' + modelNodeId + '"]');
+    renameNode: function(elementId, name) {
+        var treeNode = this.treeNode(elementId);
+        this.schemaTree.jstree('rename_node', treeNode, name);
+    },
+
+    deleteNode: function(elementId) {
+        var treeNode = this.treeNode(elementId);
+        this.schemaTree.jstree('delete_node', treeNode);
+    },
+
+    treeNode:function (elementId) {
+        return this.schemaTree.find('li[elementid="' + elementId + '"]');
     },
 
     onModelChanged:function (event) {
         var modelEvent = event.modelEvent;
-        if (modelEvent instanceof databasy.model.core.events.ItemInserted &&
-            modelEvent.val('node_id') === null &&
-            modelEvent.val('field') === 'tables') {
+        var eventTypes = databasy.model.core.events;
 
+        if (event.matches(eventTypes.ItemInserted, {node_id: null, field: 'tables'})) {
             // Table inserted to the model.
             var table = modelEvent.val('item').ref_node(databasy.gw.model);
             this.createTableNode(table);
-        } else if (modelEvent instanceof databasy.model.core.events.PropertyChanged &&
-            modelEvent.val('field') === 'name') {
 
+        } else if (event.matches(eventTypes.PropertyChanged, {field: 'name'})) {
             var node = databasy.gw.model.node(modelEvent.val('node_id'));
             if (node instanceof databasy.model.core.elements.Table) {
                 // Table name changed.
                 var newName = modelEvent.val('new_value');
-                var treeNode = this.treeNode(node.id());
-                this.schemaTree.jstree('rename_node', treeNode, newName);
+                this.renameNode(node.id(), newName);
             }
-        } else if (modelEvent instanceof databasy.model.core.events.ItemDeleted &&
-            modelEvent.val('node_id') === null &&
-            modelEvent.val('field') === 'tables') {
 
+        } else if (event.matches(eventTypes.ItemDeleted, {node_id: null, field: 'tables'})) {
             // Table deleted.
             var tableId = modelEvent.val('item').ref_id();
-            this.schemaTree.jstree('delete_node', this.treeNode(tableId));
+            this.deleteNode(tableId);
         }
     }
 });

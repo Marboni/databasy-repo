@@ -1,11 +1,15 @@
 databasy.ui.figures.Table = draw2d.shape.basic.Rectangle.extend({
     NAME:"databasy.ui.figures.Table",
 
-    init:function (tableRepr) {
-        this.tableRepr = tableRepr;
-        this.table = tableRepr.val_as_node('table', databasy.gw.model);
+    init:function (tableId, tableReprId) {
+        this.tableId = tableId;
+        this.tableReprId = tableReprId;
 
-        this._super(this.tableRepr.val('width'), 30);
+        databasy.gw.addListener(this);
+
+        this.columnsCache = {}; // Column ID and column figure.
+
+        this._super(65, 30);
         this.setMinWidth(65);
 
         // If internal logic changes figure size, this flag will be true. Otherwise it's false. It allows to prevent
@@ -14,7 +18,6 @@ databasy.ui.figures.Table = draw2d.shape.basic.Rectangle.extend({
 
         this.attachResizeListener(this);
 
-        databasy.gw.addListener(this);
         this.installEditPolicy(new databasy.ui.policy.figures.TablePolicy());
 
         this.setBackgroundColor('#00bfff');
@@ -26,6 +29,25 @@ databasy.ui.figures.Table = draw2d.shape.basic.Rectangle.extend({
         this.createColumnPanel();
 
         this.addComment();
+    },
+
+    render: function() {
+        var model = databasy.gw.model;
+        var table = model.node(this.tableId);
+        var tableRepr = model.node(this.tableReprId);
+
+        this.setName(table.val('name'));
+        this.setWidth(tableRepr.val('width'));
+        var position = tableRepr.val('position');
+        this.setPosition(position[0], position[1])
+    },
+
+    getElementId:function () {
+        return this.tableId
+    },
+
+    getReprId:function () {
+        return this.tableReprId;
     },
 
     createTitle:function () {
@@ -48,11 +70,6 @@ databasy.ui.figures.Table = draw2d.shape.basic.Rectangle.extend({
         this.comment = undefined;
     },
 
-    draw:function (canvas) {
-        var position = this.tableRepr.val('position');
-        canvas.addFigure(this, position[0], position[1]);
-    },
-
     resetHeight:function () {
         var height = 0;
         this.getChildren().each(function (i, child) {
@@ -62,12 +79,10 @@ databasy.ui.figures.Table = draw2d.shape.basic.Rectangle.extend({
             height += 8; // Adding footer.
         }
 
-        this.internalModification = true;
-        this.setDimension(this.width, height);
-        this.internalModification = false;
+        this.setDimensionInternally(this.width, height);
     },
 
-    highlight: function() {
+    highlight:function () {
         var c = this.getBackgroundColor();
         var c2 = c.lighter(0.1);
 
@@ -82,23 +97,47 @@ databasy.ui.figures.Table = draw2d.shape.basic.Rectangle.extend({
         setTimeout(setColor1, 750);
     },
 
-    renameTable: function(new_name) {
-        if (this.table.val('name') === new_name) {
-            return;
-        }
-        var command = new databasy.model.core.commands.RenameTable({
-            table_id:this.table.id(),
-            new_name:new_name
-        });
-        databasy.gw.executeCommand(command);
+    setName:function (name) {
+        this.title.setName(name);
     },
 
-    startRename: function() {
+    setWidth:function (width) {
+        this.setDimensionInternally(width, this.height);
+    },
+
+    renameTable:function (newName) {
+        databasy.service.renameTable(this.tableId, newName);
+    },
+
+    startRename:function () {
         this.title.startRename();
     },
 
-    createColumn: function(index, column) {
+    createColumn:function (columnId, columnName, index) {
+        // TODO Create column, add to cache.
         alert('Create column ' + index);
+    },
+
+    setEditable:function (editable) {
+        if (editable != this.isResizeable()) {
+            this.setResizeable(editable);
+        }
+        if (editable != this.isDraggable()) {
+            this.setDraggable(editable);
+        }
+        if (!editable && this.canvas.getSelection().contains(this)) {
+            this.unselect();
+        }
+    },
+
+    setDimensionInternally:function (w, h) {
+        this.internalModification = true;
+        this.setDimension(w, h);
+        this.internalModification = false;
+    },
+
+    getColumn:function (columnId) {
+        // TODO
     },
 
     onDoubleClick:function () {
@@ -121,12 +160,7 @@ databasy.ui.figures.Table = draw2d.shape.basic.Rectangle.extend({
 
         var dragEndPosition = this.getPosition();
         if (!this._dragStartPosition.equals(dragEndPosition)) {
-            var command = new databasy.model.core.commands.UpdateTableRepr({
-                table_repr_id:this.tableRepr.id(),
-                fields: ['position'],
-                position:[dragEndPosition.getX(), dragEndPosition.getY()]
-            });
-            databasy.gw.executeCommand(command);
+            databasy.service.updateTableReprPosition(this.tableReprId, dragEndPosition.getX(), dragEndPosition.getY());
         }
     },
 
@@ -136,12 +170,12 @@ databasy.ui.figures.Table = draw2d.shape.basic.Rectangle.extend({
         }
     },
 
-    onOtherFigureIsResizing: function(figure) {
+    onOtherFigureIsResizing:function (figure) {
         if (figure === this) {
             if (databasy.gw.runtime.isEditor()) {
                 databasy.context.put('tableReprWidthChanged', {
-                    table_repr_id: this.tableRepr.id(),
-                    width: this.width
+                    tableReprId:this.tableReprId,
+                    width:this.width
                 });
             }
         }
@@ -149,61 +183,38 @@ databasy.ui.figures.Table = draw2d.shape.basic.Rectangle.extend({
 
     onModelChanged:function (event) {
         var modelEvent = event.modelEvent;
+        var model = databasy.gw.model;
 
-        if (modelEvent instanceof databasy.model.core.events.ItemInserted &&
-            modelEvent.val('node_id') === this.table.id() &&
-            modelEvent.val('field') === 'columns') {
+        var eventTypes = databasy.model.core.events;
 
+        if (event.matches(eventTypes.ItemInserted, {node_id:this.tableId, field:'columns'})) {
             // Column added.
-            var column = modelEvent.val('item');
+            var item = modelEvent.val('item');
             var index = modelEvent.val('index');
-
-            this.createColumn(index, column);
-        } else if (modelEvent instanceof databasy.model.core.events.PropertyChanged &&
-            modelEvent.val('node_id') === this.tableRepr.id() &&
-            modelEvent.val('field') === 'position') {
-
-            // Table representation's position changed.
-            var newPosition = modelEvent.val('new_value');
-            this.setPosition(newPosition[0], newPosition[1]);
-        } else if (modelEvent instanceof databasy.model.core.events.PropertyChanged &&
-            modelEvent.val('node_id') === this.tableRepr.id() &&
-            modelEvent.val('field') === 'width') {
-
-            // Table representation's width changed.
-            var newWidth = modelEvent.val('new_value');
-            this.internalModification = true;
-            this.setDimension(newWidth, this.height);
-            this.internalModification = false;
-        } else if (modelEvent instanceof databasy.model.core.events.PropertyChanged &&
-            modelEvent.val('node_id') === this.table.id() &&
-            modelEvent.val('field') === 'name') {
-
-            // Table name changed.
-            var newName = modelEvent.val('new_value');
-            this.title.setName(newName);
-        } else if (modelEvent instanceof databasy.model.core.events.ItemDeleted &&
-            modelEvent.val('node_id') === this.canvas.canvasNode.id() &&
-            modelEvent.val('field') === 'reprs' &&
-            modelEvent.val('item').ref_id() === this.tableRepr.id()) {
-
-            // Table repr removed.
-            databasy.gw.removeListener(this);
-            this.canvas.removeFigure(this);
+            var column = item.ref_node(model);
+            this.createColumn(column.id(), column.val('name'), index);
+        } else if (event.matches(eventTypes.PropertyChanged, {node_id:this.tableReprId, field:'position'})) {
+            var newValue = modelEvent.val('new_value');
+            this.setPosition(newValue[0], newValue[1]);
+        } else if (event.matches(eventTypes.PropertyChanged, {node_id:this.tableReprId, field:'width'})) {
+            this.setWidth(modelEvent.val('new_value'));
+        } else if (event.matches(eventTypes.PropertyChanged, {node_id:this.tableId, field:'name'})) {
+            this.setName(modelEvent.val('new_value'))
+        } else if (event.matches(eventTypes.ItemDeleted, {node_id:this.canvas.canvasId, field:'reprs'}) &&
+            modelEvent.val('item').ref_id() === this.tableReprId) {
+            this.destroy();
         }
     },
 
-    onRuntimeChanged: function(event) {
-        var isEditor = event.runtime.isEditor();
-        if (isEditor != this.isResizeable()) {
-            this.setResizeable(isEditor);
-        }
-        if (isEditor != this.isDraggable()) {
-            this.setDraggable(isEditor);
-        }
-        if (!isEditor && this.canvas.getSelection().contains(this)) {
-            this.unselect();
-        }
+    onRuntimeChanged:function (event) {
+        var rt = event.runtime;
+        var editable = rt.isEditor();
+
+        this.setEditable(editable);
+    },
+
+    destroy:function () {
+        databasy.gw.removeListener(this);
+        this.canvas.removeFigure(this);
     }
-})
-;
+});

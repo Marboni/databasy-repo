@@ -17,10 +17,6 @@ databasy.gateway.CommandQueue = Class.extend({
         this._commandInProgress = command;
         databasy.gw.socket.emit('exec', command.serialize());
     },
-    reset: function() {
-        this._commandInProgress = null;
-        this._pendingCommands = [];
-    },
     on_exec_done: function() {
         if (this._pendingCommands.length == 0) {
             this._commandInProgress = null;

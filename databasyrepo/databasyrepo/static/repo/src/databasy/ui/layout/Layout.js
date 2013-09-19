@@ -2,7 +2,7 @@ databasy.ui.layout.Layout = Class.extend({
     init:function () {
         databasy.gw.addListener(this);
 
-        this.recreateHtml();
+        this.createHtml();
         this.createLayout();
 
         this.canvas = new databasy.ui.layout.canvas.Canvas('canvas');
@@ -64,7 +64,7 @@ databasy.ui.layout.Layout = Class.extend({
         });
     },
 
-    recreateHtml:function() {
+    createHtml:function() {
         $('#application').remove();
 
         var application = $('<div id="application"></div>');
@@ -101,12 +101,12 @@ databasy.ui.layout.Layout = Class.extend({
         this.layout.children.center.close('south');
     },
 
-    onRuntimeChanged:function(event) {
-        var userRoles = event.runtime;
-        var isEditor = userRoles.isEditor();
+    onRuntimeChanged: function(event) {
+        var rt = event.runtime;
+        var editable = rt.isEditor();
 
-        if (isEditor) {
-            this.openToolbar()
+        if (editable) {
+            this.openToolbar();
         } else {
             this.closeToolbar();
         }

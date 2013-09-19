@@ -61,5 +61,5 @@ databasy.ui.layout.Toolbar = Class.extend({
     }
 }, {
     POINTER:'pointer',
-    CREATE_TABLE:'createTable'
+    CREATE_TABLE:'renderTable'
 });

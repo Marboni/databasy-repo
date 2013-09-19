@@ -9,7 +9,7 @@ databasy.ui.policy.figures.TablePolicy = draw2d.policy.figure.RectangleSelection
     },
 
     onSelect: function(canvas, figure, isPrimarySelection) {
-        databasy.gw.layout.propertyPanel.refreshProperties(figure.table);
+        databasy.gw.layout.propertyPanel.refreshProperties(figure.tableId);
         this._super(canvas, figure, isPrimarySelection);
     }
 });

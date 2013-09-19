@@ -7,6 +7,7 @@ databasy.gateway.Gateway = Class.extend({
         this.disconnecting = false;
 
         this._observer = new databasy.utils.events.Observer();
+        this.runtime = new databasy.gateway.RuntimeStub();
 
         this.socket = this.createSocket();
         this._commandQueue = new databasy.gateway.CommandQueue(this);
@@ -132,11 +133,11 @@ databasy.gateway.Gateway = Class.extend({
         databasy.utils.preloader.openPreloader(false);
 
         try {
-            this._observer.reset();
-            this._commandQueue.reset();
-            this.runtime = undefined;
             this.model = databasy.model.core.serializing.Serializable.deserialize(serializedModel);
-            this.layout = new databasy.ui.layout.Layout(this);
+            databasy.service = new databasy.gateway.Service(this.model);
+
+            this.layout = new databasy.ui.layout.Layout();
+
             this.reportActivity();
         } finally {
             databasy.utils.preloader.closePreloader();

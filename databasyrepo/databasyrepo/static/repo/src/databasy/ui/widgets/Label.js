@@ -2,7 +2,11 @@ databasy.ui.widgets.Label = draw2d.shape.basic.Rectangle.extend({
     NAME:"databasy.ui.widgets.Label",
 
     init: function(width, text) {
-        this.text = text;
+        if (text === undefined) {
+            this.text = '';
+        } else {
+            this.text = text
+        }
 
         this._super(width, 10); // Height will be recalculated according to label height on repaint.
 
@@ -11,6 +15,7 @@ databasy.ui.widgets.Label = draw2d.shape.basic.Rectangle.extend({
 
         this.label = new draw2d.shape.basic.Label(text);
         this.label.setStroke(0);
+        this.label.setPadding(0);
         this.label.setColor("#0d0d0d");
         this.label.setFontSize(13);
         this.label.setFontColor("#0d0d0d");
@@ -49,7 +54,7 @@ databasy.ui.widgets.Label = draw2d.shape.basic.Rectangle.extend({
     },
 
     setWidth: function(width) {
-        this.setDimension(width, 10); // Height will be recalculated according to label height on repaint.
+        this.setDimension(width, 30); // Height will be recalculated according to label height on repaint.
     },
 
     adjustLabelToWrapper: function() {
@@ -66,8 +71,9 @@ databasy.ui.widgets.Label = draw2d.shape.basic.Rectangle.extend({
     },
 
     repaint: function(attributes) {
-        if (this.label !== undefined && this.label.height != this.height) {
-            this.setDimension(this.width, this.label.height);
+        var labelHeight = this.label === undefined ? null : (this.label.svgNodes === null ? null : this.label.svgNodes.getBBox().height);
+        if (labelHeight !== this.height) {
+            this.setDimension(this.width, labelHeight);
         }
         this._super(attributes);
     },

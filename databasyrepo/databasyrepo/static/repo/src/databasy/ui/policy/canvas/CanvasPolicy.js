@@ -1,5 +1,5 @@
-databasy.ui.policy.canvas.ToolActionPolicy = draw2d.policy.canvas.CanvasPolicy.extend({
-    NAME:"databasy.ui.policy.canvas.ToolActionPolicy",
+databasy.ui.policy.canvas.CanvasPolicy = draw2d.policy.canvas.CanvasPolicy.extend({
+    NAME:"databasy.ui.policy.canvas.CanvasPolicy",
 
     onMouseUp: function(canvas, x,y) {
         if (!databasy.gw.runtime.isEditor()) {
@@ -16,13 +16,7 @@ databasy.ui.policy.canvas.ToolActionPolicy = draw2d.policy.canvas.CanvasPolicy.e
 
         if (databasy.context.has('tableReprWidthChanged')) {
             var change = databasy.context.pop('tableReprWidthChanged');
-
-            var command = new databasy.model.core.commands.UpdateTableRepr({
-                table_repr_id:change.table_repr_id,
-                fields: ['width'],
-                width:change.width
-            });
-            databasy.gw.executeCommand(command);
+            databasy.service.updateTableReprWidth(change.tableReprId, change.width);
         }
     },
 
@@ -39,20 +33,10 @@ databasy.ui.policy.canvas.ToolActionPolicy = draw2d.policy.canvas.CanvasPolicy.e
                 return false;
         }
     },
-    createTable:function(canvas, pos) {
-        var uuid = databasy.model.utils.uuid;
-        var table_id = uuid();
-        var repr_id = uuid();
-        var command = new databasy.model.core.commands.CreateTable({
-            table_id: table_id,
-            default_table_repr_id: repr_id,
-            name: 'table',
-            canvas_id: canvas.canvasNode.id(),
-            position: pos
-        });
-        databasy.gw.executeCommand(command);
+    createTable:function(canvas, position) {
+        var tableId = databasy.service.createTable(canvas.canvasId, position);
 
-        var figure = canvas.figureByElementId(table_id);
+        var figure = canvas.getFigureByElementId(tableId);
         setTimeout($.proxy(figure.startRename, figure), 100);
     }
 });

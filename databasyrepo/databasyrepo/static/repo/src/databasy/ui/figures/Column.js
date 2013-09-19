@@ -5,8 +5,6 @@ databasy.ui.figures.Column = draw2d.shape.basic.Rectangle.extend({
         this._super(178, 20);
         this.tableFigure = tableFigure;
 
-        databasy.gw.addListener(this);
-
         this.setBackgroundColor('#FFFFFF');
         this.setColor('#FFFFFF');
         this.setRadius(0);

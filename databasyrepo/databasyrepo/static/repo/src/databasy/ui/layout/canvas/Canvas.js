@@ -7,54 +7,88 @@ databasy.ui.layout.canvas.Canvas = draw2d.Canvas.extend({
 
         databasy.gw.addListener(this);
 
-        var model = databasy.gw.model;
-        this.canvasNode = model.val_as_node('canvases', model)[0];
+        this.figureByReprId = {};
+        this.figureByElementId = {};
 
-        this._figuresByReprId = {};
-        this._figuresByElementId = {};
+        this.canvasId = this.getDefaultCanvasNode().id();
 
         this.setEditable(false);
-        this.initFigures();
 
         if (!this.constructor.contextMenu) {
             // Context menu is common for all canvas.
             this.constructor.contextMenu = new databasy.ui.layout.canvas.ContextMenu();
         }
 
-        this.installEditPolicy(new databasy.ui.policy.canvas.ToolActionPolicy());
+        this.installEditPolicy(new databasy.ui.policy.canvas.CanvasPolicy());
+
+        this.renderFigures();
     },
 
-    initFigures:function () {
-        var reprs = this.canvasNode.val_as_node('reprs', databasy.gw.model);
+    renderFigures: function() {
         var that = this;
+        var canvas = databasy.gw.model.node(this.canvasId);
+        var reprs = canvas.val_as_node('reprs', databasy.gw.model);
         $.each(reprs, function (index, repr) {
-            that.drawFigure(repr);
+            that.renderFigure(repr);
         });
     },
 
-    drawFigure:function (repr) {
-        var drawFunction;
-        var reprCode = repr.code();
-
-        if (reprCode === databasy.model.core.reprs.TableRepr.CODE) {
-            drawFunction = this.drawTable;
-        } else {
-            throw Error('Unknown reprCode ' + reprCode);
-        }
-        //noinspection UnnecessaryLocalVariableJS
-        var figure = drawFunction.call(this, repr);
-
-        this._figuresByReprId[repr.id()] = figure;
-        var elementId = repr.elementId();
-        if (elementId !== null) {
-            this._figuresByElementId[elementId] = figure;
+    renderFigure: function(repr) {
+        var code = repr.code();
+        switch (code) {
+            case databasy.model.core.reprs.TableRepr.CODE:
+                this.renderTable(repr);
+                break;
+            default:
+                throw new Error('Unknown representation code.')
         }
     },
 
-    drawTable:function (repr) {
-        var figure = new databasy.ui.figures.Table(repr);
-        figure.draw(this);
-        return figure;
+    renderTable: function(tableRepr) {
+        var tableId = tableRepr.val('table').ref_id();
+        var tableReprId = tableRepr.id();
+
+        var tableFigure = new databasy.ui.figures.Table(tableId, tableReprId);
+        this.addFigure(tableFigure);
+        this.cache(tableFigure);
+
+        tableFigure.render();
+    },
+
+    getDefaultCanvasNode: function() {
+        var model = databasy.gw.model;
+        return model.val_as_node('canvases', model)[0]
+    },
+
+    getFigureByReprId: function(reprId) {
+        return this.figureByReprId[reprId];
+    },
+
+    getFigureByRepr: function(repr) {
+        return this.getFigureByReprId(repr.id());
+    },
+
+    getFigureByElementId: function(elementId) {
+        return this.figureByElementId[elementId];
+    },
+
+    getFigureByElement: function(element) {
+        return this.getFigureByElementId(element.id());
+    },
+
+    cache: function(figure) {
+        this.figureByReprId[figure.getReprId()] = figure;
+        this.figureByElementId[figure.getElementId()] = figure;
+    },
+
+    removeFigure: function(figure) {
+        if (figure.getElementId()) {
+            delete this.figureByElementId[figure.getElementId()];
+        }
+        if (figure.getReprId()) {
+            delete this.figureByReprId[figure.getReprId()];
+        }
+        this._super(figure);
     },
 
     setEditable:function (editable) {
@@ -64,14 +98,6 @@ databasy.ui.layout.canvas.Canvas = draw2d.Canvas.extend({
         } else {
             canvasPane.addClass('readonly');
         }
-    },
-
-    figureByReprId:function (reprId) {
-        return this._figuresByReprId[reprId];
-    },
-
-    figureByElementId:function (elementId) {
-        return this._figuresByElementId[elementId];
     },
 
     scrollTo:function (centerX, centerY) {
@@ -103,19 +129,22 @@ databasy.ui.layout.canvas.Canvas = draw2d.Canvas.extend({
         this.constructor.contextMenu.show(figure, x, y);
     },
 
-    onRuntimeChanged:function (event) {
-        var editable = event.runtime.isEditor();
-        this.setEditable(editable);
-    },
-
     onModelChanged:function (event) {
         var modelEvent = event.modelEvent;
-        if (modelEvent instanceof databasy.model.core.events.ItemInserted &&
-            modelEvent.val('node_id') === this.canvasNode.id() &&
-            modelEvent.val('field') === 'reprs') {
-            // New repr added, drawing.
-            var repr = modelEvent.val('item').ref_node(databasy.gw.model);
-            this.drawFigure(repr);
+        var model = databasy.gw.model;
+
+        var eventTypes = databasy.model.core.events;
+
+        if (event.matches(eventTypes.ItemInserted, {node_id: this.canvasId, field: 'reprs'})) {
+            var repr = modelEvent.val('item').ref_node(model);
+            this.renderFigure(repr);
         }
+    },
+
+    onRuntimeChanged: function(event) {
+        var rt = event.runtime;
+        var editable = rt.isEditor();
+
+        this.setEditable(editable);
     }
 });
