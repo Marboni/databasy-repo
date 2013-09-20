@@ -33,16 +33,6 @@ html, body {
     display: none;
 }
 
-#inplaceeditor {
-    width: 120px;
-    font-weight: bold;
-    font-size: 13px;
-    line-height: 0;
-    vertical-align: baseline;
-    height: 13pt !important;
-    padding-left: 1px;
-}
-
 .icn {
     background-image: url(../img/sprite.png);
     background-repeat: no-repeat;

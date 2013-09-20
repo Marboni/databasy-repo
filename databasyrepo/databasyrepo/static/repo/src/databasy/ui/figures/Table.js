@@ -63,7 +63,7 @@ databasy.ui.figures.Table = draw2d.shape.basic.Rectangle.extend({
 
     createColumnPanel:function () {
         this.columnPanel = new databasy.ui.figures.ColumnPanel(this);
-        this.addFigure(this.columnPanel, new databasy.ui.locators.InnerPositionLocator(this, 1, 30));
+        this.addFigure(this.columnPanel, new databasy.ui.locators.InnerPositionLocator(this, 1, this.title.height));
     },
 
     addComment:function () {

@@ -15,7 +15,6 @@ databasy.ui.widgets.Label = draw2d.shape.basic.Rectangle.extend({
 
         this.label = new draw2d.shape.basic.Label(text);
         this.label.setStroke(0);
-        this.label.setPadding(0);
         this.label.setColor("#0d0d0d");
         this.label.setFontSize(13);
         this.label.setFontColor("#0d0d0d");
@@ -78,7 +77,8 @@ databasy.ui.widgets.Label = draw2d.shape.basic.Rectangle.extend({
     },
 
     repaint: function(attributes) {
-        var labelHeight = this.label === undefined ? null : (this.label.svgNodes === null ? null : this.label.svgNodes.getBBox().height);
+        var labelHeight = this.label === undefined ? null :
+            (this.label.svgNodes === null ? null : this.label.svgNodes.getBBox().height + this.label.padding * 2);
         if (labelHeight !== this.height) {
             this.setDimension(this.width, labelHeight);
         }

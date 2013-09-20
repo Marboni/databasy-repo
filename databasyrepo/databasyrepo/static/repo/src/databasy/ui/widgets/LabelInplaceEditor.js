@@ -25,6 +25,13 @@ databasy.ui.widgets.InplaceEditor = draw2d.ui.LabelEditor.extend({
         body.bind("click", this.commitCallback);
 
         this.html = $('<input id="inplaceeditor">');
+        if (this.label.bold) {
+            this.html.css('font-weight', 'bold');
+        }
+        this.html.css('font-family', this.label.font);
+        this.html.css('font-size', this.label.fontSize + 'px');
+        this.html.css('width', this.label.getParent().width + 'px');
+        this.html.css('height', this.label.fontSize + 'pt');
         this.html.val(text);
         this.html.hide();
 
@@ -65,7 +72,7 @@ databasy.ui.widgets.InplaceEditor = draw2d.ui.LabelEditor.extend({
         bb.translate(-1, -1);
         bb.resize(2, 2);
 
-        this.html.css({position:"absolute", top:bb.y, left:bb.x, "min-width":bb.w, height:bb.h});
+        this.html.css({position:"absolute", top:bb.y, left:bb.x});
         this.html.fadeIn($.proxy(function () {
             this.html.focus();
         }, this));
