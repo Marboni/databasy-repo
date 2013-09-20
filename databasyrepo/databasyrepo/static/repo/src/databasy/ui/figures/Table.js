@@ -39,7 +39,13 @@ databasy.ui.figures.Table = draw2d.shape.basic.Rectangle.extend({
         this.setName(table.val('name'));
         this.setWidth(tableRepr.val('width'));
         var position = tableRepr.val('position');
-        this.setPosition(position[0], position[1])
+        this.setPosition(position[0], position[1]);
+
+        var columns = table.val_as_node('columns', model);
+        for (var i = 0; i < columns.length; i++) {
+            var column = columns[i];
+            this.createColumn(column);
+        }
     },
 
     getElementId:function () {
@@ -113,9 +119,8 @@ databasy.ui.figures.Table = draw2d.shape.basic.Rectangle.extend({
         this.title.startRename();
     },
 
-    createColumn:function (columnId, columnName, index) {
-        // TODO Create column, add to cache.
-        alert('Create column ' + index);
+    createColumn:function (column) {
+        this.columnPanel.createColumn(column);
     },
 
     setEditable:function (editable) {
@@ -138,6 +143,14 @@ databasy.ui.figures.Table = draw2d.shape.basic.Rectangle.extend({
 
     getColumn:function (columnId) {
         // TODO
+    },
+
+    getColumnCount: function() {
+        var count = 0;
+        for (var column in this.columnsCache) {
+            count++;
+        }
+        return count;
     },
 
     onDoubleClick:function () {
@@ -192,7 +205,7 @@ databasy.ui.figures.Table = draw2d.shape.basic.Rectangle.extend({
             var item = modelEvent.val('item');
             var index = modelEvent.val('index');
             var column = item.ref_node(model);
-            this.createColumn(column.id(), column.val('name'), index);
+            this.createColumn(column);
         } else if (event.matches(eventTypes.PropertyChanged, {node_id:this.tableReprId, field:'position'})) {
             var newValue = modelEvent.val('new_value');
             this.setPosition(newValue[0], newValue[1]);

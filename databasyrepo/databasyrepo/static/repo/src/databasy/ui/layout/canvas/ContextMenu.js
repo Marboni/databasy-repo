@@ -3,10 +3,11 @@ databasy.ui.layout.canvas.ContextMenu = Class.extend({
         this.contextMenuPlatforms = {};
 
         this.createContextMenu('canvasTable', databasy.ui.figures.Table, {
-            addColumn:{
+            createColumn:{
                 name:'Add Column',
                 handler:function (tableFigure) {
-                    databasy.service.createColumn(tableFigure.tableId);
+                    var index = tableFigure.getColumnCount(); // Last.
+                    databasy.service.createColumn(tableFigure.tableId, index);
                 }
             },
             deleteTable:{

@@ -26,6 +26,7 @@ databasy.ui.figures.TableTitle = draw2d.shape.basic.Rectangle.extend({
 
     createName: function() {
         this.name = new databasy.ui.widgets.Label(this.width - 35);
+        this.name.setBold(true);
 
         this.name.onCommit = $.proxy(function(value) {
             this.tableFigure.renameTable(value);

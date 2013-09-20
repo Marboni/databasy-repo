@@ -552,7 +552,6 @@ draw2d.Figure = Class.extend({
         this.children.each(function(i,e){
             e.locator.relocate(i, e.figure);
         });
-        
      },
      
      /**

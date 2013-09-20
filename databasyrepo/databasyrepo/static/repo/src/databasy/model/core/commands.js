@@ -162,9 +162,11 @@ databasy.model.core.commands.CreateColumn = databasy.model.core.commands.Command
 
         var table = executor.model.node(this.val('table_id'), core.elements.Table);
 
-        var column = new core.elements.Column(this.val('column_id'));
-        column.set('name', this.val('name'));
-        column.set('table', table.ref());
+        var column = new core.elements.Column({
+            _id: this.val('column_id'),
+            name: this.val('name'),
+            table: table.ref()
+        });
 
         executor.execute(new core.actions.Register({node:column}));
         executor.execute(new core.actions.InsertItem({node_id:table.id(), field:'columns', index:this.val('index'), item:column}));

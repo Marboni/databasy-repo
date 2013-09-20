@@ -1,31 +1,41 @@
 databasy.ui.figures.Column = draw2d.shape.basic.Rectangle.extend({
     NAME:"databasy.ui.figures.Column",
 
-    init:function (tableFigure, name) {
+    init:function (columnPanelFigure) {
         this._super(178, 20);
-        this.tableFigure = tableFigure;
+        this.columnPanelFigure = columnPanelFigure;
 
-        this.setBackgroundColor('#FFFFFF');
-        this.setColor('#FFFFFF');
+        this.setAlpha(0);
         this.setRadius(0);
         this.setStroke(0);
 
-        databasy.ui.utils.delegateContextMenu(this, this.tableFigure);
-        databasy.ui.utils.delegateDoubleClick(this, this.tableFigure);
+        columnPanelFigure.attachResizeListener(this);
 
-        this.createName(name);
+        databasy.ui.utils.delegateContextMenu(this, this.columnPanelFigure);
+        databasy.ui.utils.delegateDoubleClick(this, this.columnPanelFigure);
+
+        this.createName();
     },
 
-    createName: function(name) {
-        this.label = new draw2d.shape.basic.Label(name);
-        this.label.setStroke(0);
-        this.label.setColor("#0d0d0d");
-        this.label.setFontSize(12);
-        this.label.setFontColor("#0d0d0d");
-        databasy.ui.utils.delegateContextMenu(this.label, this.tableFigure);
-        databasy.ui.utils.delegateDoubleClick(this.label, this.tableFigure);
+    render: function(column) {
+        this.setName(column.val('name'));
+    },
 
-        this.addFigure(this.label, new databasy.ui.locators.InnerVerticalCenterLocator(this, 20));
+    createName: function() {
+        this.name = new databasy.ui.widgets.Label(this.width - 27);
+
+        this.name.onCommit = $.proxy(function(value) {
+            //this.tableFigure.renameTable(value);
+        }, this);
+
+        this.name.onOtherFigureIsResizing = $.proxy(function(tableTitle) {
+            this.setWidth(tableTitle.width - 27);
+        }, this.name);
+        this.attachResizeListener(this.name);
+
+        databasy.ui.utils.delegateContextMenu(this.name, this);
+
+        this.addFigure(this.name, new databasy.ui.locators.InnerVerticalCenterLocator(this, 20));
     },
 
     addComment: function() {
@@ -39,6 +49,10 @@ databasy.ui.figures.Column = draw2d.shape.basic.Rectangle.extend({
     },
 
     setName: function(name) {
-        this.label.setText(name);
+        this.name.setText(name);
+    },
+
+    onOtherFigureIsResizing: function(figure) {
+        this.setDimension(figure.width,  this.height);
     }
 });

@@ -13,6 +13,6 @@ databasy.ui.locators.EqualItemsLocator = draw2d.layout.locator.Locator.extend({
         var boundingBox = parent.getBoundingBox();
         var targetBoundingBox = target.getBoundingBox();
 
-        target.setPosition(boundingBox.w/2 - targetBoundingBox.w/2, targetBoundingBox.h * index);
+        target.setPosition(0, targetBoundingBox.h * index);
     }
 });

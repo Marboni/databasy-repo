@@ -12,13 +12,16 @@ databasy.ui.figures.ColumnPanel = draw2d.shape.basic.Rectangle.extend({
         this.setMinHeight(0);
         this.setDimension(178, 0);
 
+        tableFigure.attachResizeListener(this);
+
         databasy.ui.utils.delegateContextMenu(this, this.tableFigure);
         databasy.ui.utils.delegateDoubleClick(this, this.tableFigure);
     },
 
-    addColumn: function(name) {
-        var column = new databasy.ui.figures.Column(this.tableFigure, name);
-        this.addFigure(column, new databasy.ui.locators.EqualItemsLocator(this));
+    createColumn: function(column) {
+        var columnFigure = new databasy.ui.figures.Column(this);
+        this.addFigure(columnFigure, new databasy.ui.locators.EqualItemsLocator(this));
+        columnFigure.render(column);
         this.resetHeight();
     },
 
@@ -29,5 +32,9 @@ databasy.ui.figures.ColumnPanel = draw2d.shape.basic.Rectangle.extend({
         });
         this.setDimension(this.width, height);
         this.tableFigure.resetHeight();
+    },
+
+    onOtherFigureIsResizing: function(figure) {
+        this.setDimension(figure.width - 2,  this.height);
     }
 });

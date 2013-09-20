@@ -19,7 +19,6 @@ databasy.ui.widgets.Label = draw2d.shape.basic.Rectangle.extend({
         this.label.setColor("#0d0d0d");
         this.label.setFontSize(13);
         this.label.setFontColor("#0d0d0d");
-        this.label.setBold(true);
 
         var that = this;
         var labelListener = {
@@ -38,6 +37,14 @@ databasy.ui.widgets.Label = draw2d.shape.basic.Rectangle.extend({
         databasy.ui.utils.delegateDoubleClick(this, this.label);
 
         this.addFigure(this.label, new databasy.ui.locators.InnerPositionLocator(this, 0, 0));
+    },
+
+    setFontSize: function(fontSize) {
+        this.label.setFontSize(fontSize);
+    },
+
+    setBold: function(bold) {
+        this.label.setBold(bold);
     },
 
     getText: function() {
