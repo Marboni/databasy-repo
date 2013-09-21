@@ -56,7 +56,7 @@ databasy.ui.widgets.Label = draw2d.shape.basic.Rectangle.extend({
     },
 
     startEdit: function() {
-        this.label.editor.start(this.label);
+        setTimeout($.proxy(this.label.editor.start, this.label.editor, this.label), 100);
     },
 
     setWidth: function(width) {

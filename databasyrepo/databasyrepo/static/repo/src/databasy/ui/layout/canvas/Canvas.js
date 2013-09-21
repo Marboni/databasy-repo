@@ -82,10 +82,10 @@ databasy.ui.layout.canvas.Canvas = draw2d.Canvas.extend({
     },
 
     removeFigure: function(figure) {
-        if (figure.getElementId()) {
+        if (figure.getElementId) {
             delete this.figureByElementId[figure.getElementId()];
         }
-        if (figure.getReprId()) {
+        if (figure.getReprId) {
             delete this.figureByReprId[figure.getReprId()];
         }
         this._super(figure);

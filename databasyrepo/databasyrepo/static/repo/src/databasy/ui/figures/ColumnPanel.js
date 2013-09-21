@@ -5,6 +5,8 @@ databasy.ui.figures.ColumnPanel = draw2d.shape.basic.Rectangle.extend({
         this._super();
         this.tableFigure = tableFigure;
 
+        this.columnFigures = [];
+
         this.setBackgroundColor('#FFFFFF');
         this.setRadius(0);
         this.setStroke(0);
@@ -18,11 +20,13 @@ databasy.ui.figures.ColumnPanel = draw2d.shape.basic.Rectangle.extend({
         databasy.ui.utils.delegateDoubleClick(this, this.tableFigure);
     },
 
-    createColumn: function(column) {
-        var columnFigure = new databasy.ui.figures.Column(this);
+    createColumn: function(columnId) {
+        var columnFigure = new databasy.ui.figures.Column(columnId, this.tableFigure);
         this.addFigure(columnFigure, new databasy.ui.locators.EqualItemsLocator(this));
-        columnFigure.render(column);
+        this.columnFigures.push(columnFigure);
+        columnFigure.render();
         this.resetHeight();
+        return columnFigure;
     },
 
     resetHeight: function() {
@@ -36,5 +40,13 @@ databasy.ui.figures.ColumnPanel = draw2d.shape.basic.Rectangle.extend({
 
     onOtherFigureIsResizing: function(figure) {
         this.setDimension(figure.width - 2,  this.height);
+    },
+
+    destroy: function() {
+        $.each(this.columnFigures, function(i, figure) {
+            figure.destroy();
+        });
+
+        this.canvas.removeFigure(this);
     }
 });

@@ -22,14 +22,14 @@ databasy.gateway.Service = Class.extend({
         return tableId;
     },
 
-    renameTable: function(tableId, newName) {
+    renameTable: function(tableId, name) {
         var table = this.model.node(tableId);
-        if (table.val('name') === newName) {
+        if (table.val('name') === name) {
             return;
         }
         var command = new databasy.model.core.commands.RenameTable({
             table_id:tableId,
-            new_name:newName
+            new_name:name
         });
         databasy.gw.executeCommand(command);
     },
@@ -42,6 +42,10 @@ databasy.gateway.Service = Class.extend({
     },
 
     updateTableReprPosition: function(tableReprId, x, y) {
+        var tableRepr = this.model.node(tableReprId);
+        if (tableRepr.val('position') === [x, y]) {
+            return;
+        }
         var command = new databasy.model.core.commands.UpdateTableRepr({
             table_repr_id:tableReprId,
             fields: ['position'],
@@ -51,6 +55,10 @@ databasy.gateway.Service = Class.extend({
     },
 
     updateTableReprWidth: function(tableReprId, width) {
+        var tableRepr = this.model.node(tableReprId);
+        if (tableRepr.val('width') === width) {
+            return;
+        }
         var command = new databasy.model.core.commands.UpdateTableRepr({
             table_repr_id:tableReprId,
             fields: ['width'],
@@ -66,6 +74,25 @@ databasy.gateway.Service = Class.extend({
             column_id:column_id,
             name:'column',
             index:index
+        });
+        databasy.gw.executeCommand(command);
+    },
+
+    renameColumn: function(columnId, name) {
+        var column = this.model.node(columnId);
+        if (column.val('name') === name) {
+            return;
+        }
+        var command = new databasy.model.core.commands.RenameColumn({
+            column_id:columnId,
+            new_name:name
+        });
+        databasy.gw.executeCommand(command);
+    },
+
+    deleteColumn: function(columnId) {
+        var command = new databasy.model.core.commands.DeleteColumn({
+            column_id:columnId
         });
         databasy.gw.executeCommand(command);
     }

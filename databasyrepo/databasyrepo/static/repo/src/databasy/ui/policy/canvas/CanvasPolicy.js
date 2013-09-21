@@ -37,6 +37,6 @@ databasy.ui.policy.canvas.CanvasPolicy = draw2d.policy.canvas.CanvasPolicy.exten
         var tableId = databasy.service.createTable(canvas.canvasId, position);
 
         var figure = canvas.getFigureByElementId(tableId);
-        setTimeout($.proxy(figure.startRename, figure), 100);
+        figure.startRename();
     }
 });

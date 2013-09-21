@@ -6,6 +6,8 @@ databasy.ui.figures.TableTitle = draw2d.shape.basic.Rectangle.extend({
 
         this.tableFigure = tableFigure;
 
+        databasy.gw.addListener(this);
+
         this.setRadius(8);
         this.setAlpha(0);
         this.tableFigure.attachResizeListener(this);
@@ -29,7 +31,7 @@ databasy.ui.figures.TableTitle = draw2d.shape.basic.Rectangle.extend({
         this.name.setBold(true);
 
         this.name.onCommit = $.proxy(function(value) {
-            this.tableFigure.renameTable(value);
+            databasy.service.renameTable(this.tableFigure.tableId, value);
         }, this);
 
         this.name.onOtherFigureIsResizing = $.proxy(function(tableTitle) {
@@ -52,5 +54,20 @@ databasy.ui.figures.TableTitle = draw2d.shape.basic.Rectangle.extend({
 
     onOtherFigureIsResizing: function(figure) {
         this.setDimension(figure.width,  this.height);
+    },
+
+    onModelChanged:function (event) {
+        var modelEvent = event.modelEvent;
+
+        var eventTypes = databasy.model.core.events;
+
+        if (event.matches(eventTypes.PropertyChanged, {node_id:this.tableFigure.tableId, field:'name'})) {
+            this.setName(modelEvent.val('new_value'))
+        }
+    },
+
+    destroy: function() {
+        databasy.gw.removeListener(this);
+        this.canvas.removeFigure(this);
     }
 });

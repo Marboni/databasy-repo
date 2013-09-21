@@ -1,23 +1,27 @@
 databasy.ui.figures.Column = draw2d.shape.basic.Rectangle.extend({
     NAME:"databasy.ui.figures.Column",
 
-    init:function (columnPanelFigure) {
+    init:function (columnId, tableFigure) {
         this._super(178, 20);
-        this.columnPanelFigure = columnPanelFigure;
+        this.tableFigure = tableFigure;
+        this.columnId = columnId;
+
+        databasy.gw.addListener(this);
 
         this.setAlpha(0);
         this.setRadius(0);
         this.setStroke(0);
 
-        columnPanelFigure.attachResizeListener(this);
+        tableFigure.columnPanel.attachResizeListener(this);
 
-        databasy.ui.utils.delegateContextMenu(this, this.columnPanelFigure);
-        databasy.ui.utils.delegateDoubleClick(this, this.columnPanelFigure);
+        databasy.ui.utils.delegateContextMenu(this, tableFigure.columnPanel);
+        databasy.ui.utils.delegateDoubleClick(this, tableFigure.columnPanel);
 
         this.createName();
     },
 
-    render: function(column) {
+    render: function() {
+        var column = databasy.gw.model.node(this.columnId);
         this.setName(column.val('name'));
     },
 
@@ -25,7 +29,7 @@ databasy.ui.figures.Column = draw2d.shape.basic.Rectangle.extend({
         this.name = new databasy.ui.widgets.Label(this.width - 27);
 
         this.name.onCommit = $.proxy(function(value) {
-            //this.tableFigure.renameTable(value);
+            databasy.service.renameColumn(this.columnId, value);
         }, this);
 
         this.name.onOtherFigureIsResizing = $.proxy(function(tableTitle) {
@@ -48,11 +52,34 @@ databasy.ui.figures.Column = draw2d.shape.basic.Rectangle.extend({
         this.comment = undefined;
     },
 
+    startRename: function() {
+        this.name.startEdit();
+    },
+
     setName: function(name) {
         this.name.setText(name);
     },
 
     onOtherFigureIsResizing: function(figure) {
         this.setDimension(figure.width,  this.height);
+    },
+
+    onModelChanged:function (event) {
+        var modelEvent = event.modelEvent;
+
+        var eventTypes = databasy.model.core.events;
+
+        if (event.matches(eventTypes.PropertyChanged, {node_id:this.columnId, field:'name'})) {
+            var newValue = modelEvent.val('new_value');
+            this.setName(newValue);
+        } else if (event.matches(eventTypes.ItemDeleted, {node_id: this.columnId})) {
+            this.destroy();
+        }
+    },
+
+    destroy: function() {
+        databasy.gw.removeListener(this);
+        this.canvas.removeFigure(this);
+        this.tableFigure.columnPanel.resetHeight();
     }
 });

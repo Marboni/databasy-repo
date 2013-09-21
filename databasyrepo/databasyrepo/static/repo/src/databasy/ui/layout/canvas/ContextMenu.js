@@ -6,8 +6,10 @@ databasy.ui.layout.canvas.ContextMenu = Class.extend({
             createColumn:{
                 name:'Add Column',
                 handler:function (tableFigure) {
-                    var index = tableFigure.getColumnCount(); // Last.
-                    databasy.service.createColumn(tableFigure.tableId, index);
+                    var tableId = tableFigure.tableId;
+                    var table = databasy.gw.model.node(tableId);
+                    var index = table.items_count('columns');
+                    databasy.service.createColumn(tableId, index);
                 }
             },
             deleteTable:{

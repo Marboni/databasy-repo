@@ -7,8 +7,6 @@ databasy.ui.figures.Table = draw2d.shape.basic.Rectangle.extend({
 
         databasy.gw.addListener(this);
 
-        this.columnsCache = {}; // Column ID and column figure.
-
         this._super(65, 30);
         this.setMinWidth(65);
 
@@ -41,10 +39,10 @@ databasy.ui.figures.Table = draw2d.shape.basic.Rectangle.extend({
         var position = tableRepr.val('position');
         this.setPosition(position[0], position[1]);
 
-        var columns = table.val_as_node('columns', model);
-        for (var i = 0; i < columns.length; i++) {
-            var column = columns[i];
-            this.createColumn(column);
+        var columnRefs = table.val('columns');
+        for (var i = 0; i < columnRefs.length; i++) {
+            var columnRef = columnRefs[i];
+            this.createColumn(columnRef.ref_id());
         }
     },
 
@@ -111,16 +109,12 @@ databasy.ui.figures.Table = draw2d.shape.basic.Rectangle.extend({
         this.setDimensionInternally(width, this.height);
     },
 
-    renameTable:function (newName) {
-        databasy.service.renameTable(this.tableId, newName);
-    },
-
     startRename:function () {
         this.title.startRename();
     },
 
-    createColumn:function (column) {
-        this.columnPanel.createColumn(column);
+    createColumn:function (columnId) {
+        return this.columnPanel.createColumn(columnId);
     },
 
     setEditable:function (editable) {
@@ -139,18 +133,6 @@ databasy.ui.figures.Table = draw2d.shape.basic.Rectangle.extend({
         this.internalModification = true;
         this.setDimension(w, h);
         this.internalModification = false;
-    },
-
-    getColumn:function (columnId) {
-        // TODO
-    },
-
-    getColumnCount: function() {
-        var count = 0;
-        for (var column in this.columnsCache) {
-            count++;
-        }
-        return count;
     },
 
     onDoubleClick:function () {
@@ -196,7 +178,6 @@ databasy.ui.figures.Table = draw2d.shape.basic.Rectangle.extend({
 
     onModelChanged:function (event) {
         var modelEvent = event.modelEvent;
-        var model = databasy.gw.model;
 
         var eventTypes = databasy.model.core.events;
 
@@ -204,15 +185,14 @@ databasy.ui.figures.Table = draw2d.shape.basic.Rectangle.extend({
             // Column added.
             var item = modelEvent.val('item');
             var index = modelEvent.val('index');
-            var column = item.ref_node(model);
-            this.createColumn(column);
+            var columnId = item.ref_id();
+            var columnFigure = this.createColumn(columnId);
+            columnFigure.startRename();
         } else if (event.matches(eventTypes.PropertyChanged, {node_id:this.tableReprId, field:'position'})) {
             var newValue = modelEvent.val('new_value');
             this.setPosition(newValue[0], newValue[1]);
         } else if (event.matches(eventTypes.PropertyChanged, {node_id:this.tableReprId, field:'width'})) {
             this.setWidth(modelEvent.val('new_value'));
-        } else if (event.matches(eventTypes.PropertyChanged, {node_id:this.tableId, field:'name'})) {
-            this.setName(modelEvent.val('new_value'))
         } else if (event.matches(eventTypes.ItemDeleted, {node_id:this.canvas.canvasId, field:'reprs'}) &&
             modelEvent.val('item').ref_id() === this.tableReprId) {
             this.destroy();
@@ -227,6 +207,9 @@ databasy.ui.figures.Table = draw2d.shape.basic.Rectangle.extend({
     },
 
     destroy:function () {
+        this.title.destroy();
+        this.columnPanel.destroy();
+
         databasy.gw.removeListener(this);
         this.canvas.removeFigure(this);
     }

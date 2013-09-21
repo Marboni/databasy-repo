@@ -1,4 +1,11 @@
 databasy.model.core.elements.Table = databasy.model.core.nodes.Node.extend({
+    init: function(params) {
+        this._super(params);
+        if (this.val('columns') === null) {
+            this.set('columns', []);
+        }
+    },
+
     fields:function () {
         return this._super().concat(
             'name',

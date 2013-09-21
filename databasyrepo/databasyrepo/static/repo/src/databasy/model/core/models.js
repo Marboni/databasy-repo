@@ -2,7 +2,6 @@ databasy.model.core.models.Model = databasy.model.core.nodes.Node.extend({
     init:function () {
         this._super();
         this._node_register = {};
-        this._last_generated_id = null;
     },
     fields:function () {
         return this._super().concat(
