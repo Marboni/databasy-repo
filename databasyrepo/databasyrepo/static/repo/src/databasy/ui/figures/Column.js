@@ -18,6 +18,7 @@ databasy.ui.figures.Column = draw2d.shape.basic.Rectangle.extend({
         databasy.ui.utils.delegateDoubleClick(this, tableFigure.columnPanel);
 
         this.createName();
+        this.createIcon();
     },
 
     render: function() {
@@ -26,20 +27,25 @@ databasy.ui.figures.Column = draw2d.shape.basic.Rectangle.extend({
     },
 
     createName: function() {
-        this.name = new databasy.ui.widgets.Label(this.width - 27);
+        this.name = new databasy.ui.widgets.Label(this.width - 32);
 
         this.name.onCommit = $.proxy(function(value) {
             databasy.service.renameColumn(this.columnId, value);
         }, this);
 
         this.name.onOtherFigureIsResizing = $.proxy(function(tableTitle) {
-            this.setWidth(tableTitle.width - 27);
+            this.setWidth(tableTitle.width - 32);
         }, this.name);
         this.attachResizeListener(this.name);
 
         databasy.ui.utils.delegateContextMenu(this.name, this);
 
-        this.addFigure(this.name, new databasy.ui.locators.InnerVerticalCenterLocator(this, 20));
+        this.addFigure(this.name, new databasy.ui.locators.InnerVerticalCenterLocator(this, 25));
+    },
+
+    createIcon: function() {
+        this.icon = new databasy.ui.figures.ColumnIcon(this);
+        this.addFigure(this.icon, new databasy.ui.locators.InnerVerticalCenterLocator(this, 8));
     },
 
     addComment: function() {
@@ -78,6 +84,8 @@ databasy.ui.figures.Column = draw2d.shape.basic.Rectangle.extend({
     },
 
     destroy: function() {
+        this.icon.destroy();
+
         databasy.gw.removeListener(this);
         this.canvas.removeFigure(this);
         this.tableFigure.columnPanel.resetHeight();

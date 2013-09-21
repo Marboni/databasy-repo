@@ -27,7 +27,7 @@ databasy.ui.figures.TableTitle = draw2d.shape.basic.Rectangle.extend({
     },
 
     createName: function() {
-        this.name = new databasy.ui.widgets.Label(this.width - 35);
+        this.name = new databasy.ui.widgets.Label(this.width - 32);
         this.name.setBold(true);
 
         this.name.onCommit = $.proxy(function(value) {
@@ -35,13 +35,13 @@ databasy.ui.figures.TableTitle = draw2d.shape.basic.Rectangle.extend({
         }, this);
 
         this.name.onOtherFigureIsResizing = $.proxy(function(tableTitle) {
-            this.setWidth(tableTitle.width - 35);
+            this.setWidth(tableTitle.width - 32);
         }, this.name);
         this.attachResizeListener(this.name);
 
         databasy.ui.utils.delegateContextMenu(this.name, this);
 
-        this.addFigure(this.name, new databasy.ui.locators.InnerVerticalCenterLocator(this, 28));
+        this.addFigure(this.name, new databasy.ui.locators.InnerVerticalCenterLocator(this, 25));
     },
 
     startRename: function() {
@@ -58,7 +58,6 @@ databasy.ui.figures.TableTitle = draw2d.shape.basic.Rectangle.extend({
 
     onModelChanged:function (event) {
         var modelEvent = event.modelEvent;
-
         var eventTypes = databasy.model.core.events;
 
         if (event.matches(eventTypes.PropertyChanged, {node_id:this.tableFigure.tableId, field:'name'})) {
