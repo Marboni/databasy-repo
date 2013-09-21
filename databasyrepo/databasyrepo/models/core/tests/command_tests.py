@@ -212,9 +212,10 @@ class CommandTest(ODMTest):
         table = create_table(model)
         column = create_column(model, table)
 
-        execute_command(model, RenameColumn,
+        execute_command(model, UpdateColumn,
             column_id=column.id,
-            new_name='NewName',
+            fields=['name'],
+            name='NewName',
         )
 
         self.assertEqual('NewName', column.val('name'))

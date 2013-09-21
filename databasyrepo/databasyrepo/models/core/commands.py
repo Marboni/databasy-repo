@@ -4,7 +4,7 @@ from databasyrepo.models.core.errors import IllegalCommand
 from databasyrepo.models.core.reprs import Canvas, TableRepr
 from databasyrepo.models.core.serializing import Serializable
 from databasyrepo.models.core.validators import NodeClass, CorrectVersion, UniqueID, IfInFields
-from databasyrepo.utils.validators import InvalidStateError, Always, Length, Iterable, NotEqual, Integer, IfNotNone
+from databasyrepo.utils.validators import InvalidStateError, Always, Length, Iterable, NotEqual, Integer, IfNotNone, Boolean
 
 __author__ = 'Marboni'
 
@@ -273,25 +273,20 @@ class CreateColumn(Command):
         executor.execute(InsertItem(node_id=table_id, field='columns', index=self.val('index'), item=column))
 
 
-class RenameColumn(Command):
-    def fields(self):
-        fields = super(RenameColumn, self).fields()
-        fields.update({
-            'column_id': basestring,
-            'new_name': basestring
-        })
-        return fields
+class UpdateColumn(UpdateCommand):
+    def obj_type(self):
+        return Column
 
-    def validators(self, model):
-        validators = super(RenameColumn, self).validators(model)
-        validators.update({
-            'column_id': Always(NodeClass(model, Column)),
-            'new_name': Always(Length(1, 512))
-        })
-        return validators
+    def obj_id_field(self):
+        return 'column_id'
 
-    def do(self, executor):
-        executor.execute(Set(self.val('column_id'), 'name', self.val('new_name')))
+    def obj_changeable_fields_and_validators(self):
+        return {
+            'name': [Length(1, 512)],
+            'pk': [Boolean()],
+            'unique': [Boolean()],
+            'null': [Boolean()]
+            }
 
 
 class DeleteColumn(Command):

@@ -175,22 +175,21 @@ databasy.model.core.commands.CreateColumn = databasy.model.core.commands.Command
     CODE:'core.commands.CreateColumn'
 });
 
-databasy.model.core.commands.RenameColumn = databasy.model.core.commands.Command.extend({
-    fields:function () {
-        return this._super().concat(
-            'column_id',
-            'new_name'
-        )
+databasy.model.core.commands.UpdateColumn = databasy.model.core.commands.UpdateCommand.extend({
+    obj_id_field:function () {
+        return 'column_id';
     },
-    do:function (executor) {
-        executor.execute(new databasy.model.core.actions.Set({
-            node_id:this.val('column_id'),
-            field:'name',
-            value:this.val('new_name')
-        }));
+
+    obj_changeable_fields:function () {
+        return [
+            'name',
+            'pk',
+            'unique',
+            'null'
+        ]
     }
 }, {
-    CODE:'core.commands.RenameColumn'
+    CODE:'core.commands.UpdateColumn'
 });
 
 databasy.model.core.commands.DeleteColumn = databasy.model.core.commands.Command.extend({

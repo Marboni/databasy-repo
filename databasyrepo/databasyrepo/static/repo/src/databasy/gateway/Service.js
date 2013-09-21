@@ -83,9 +83,10 @@ databasy.gateway.Service = Class.extend({
         if (column.val('name') === name) {
             return;
         }
-        var command = new databasy.model.core.commands.RenameColumn({
+        var command = new databasy.model.core.commands.UpdateColumn({
             column_id:columnId,
-            new_name:name
+            fields: ['name'],
+            name:name
         });
         databasy.gw.executeCommand(command);
     },
