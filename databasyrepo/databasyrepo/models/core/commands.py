@@ -288,6 +288,30 @@ class UpdateColumn(UpdateCommand):
             'null': [Boolean()]
             }
 
+    def post_validation(self, model):
+        super(UpdateColumn, self).post_validation(model)
+        changeable_fields = self.val('fields')
+        column_id = self.val('column_id')
+
+        column = model.node(column_id)
+        old_pk = column.val('pk')
+        new_pk = self.val('pk') if 'pk' in changeable_fields else old_pk
+        if new_pk is True and ('unique' in changeable_fields or 'null' in changeable_fields):
+            raise IllegalCommand('PK column does\'t allow UNIQUE or NULL fields modification.')
+
+    def do(self, executor):
+        super(UpdateColumn, self).do(executor)
+
+        changeable_fields = self.val('fields')
+        became_pk = 'pk' in changeable_fields and self.val('pk') is True
+        if became_pk:
+            column_id = self.val('column_id')
+            column = executor.model.node(column_id)
+            if column.val('unique') is False:
+                executor.execute(Set(column_id, 'unique', True))
+            if column.val('null') is True:
+                executor.execute(Set(column_id, 'null', False))
+
 
 class DeleteColumn(Command):
     def fields(self):

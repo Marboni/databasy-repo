@@ -16,7 +16,7 @@ class Column(Node):
         super(Column, self).__init__(id)
         self.set('pk', False)
         self.set('unique', False)
-        self.set('null', False)
+        self.set('null', True)
 
     def fields(self):
         fields = super(Column, self).fields()

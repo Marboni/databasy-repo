@@ -23,7 +23,7 @@ databasy.model.core.models.Model = databasy.model.core.nodes.Node.extend({
             coreCommands.DeleteTable,
 
             coreCommands.CreateColumn,
-            coreCommands.RenameColumn,
+            coreCommands.UpdateColumn,
             coreCommands.DeleteColumn,
 
             coreCommands.UpdateTableRepr,

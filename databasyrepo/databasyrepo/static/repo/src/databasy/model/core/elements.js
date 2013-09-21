@@ -26,7 +26,7 @@ databasy.model.core.elements.Column = databasy.model.core.nodes.Node.extend({
             this.set('unique', false);
         }
         if (this.val('null') === null) {
-            this.set('null', false);
+            this.set('null', true);
         }
     },
 
