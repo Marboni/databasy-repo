@@ -27,7 +27,7 @@ databasy.ui.figures.Column = draw2d.shape.basic.Rectangle.extend({
     },
 
     createName: function() {
-        this.name = new databasy.ui.widgets.Label(this.width - 32);
+        this.name = new databasy.ui.widgets.Label(this, this.width - 32);
 
         this.name.onCommit = $.proxy(function(value) {
             databasy.service.renameColumn(this.columnId, value);

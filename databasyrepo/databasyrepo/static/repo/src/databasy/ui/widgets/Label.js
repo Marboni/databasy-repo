@@ -1,19 +1,21 @@
 databasy.ui.widgets.Label = draw2d.shape.basic.Rectangle.extend({
     NAME:"databasy.ui.widgets.Label",
 
-    init: function(width, text) {
-        if (text === undefined) {
-            this.text = '';
-        } else {
-            this.text = text
-        }
-
+    init: function(parent, width) {
         this._super(width, 10); // Height will be recalculated according to label height on repaint.
 
         this.setStroke(0);
         this.setAlpha(0);
 
-        this.label = new draw2d.shape.basic.Label(text);
+        this.text = '';
+
+        databasy.ui.utils.delegateContextMenu(this, parent);
+
+        this.createLabel();
+    },
+
+    createLabel: function() {
+        this.label = new draw2d.shape.basic.Label(this.text);
         this.label.setStroke(0);
         this.label.setColor("#0d0d0d");
         this.label.setFontSize(13);
@@ -34,6 +36,7 @@ databasy.ui.widgets.Label = draw2d.shape.basic.Rectangle.extend({
         this.attachResizeListener(this.label);
 
         databasy.ui.utils.delegateDoubleClick(this, this.label);
+        databasy.ui.utils.delegateContextMenu(this.label, this);
 
         this.addFigure(this.label, new databasy.ui.locators.InnerPositionLocator(this, 0, 0));
     },
