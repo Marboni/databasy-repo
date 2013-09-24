@@ -8,6 +8,7 @@ databasy.ui.widgets.Label = draw2d.shape.basic.Rectangle.extend({
         this.setAlpha(0);
 
         this.text = '';
+        this.restoreTextWhenEmpty = false;
 
         databasy.ui.utils.delegateContextMenu(this, parent);
 
@@ -24,6 +25,10 @@ databasy.ui.widgets.Label = draw2d.shape.basic.Rectangle.extend({
         var that = this;
         var labelListener = {
             onCommit: function(value) {
+                if (that.restoreTextWhenEmpty && value === "") {
+                    value = that.text;
+                }
+                that.setText(value);
                 that.onCommit(value);
             },
             onCancel: function() {
@@ -56,6 +61,14 @@ databasy.ui.widgets.Label = draw2d.shape.basic.Rectangle.extend({
     setText: function(text) {
         this.text = text;
         this.adjustLabelToWrapper();
+    },
+
+    /**
+     * Defines actions in case of user commits empty string.
+     * If false (by default), empty string will be left. If true, it will be changed to value before edition.
+     */
+    setRestorePreviousValueIfEmpty: function(restore) {
+        this.restoreTextWhenEmpty = restore;
     },
 
     startEdit: function() {
