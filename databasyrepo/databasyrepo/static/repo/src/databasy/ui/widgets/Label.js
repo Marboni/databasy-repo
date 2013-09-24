@@ -25,10 +25,6 @@ databasy.ui.widgets.Label = draw2d.shape.basic.Rectangle.extend({
         var that = this;
         var labelListener = {
             onCommit: function(value) {
-                if (that.restoreTextWhenEmpty && value === "") {
-                    value = that.text;
-                }
-                that.setText(value);
                 that.onCommit(value);
             },
             onCancel: function() {

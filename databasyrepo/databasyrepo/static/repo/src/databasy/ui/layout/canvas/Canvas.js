@@ -137,6 +137,7 @@ databasy.ui.layout.canvas.Canvas = draw2d.Canvas.extend({
                     databasy.service.deleteTable(figure.tableId);
                 }
             });
+            databasy.gw.layout.propertyPanel.refreshProperties(null);
         } else {
             this._super(keyCode, ctrl);
         }

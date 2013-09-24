@@ -2,6 +2,21 @@ databasy.ui.layout.property.PropertyPanel = Class.extend({
     init:function () {
         this.element = null;
         this.propertyPanel = $('#propertyPanel');
+        this.createEmptyPanel();
+    },
+
+    createEmptyPanel: function() {
+        this.emptyPanel = $(
+            '<table align="center" width="100%" height="100%">' +
+            '   <tr>' +
+            '       <td valign="center">' +
+            '           <small class="muted text-center" style="display:block;">Nothing to show</small>' +
+            '       </td>' +
+            '   </tr>' +
+            '</table>'
+        );
+
+        this.propertyPanel.append(this.emptyPanel);
     },
 
     refreshProperties: function(elementId) {
@@ -11,7 +26,11 @@ databasy.ui.layout.property.PropertyPanel = Class.extend({
                 this.properties.destroy();
                 this.properties = undefined;
             }
+        }
 
+        if (elementId == null) {
+            this.propertyPanel.append(this.emptyPanel);
+        } else {
             var element = databasy.gw.model.node(elementId);
             this.createProperties(element);
             this.element = element;
