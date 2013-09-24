@@ -14,6 +14,8 @@ databasy.ui.figures.ColumnIcon = draw2d.shape.basic.Image.extend({
 
         databasy.ui.utils.delegateContextMenu(this, columnFigure);
         databasy.ui.utils.delegateDoubleClick(this, columnFigure);
+        databasy.ui.utils.delegateMouseEnter(this, columnFigure);
+        databasy.ui.utils.delegateMouseLeave(this, columnFigure);
     },
 
     setPkState: function() {

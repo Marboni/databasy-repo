@@ -11,6 +11,8 @@ databasy.ui.widgets.Label = draw2d.shape.basic.Rectangle.extend({
         this.restoreTextWhenEmpty = false;
 
         databasy.ui.utils.delegateContextMenu(this, parent);
+        databasy.ui.utils.delegateMouseEnter(this, parent);
+        databasy.ui.utils.delegateMouseLeave(this, parent);
 
         this.createLabel();
     },
@@ -38,6 +40,8 @@ databasy.ui.widgets.Label = draw2d.shape.basic.Rectangle.extend({
 
         databasy.ui.utils.delegateDoubleClick(this, this.label);
         databasy.ui.utils.delegateContextMenu(this.label, this);
+        databasy.ui.utils.delegateMouseEnter(this.label, this);
+        databasy.ui.utils.delegateMouseLeave(this.label, this);
 
         this.addFigure(this.label, new databasy.ui.locators.InnerPositionLocator(this, 0, 0));
     },

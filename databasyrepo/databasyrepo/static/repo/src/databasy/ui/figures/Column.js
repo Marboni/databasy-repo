@@ -8,7 +8,7 @@ databasy.ui.figures.Column = draw2d.shape.basic.Rectangle.extend({
 
         databasy.gw.addListener(this);
 
-        this.setAlpha(0);
+        this.setBackgroundColor("#ffffff");
         this.setRadius(0);
         this.setStroke(0);
 
@@ -65,6 +65,16 @@ databasy.ui.figures.Column = draw2d.shape.basic.Rectangle.extend({
 
     setName: function(name) {
         this.name.setText(name);
+    },
+
+    onMouseEnter: function() {
+        if (databasy.gw.runtime.isEditor()) {
+            this.setBackgroundColor('#ddf3ff');
+        }
+    },
+
+    onMouseLeave: function() {
+        this.setBackgroundColor('#ffffff');
     },
 
     onOtherFigureIsResizing: function(figure) {
