@@ -22,6 +22,8 @@ databasy.ui.widgets.InplaceEditor = draw2d.ui.LabelEditor.extend({
         this.commitCallback = $.proxy(this.commit, this);
 
         var body = $("body");
+        var canvasWrapper = $('#canvasWrapper');
+
         body.bind("click", this.commitCallback);
 
         this.html = $('<input id="inplaceeditor">');
@@ -35,9 +37,9 @@ databasy.ui.widgets.InplaceEditor = draw2d.ui.LabelEditor.extend({
         this.html.val(text);
         this.html.hide();
 
-        body.append(this.html);
+        canvasWrapper.append(this.html);
 
-        this.html.autoResize({animate:false});
+        this.html.autoResize({animate:true});
 
         this.html.bind("keyup", $.proxy(function (e) {
             switch (e.which) {
@@ -59,16 +61,7 @@ databasy.ui.widgets.InplaceEditor = draw2d.ui.LabelEditor.extend({
 
         this.label.setText(text);
 
-        var canvas = this.label.getCanvas();
         var bb = this.label.getBoundingBox();
-
-        bb.setPosition(canvas.fromCanvasToDocumentCoordinate(bb.x, bb.y));
-
-        var scrollDiv = canvas.getScrollArea();
-        if (scrollDiv.is(body)) {
-            bb.translate(canvas.getScrollLeft(), canvas.getScrollTop());
-        }
-
         bb.translate(-1, -1);
         bb.resize(2, 2);
 
@@ -77,6 +70,17 @@ databasy.ui.widgets.InplaceEditor = draw2d.ui.LabelEditor.extend({
             this.html.focus();
         }, this));
         this.html.select();
+
+        var that = this;
+        canvasWrapper.scroll(function() {
+            var bb = that.label.getBoundingBox();
+            var inplaceEditor = $('#inplaceeditor');
+
+            var left = bb.x;
+            var top = bb.y;
+
+            inplaceEditor.css({position:"absolute", top:top, left:left});
+        });
     },
 
     commit:function () {
