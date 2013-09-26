@@ -114,15 +114,15 @@ class ModelManager(object):
         self._model = retrieve_model(self.model_id, mg())
         self._init_runtime()
 
-    def add_user(self, user_id, socket):
+    def add_user(self, user, socket):
         with self.lock:
             try:
-                old_socket = self.runtime.user_socket(user_id)
+                old_socket = self.runtime.user_socket(user.id)
             except ValueError:
                 pass
             else:
                 socket_utils.emit('/models', old_socket, 'server_disconnect')
-            self.runtime.add_user(user_id, socket)
+            self.runtime.add_user(user, socket)
 
     def remove_user(self, user_id):
         with self.lock:
@@ -200,12 +200,13 @@ class Runtime(dict):
     def applicants(self):
         return self['applicants']
 
-    def add_user(self, user_id, socket):
+    def add_user(self, user, socket):
         # If user reconnects and already exists in list of active users, just update his socket.
+        user_id = user.id
         if self.users.has_key(user_id):
             self.users[user_id].socket = socket
         else:
-            user_info = UserInfo(user_id, socket)
+            user_info = UserInfo(user, socket)
             self.users[user_id] = user_info
 
     def remove_user(self, user_id):
@@ -273,17 +274,18 @@ class Runtime(dict):
 
 
 class UserInfo(dict):
-    def __init__(self, user_id, socket):
+    def __init__(self, user, socket):
         super(UserInfo, self).__init__()
-        self['user_id'] = user_id
+        self['id'] = user.id
+        self['username'] = user.username
         self['active'] = True
         self.last_online = dateutils.now()
         self.last_activity = dateutils.now()
         self.socket = socket
 
     @property
-    def user_id(self):
-        return self['user_id']
+    def id(self):
+        return self['id']
 
     @property
     def active(self):

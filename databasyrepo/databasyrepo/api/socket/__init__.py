@@ -27,7 +27,7 @@ def error_handler(socket, error_name, error_message, endpoint, msg_id, quiet):
 @bp.route('/<path:remaining>')
 @login_required
 def socketio(remaining):
-    user_id = current_user.id
+    user = current_user.clone()
     try:
         model_id = request.values['m']
     except KeyError:
@@ -45,7 +45,7 @@ def socketio(remaining):
     settings = {
         'app': app,
         'model_id': model_id,
-        'user_id': user_id,
+        'user': user,
         'role': role
     }
     try:
@@ -66,7 +66,7 @@ class ModelsNamespace(BaseNamespace):
             session = environ['socketio'].session
 
             session['model_id'] = settings['model_id']
-            session['user_id'] = settings['user_id']
+            session['user'] = settings['user']
             session['role'] = settings['role']
         super(ModelsNamespace, self).__init__(environ, ns_name)
 
@@ -88,7 +88,7 @@ class ModelsNamespace(BaseNamespace):
         self.app.logger.info("[SocketSession:%s] [uid:%s] %s" % (self.socket.sessid, self.user_id, message))
 
     def on_enter(self):
-        self.app.pool.connect(self.model_id, self.user_id, self.socket)
+        self.app.pool.connect(self.model_id, self.user, self.socket)
         self.lift_acl_restrictions()
 
         self.on_activity(True)
@@ -166,7 +166,11 @@ class ModelsNamespace(BaseNamespace):
 
     @property
     def user_id(self):
-        return self.session['user_id']
+        return self.user.id
+
+    @property
+    def user(self):
+        return self.session['user']
 
     @property
     def model_id(self):

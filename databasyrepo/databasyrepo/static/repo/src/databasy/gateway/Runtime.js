@@ -41,5 +41,17 @@ databasy.gateway.Runtime = Class.extend({
 
     isApplicant:function() {
         return $.inArray(this.userId, this.applicants) != -1;
+    },
+
+    getUsername: function(userId) {
+        var username = null;
+        $.each(this.users, function(i, user) {
+            if (user.id === userId) {
+                username = user.username;
+                return false;
+            }
+            return true;
+        });
+        return username;
     }
 });

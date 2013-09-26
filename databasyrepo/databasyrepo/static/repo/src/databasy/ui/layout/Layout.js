@@ -1,4 +1,7 @@
 databasy.ui.layout.Layout = Class.extend({
+    TOOLBAR_SIZE:44,
+    TOOLBAR_SLIDE_SPEED:300,
+
     init:function () {
         databasy.gw.addListener(this);
 
@@ -14,7 +17,7 @@ databasy.ui.layout.Layout = Class.extend({
 
     createLayout:function () {
         var defaults = {
-            fxName: 'none',
+            fxName:'none',
             resizable:false,
             closable:false,
             spacing_open:5,
@@ -43,9 +46,10 @@ databasy.ui.layout.Layout = Class.extend({
                     defaults:defaults,
                     west:{
                         paneSelector:"#toolbar",
-                        fxName: 'slide',
-                        initClosed: true,
-                        size:44,
+                        fxName:'slide',
+                        fxSpeed: this.TOOLBAR_SLIDE_SPEED,
+                        initClosed:true,
+                        size:this.TOOLBAR_SIZE,
                         spacing_open:0,
                         spacing_closed:0,
                         closable:true
@@ -53,10 +57,10 @@ databasy.ui.layout.Layout = Class.extend({
                     center:{
                         paneSelector:"#canvasWrapper"
                     },
-                    south: {
+                    south:{
                         paneSelector:"#propertyPanel",
                         size:150,
-                        initClosed: true,
+                        initClosed:true,
                         closable:true
                     }
                 }
@@ -64,7 +68,7 @@ databasy.ui.layout.Layout = Class.extend({
         });
     },
 
-    createHtml:function() {
+    createHtml:function () {
         $('#application').remove();
 
         var application = $('<div id="application"></div>');
@@ -101,7 +105,7 @@ databasy.ui.layout.Layout = Class.extend({
         this.layout.children.center.close('south');
     },
 
-    onRuntimeChanged: function(event) {
+    onRuntimeChanged:function (event) {
         var rt = event.runtime;
         var editable = rt.isEditor();
 

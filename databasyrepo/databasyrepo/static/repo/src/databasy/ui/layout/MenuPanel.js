@@ -6,7 +6,7 @@ databasy.ui.layout.MenuPanel = Class.extend({
 
     NOBODY_EDITING_MSG:'Nobody is editing the model',
     USER_EDITING_MSG:'You are editing the model',
-    OTHER_USER_EDITING_MSG:'Editor: Somebody Else', //TODO
+    OTHER_USER_EDITING_MSG:'Editor: ',
     PASSING_CONTROL_MSG:'Passing control...',
     REQUESTING_CONTROL_MSG:'Requesting control...',
 
@@ -149,18 +149,18 @@ databasy.ui.layout.MenuPanel = Class.extend({
         this.controlStatusMsg.text(this.REQUESTING_CONTROL_MSG);
     },
 
-    setApplicantState: function() {
+    setApplicantState: function(usernameOfEditor) {
         this.controlButton.text(this.CONTROL_BTN_LABEL_CANCEL_REQUEST);
         this.changeControlButtonClass('btn-info');
         this.controlButton.attr('disabled', false);
-        this.controlStatusMsg.text(this.OTHER_USER_EDITING_MSG);
+        this.controlStatusMsg.text(this.OTHER_USER_EDITING_MSG + usernameOfEditor);
     },
 
-    setNotApplicantState: function() {
+    setNotApplicantState: function(usernameOfEditor) {
         this.controlButton.text(this.CONTROL_BTN_LABEL_REQUEST_CONTROL);
         this.changeControlButtonClass('btn-info');
         this.controlButton.attr('disabled', false);
-        this.controlStatusMsg.text(this.OTHER_USER_EDITING_MSG);
+        this.controlStatusMsg.text(this.OTHER_USER_EDITING_MSG + usernameOfEditor);
     },
 
     setNobodyEditingState: function() {
@@ -170,10 +170,10 @@ databasy.ui.layout.MenuPanel = Class.extend({
         this.controlStatusMsg.text(this.NOBODY_EDITING_MSG);
     },
 
-    setViewerOtherUserEditingState: function() {
+    setViewerOtherUserEditingState: function(usernameOfEditor) {
         this.controlButton.text(this.CONTROL_BTN_LABEL_EDIT);
         this.controlButton.attr('disabled', true);
-        this.controlStatusMsg.text(this.OTHER_USER_EDITING_MSG);
+        this.controlStatusMsg.text(this.OTHER_USER_EDITING_MSG + usernameOfEditor);
     },
 
     setViewerNobodyEditingState: function() {
@@ -202,10 +202,11 @@ databasy.ui.layout.MenuPanel = Class.extend({
                 } else if (runtime.requestingControl) {
                     this.setRequestingControlState();
                 } else if (runtime.editor !== null) {
+                    var usernameOfEditor = runtime.getUsername(runtime.editor);
                     if (runtime.isApplicant()) {
-                        this.setApplicantState();
+                        this.setApplicantState(usernameOfEditor);
                     } else {
-                        this.setNotApplicantState();
+                        this.setNotApplicantState(usernameOfEditor);
                     }
                 } else {
                     this.setNobodyEditingState();
@@ -215,7 +216,7 @@ databasy.ui.layout.MenuPanel = Class.extend({
             if (runtime.editor === null) {
                 this.setViewerNobodyEditingState();
             } else {
-                this.setViewerOtherUserEditingState();
+                this.setViewerOtherUserEditingState(runtime.getUsername(runtime.editor));
             }
         }
     }

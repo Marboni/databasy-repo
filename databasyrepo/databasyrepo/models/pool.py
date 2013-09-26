@@ -118,14 +118,14 @@ class ModelsPool(object):
             mm = self._load(model_id)
         return mm
 
-    def connect(self, model_id, user_id, socket):
+    def connect(self, model_id, user, socket):
         try:
             mm = self.get_or_load(model_id)
         except ModelNotFound:
-            mm = self._create(model_id, user_id)
+            mm = self._create(model_id, user.id)
 
-        mm.add_user(user_id, socket)
-        self.bind_user_to_model(user_id, model_id)
+        mm.add_user(user, socket)
+        self.bind_user_to_model(user.id, model_id)
 
     def disconnect(self, model_id, user_id):
         mm = self.get(model_id)

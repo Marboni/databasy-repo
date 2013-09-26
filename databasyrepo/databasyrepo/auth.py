@@ -33,6 +33,14 @@ class UserInfo(UserMixin):
     def is_active(self):
         return self.active
 
+    def clone(self):
+        return UserInfo({
+            'user_id': self.id,
+            'username': self.username,
+            'email': self.email,
+            'active': self.is_active()
+        })
+
 
 def load_user(user_id):
     info = facade_rpc('user_info', user_id)
