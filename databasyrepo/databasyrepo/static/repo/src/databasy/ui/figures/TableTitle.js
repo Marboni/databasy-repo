@@ -1,4 +1,4 @@
-databasy.ui.figures.TableTitle = draw2d.shape.basic.Rectangle.extend({
+databasy.ui.figures.TableTitle = databasy.ui.figures.Rectangle.extend({
     NAME:"databasy.ui.figures.TableTitle",
 
     init: function(tableFigure) {

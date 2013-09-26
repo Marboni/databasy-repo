@@ -45,10 +45,11 @@ databasy.gateway.Gateway = Class.extend({
         setTimeout("document.location.href='/'", 300);
     },
     on_reconnect:function () {
+
     },
     on_reconnecting:function () {
-        console.log('reconnect');
         databasy.utils.preloader.openPreloader(false);
+        window.location.href = '/models/' + this.modelId;
     },
     on_error:function (error, message) {
         if (this.disconnecting) {

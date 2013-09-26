@@ -27,18 +27,35 @@ databasy.model.core.nodes.Node = databasy.model.core.serializing.Serializable.ex
     item_index:function (field, item) {
         var lst = this._iter_val(field);
         var index = -1;
-        //noinspection FunctionWithInconsistentReturnsJS
-        $.each(lst, function (i, list_item) {
-            if (item === list_item) {
-                index = i;
-                return false;
-            } else if (item instanceof databasy.model.core.nodes.NodeRef &&
-                item.ref_code() === list_item.ref_code() &&
-                item.ref_id() === list_item.ref_id()) {
-                index = i;
-                return false;
+
+        var nodes = databasy.model.core.nodes;
+        if (item instanceof nodes.Node || item instanceof nodes.NodeRef) {
+            if (item instanceof nodes.Node) {
+                item = item.id();
+            } else {
+                item = item.ref_id();
             }
-        });
+            $.each(lst, function (i, list_item) {
+                if (list_item instanceof nodes.Node && item === list_item.id()) {
+                    index = i;
+                    return false;
+                } else if (list_item instanceof nodes.NodeRef && item === list_item.ref_id()) {
+                    index = i;
+                    return false;
+                } else {
+                    return true;
+                }
+            });
+        } else {
+            $.each(lst, function (i, list_item) {
+                if (item === list_item) {
+                    index = i;
+                    return false;
+                }
+                return true;
+            });
+        }
+
         if (index == -1) {
             throw new Error('Item not found in the list "' + field + '".')
         } else {

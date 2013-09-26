@@ -2,7 +2,7 @@ databasy.ui.layout.canvas.ContextMenu = Class.extend({
     init:function () {
         this.contextMenuPlatforms = {};
 
-        this.createContextMenu('canvasTable', databasy.ui.figures.Table, {
+        this.createContextMenu('canvasTable', 'databasy.ui.figures.Table', {
             createColumn:{
                 name:'Add Column',
                 handler:function (tableFigure) {
@@ -16,6 +16,33 @@ databasy.ui.layout.canvas.ContextMenu = Class.extend({
                 name:'Delete Table',
                 handler:function (tableFigure) {
                     databasy.service.deleteTable(tableFigure.tableId);
+                }
+            }
+        });
+
+        this.createContextMenu('canvasTableColumn', 'databasy.ui.figures.Column', {
+            createColumn:{
+                name:'Add Column',
+                handler:function (columnFigure) {
+                    var tableId = columnFigure.tableFigure.tableId;
+                    var model = databasy.gw.model;
+                    var table = model.node(tableId);
+                    var column = model.node(columnFigure.columnId);
+                    // Adding column after current one.
+                    var index = table.item_index('columns', column) + 1;
+                    databasy.service.createColumn(tableId, index);
+                }
+            },
+            deleteColumn: {
+                name: 'Delete Column',
+                handler: function(columnFigure) {
+                    databasy.service.deleteColumn(columnFigure.columnId);
+                }
+            },
+            deleteTable:{
+                name:'Delete Table',
+                handler:function (columnFigure) {
+                    databasy.service.deleteTable(columnFigure.tableFigure.tableId);
                 }
             }
         });
@@ -61,7 +88,11 @@ databasy.ui.layout.canvas.ContextMenu = Class.extend({
     },
 
     show:function (figure, x, y) {
-        var cmPlatform = this.contextMenuPlatforms[figure.constructor];
+        var figureName = figure.NAME;
+        if (!figureName) {
+            throw new Error('Figure name is undefined.');
+        }
+        var cmPlatform = this.contextMenuPlatforms[figureName];
         if (!cmPlatform) {
             throw new Error('Figure has no context menu.');
         }

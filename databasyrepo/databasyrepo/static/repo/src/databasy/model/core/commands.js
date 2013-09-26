@@ -226,7 +226,7 @@ databasy.model.core.commands.DeleteColumn = databasy.model.core.commands.Command
         executor.execute(new core.actions.Unregister({node_id:column_id}));
     }
 }, {
-    CODE:'core.commands.DeleteTable'
+    CODE:'core.commands.DeleteColumn'
 });
 
 databasy.model.core.commands.CreateTableRepr = databasy.model.core.commands.Command.extend({

@@ -51,6 +51,6 @@ databasy.ui.figures.ColumnIcon = draw2d.shape.basic.Image.extend({
 
     destroy: function() {
         databasy.gw.removeListener(this);
-        this.canvas.removeFigure(this);
+        this.parent.removeFigure(this);
     }
 });
