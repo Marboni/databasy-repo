@@ -6,7 +6,7 @@ databasy.ui.layout.overview.SchemaTreePanel = Class.extend({
         this.createSchemaTree();
     },
 
-    renderSchemaTree: function() {
+    renderSchemaTree:function () {
         var schemaTreePanel = this;
         var tables = databasy.gw.model.val_as_node('tables', databasy.gw.model);
         if (tables.length > 0) {
@@ -54,19 +54,19 @@ databasy.ui.layout.overview.SchemaTreePanel = Class.extend({
                         schema:{
                             icon:{
                                 image:'/static/repo/src/img/sprites.png',
-                                position: '-17px -265px'
+                                position:'-17px -265px'
                             }
                         },
-                        dir: {
+                        dir:{
                             icon:{
                                 image:'/static/repo/src/img/sprites.png',
-                                position: '-17px -214px'
+                                position:'-17px -214px'
                             }
                         },
                         table:{
                             icon:{
                                 image:'/static/repo/src/img/sprites.png',
-                                position: '-22px -116px'
+                                position:'-22px -116px'
                             }
                         }
                     }
@@ -136,14 +136,22 @@ databasy.ui.layout.overview.SchemaTreePanel = Class.extend({
             var elementId = $(this).attr('elementid');
             if (elementId !== null) {
                 var layout = databasy.gw.layout;
-                var figure = layout.canvas.getFigureByElementId(elementId);
+                var canvas = layout.canvas;
+                var figure = canvas.getFigureByElementId(elementId);
                 if (figure) {
-                    layout.canvas.scrollToFigure(figure);
-                    figure.select();
-                    figure.unselect();
-                    figure.highlight();
+                    canvas.scrollToFigure(figure);
 
-                    layout.propertyPanel.refreshProperties(elementId);
+                    var selection = canvas.getSelection();
+                    selection.getAll().each(function(i, f) {
+                        f.unselect();
+                        selection.remove(f);
+                    });
+                    figure.select(true);
+                    selection.setPrimary(figure);
+                    canvas.selectionListeners.each(function (i, w) {
+                        w.onSelectionChanged(figure);
+                    });
+
                     layout.openPropertyPanel();
                 }
             }
@@ -152,7 +160,7 @@ databasy.ui.layout.overview.SchemaTreePanel = Class.extend({
         });
     },
 
-    openTableNode: function() {
+    openTableNode:function () {
         this.schemaTree.jstree('open_node', '#schemaTreeTables');
     },
 
@@ -220,12 +228,12 @@ databasy.ui.layout.overview.SchemaTreePanel = Class.extend({
         this.bindContextMenu(node);
     },
 
-    renameNode: function(elementId, name) {
+    renameNode:function (elementId, name) {
         var treeNode = this.treeNode(elementId);
         this.schemaTree.jstree('rename_node', treeNode, name);
     },
 
-    deleteNode: function(elementId) {
+    deleteNode:function (elementId) {
         var treeNode = this.treeNode(elementId);
         this.schemaTree.jstree('delete_node', treeNode);
     },
@@ -238,12 +246,12 @@ databasy.ui.layout.overview.SchemaTreePanel = Class.extend({
         var modelEvent = event.modelEvent;
         var eventTypes = databasy.model.core.events;
 
-        if (event.matches(eventTypes.ItemInserted, {node_id: null, field: 'tables'})) {
+        if (event.matches(eventTypes.ItemInserted, {node_id:null, field:'tables'})) {
             // Table inserted to the model.
             var table = modelEvent.val('item').ref_node(databasy.gw.model);
             this.createTableNode(table);
 
-        } else if (event.matches(eventTypes.PropertyChanged, {field: 'name'})) {
+        } else if (event.matches(eventTypes.PropertyChanged, {field:'name'})) {
             var node = databasy.gw.model.node(modelEvent.val('node_id'));
             if (node instanceof databasy.model.core.elements.Table) {
                 // Table name changed.
@@ -251,7 +259,7 @@ databasy.ui.layout.overview.SchemaTreePanel = Class.extend({
                 this.renameNode(node.id(), newName);
             }
 
-        } else if (event.matches(eventTypes.ItemDeleted, {node_id: null, field: 'tables'})) {
+        } else if (event.matches(eventTypes.ItemDeleted, {node_id:null, field:'tables'})) {
             // Table deleted.
             var tableId = modelEvent.val('item').ref_id();
             this.deleteNode(tableId);
