@@ -1,5 +1,5 @@
-databasy.ui.figures.Rectangle = draw2d.shape.basic.Rectangle.extend({
-    NAME: "databasy.ui.figures.Rectangle",
+databasy.ui.figure.Rectangle = draw2d.shape.basic.Rectangle.extend({
+    NAME: "databasy.ui.figure.Rectangle",
 
     insertFigure: function (child, index, locator) {
         child.setDraggable(false);

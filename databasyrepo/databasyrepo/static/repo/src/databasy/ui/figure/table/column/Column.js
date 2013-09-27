@@ -1,5 +1,5 @@
-databasy.ui.figures.Column = databasy.ui.figures.Rectangle.extend({
-    NAME:"databasy.ui.figures.Column",
+databasy.ui.figure.table.column.Column = databasy.ui.figure.Rectangle.extend({
+    NAME:"databasy.ui.figure.table.column.Column",
 
     init:function (columnId, tableFigure) {
         this._super(178, 20);
@@ -26,7 +26,7 @@ databasy.ui.figures.Column = databasy.ui.figures.Rectangle.extend({
     },
 
     createName:function () {
-        this.name = new databasy.ui.widgets.Label(this, this.width - 32);
+        this.name = new databasy.ui.widget.Label(this, this.width - 32);
         this.name.setRestorePreviousValueIfEmpty(true);
 
         this.name.onCommit = $.proxy(function (value) {
@@ -40,17 +40,17 @@ databasy.ui.figures.Column = databasy.ui.figures.Rectangle.extend({
 
         databasy.ui.utils.delegateContextMenu(this.name, this);
 
-        this.addFigure(this.name, new databasy.ui.locators.InnerVerticalCenterLocator(this, 25));
+        this.addFigure(this.name, new databasy.ui.locator.InnerVerticalCenterLocator(this, 25));
     },
 
     createIcon:function () {
-        this.icon = new databasy.ui.figures.ColumnIcon(this);
-        this.addFigure(this.icon, new databasy.ui.locators.InnerVerticalCenterLocator(this, 8));
+        this.icon = new databasy.ui.figure.table.column.ColumnIcon(this);
+        this.addFigure(this.icon, new databasy.ui.locator.InnerVerticalCenterLocator(this, 8));
     },
 
     addComment:function () {
-        this.comment = new databasy.ui.figures.Comment(this);
-        this.addFigure(this.comment, new databasy.ui.locators.InnerTopRightLocator(this, 2, 0));
+        this.comment = new databasy.ui.figure.Comment(this);
+        this.addFigure(this.comment, new databasy.ui.locator.InnerTopRightLocator(this, 2, 0));
     },
 
     removeComment:function () {

@@ -1,5 +1,5 @@
-databasy.ui.figures.ColumnPanel = databasy.ui.figures.Rectangle.extend({
-    NAME:"databasy.ui.figures.ColumnPanel",
+databasy.ui.figure.table.column.ColumnPanel = databasy.ui.figure.Rectangle.extend({
+    NAME:"databasy.ui.figure.table.column.ColumnPanel",
 
     init:function (tableFigure) {
         this._super();
@@ -19,8 +19,8 @@ databasy.ui.figures.ColumnPanel = databasy.ui.figures.Rectangle.extend({
     },
 
     createColumn:function (columnId, index) {
-        var columnFigure = new databasy.ui.figures.Column(columnId, this.tableFigure);
-        this.insertFigure(columnFigure, index, new databasy.ui.locators.EqualItemsLocator(this));
+        var columnFigure = new databasy.ui.figure.table.column.Column(columnId, this.tableFigure);
+        this.insertFigure(columnFigure, index, new databasy.ui.locator.EqualItemsLocator(this));
         columnFigure.render();
         this.resetHeight();
         return columnFigure;

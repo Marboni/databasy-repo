@@ -1,5 +1,5 @@
-databasy.ui.figures.Table = databasy.ui.figures.Rectangle.extend({
-    NAME:"databasy.ui.figures.Table",
+databasy.ui.figure.table.Table = databasy.ui.figure.Rectangle.extend({
+    NAME:"databasy.ui.figure.table.Table",
 
     init:function (tableId, tableReprId) {
         this.tableId = tableId;
@@ -16,7 +16,7 @@ databasy.ui.figures.Table = databasy.ui.figures.Rectangle.extend({
 
         this.attachResizeListener(this);
 
-        this.installEditPolicy(new databasy.ui.policy.figures.TablePolicy());
+        this.installEditPolicy(new databasy.ui.policy.figure.TablePolicy());
 
         this.setBackgroundColor('#00bfff');
         this.setColor('#009acd');
@@ -55,18 +55,18 @@ databasy.ui.figures.Table = databasy.ui.figures.Rectangle.extend({
     },
 
     createTitle:function () {
-        this.title = new databasy.ui.figures.TableTitle(this);
-        this.addFigure(this.title, new databasy.ui.locators.InnerPositionLocator(this, 0, 0));
+        this.title = new databasy.ui.figure.table.TableTitle(this);
+        this.addFigure(this.title, new databasy.ui.locator.InnerPositionLocator(this, 0, 0));
     },
 
     createColumnPanel:function () {
-        this.columnPanel = new databasy.ui.figures.ColumnPanel(this);
-        this.addFigure(this.columnPanel, new databasy.ui.locators.InnerPositionLocator(this, 1, this.title.height));
+        this.columnPanel = new databasy.ui.figure.table.column.ColumnPanel(this);
+        this.addFigure(this.columnPanel, new databasy.ui.locator.InnerPositionLocator(this, 1, this.title.height));
     },
 
     addComment:function () {
-        this.comment = new databasy.ui.figures.Comment(this);
-        this.title.addFigure(this.comment, new databasy.ui.locators.InnerTopRightLocator(this.title, 1, -1));
+        this.comment = new databasy.ui.figure.Comment(this);
+        this.title.addFigure(this.comment, new databasy.ui.locator.InnerTopRightLocator(this.title, 1, -1));
     },
 
     removeComment:function () {

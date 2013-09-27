@@ -1,5 +1,5 @@
-databasy.ui.widgets.Label = draw2d.shape.basic.Rectangle.extend({
-    NAME:"databasy.ui.widgets.Label",
+databasy.ui.widget.Label = draw2d.shape.basic.Rectangle.extend({
+    NAME:"databasy.ui.widget.Label",
 
     init: function(parent, width) {
         this._super(width, 10); // Height will be recalculated according to label height on repaint.
@@ -33,7 +33,7 @@ databasy.ui.widgets.Label = draw2d.shape.basic.Rectangle.extend({
                 that.onCancel();
             }
         };
-        this.label.installEditor(new databasy.ui.widgets.InplaceEditor(labelListener, $.proxy(this.getText, this)));
+        this.label.installEditor(new databasy.ui.widget.InplaceEditor(labelListener, $.proxy(this.getText, this)));
 
         this.label.onOtherFigureIsResizing = $.proxy(this.adjustLabelToWrapper, this);
         this.attachResizeListener(this.label);
@@ -43,7 +43,7 @@ databasy.ui.widgets.Label = draw2d.shape.basic.Rectangle.extend({
         databasy.ui.utils.delegateMouseEnter(this.label, this);
         databasy.ui.utils.delegateMouseLeave(this.label, this);
 
-        this.addFigure(this.label, new databasy.ui.locators.InnerPositionLocator(this, 0, 0));
+        this.addFigure(this.label, new databasy.ui.locator.InnerPositionLocator(this, 0, 0));
     },
 
     setFontSize: function(fontSize) {

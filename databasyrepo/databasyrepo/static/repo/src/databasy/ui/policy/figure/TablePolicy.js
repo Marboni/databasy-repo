@@ -1,5 +1,5 @@
-databasy.ui.policy.figures.TablePolicy = draw2d.policy.figure.RectangleSelectionFeedbackPolicy.extend({
-    NAME:"databasy.ui.policy.figures.TablePolicy",
+databasy.ui.policy.figure.TablePolicy = draw2d.policy.figure.RectangleSelectionFeedbackPolicy.extend({
+    NAME:"databasy.ui.policy.figure.TablePolicy",
 
     adjustDimension: function(figure, width, height) {
         if (!figure.internalModification) {

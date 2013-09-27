@@ -48,7 +48,7 @@ databasy.ui.layout.canvas.Canvas = draw2d.Canvas.extend({
         var tableId = tableRepr.val('table').ref_id();
         var tableReprId = tableRepr.id();
 
-        var tableFigure = new databasy.ui.figures.Table(tableId, tableReprId);
+        var tableFigure = new databasy.ui.figure.table.Table(tableId, tableReprId);
         this.addFigure(tableFigure);
         this.cache(tableFigure);
 
@@ -133,7 +133,7 @@ databasy.ui.layout.canvas.Canvas = draw2d.Canvas.extend({
         if (keyCode == 46 && databasy.gw.runtime.isEditor()) {
             // Delete button pressed.
             this.selection.getAll().each(function(i, figure) {
-                if (figure instanceof databasy.ui.figures.Table) {
+                if (figure instanceof databasy.ui.figure.table.Table) {
                     databasy.service.deleteTable(figure.tableId);
                 }
             });

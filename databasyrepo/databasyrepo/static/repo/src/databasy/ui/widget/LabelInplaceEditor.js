@@ -1,5 +1,5 @@
-databasy.ui.widgets.InplaceEditor = draw2d.ui.LabelEditor.extend({
-    NAME:"databasy.ui.widgets.InplaceEditor",
+databasy.ui.widget.InplaceEditor = draw2d.ui.LabelEditor.extend({
+    NAME:"databasy.ui.widget.InplaceEditor",
 
     init:function (listener) {
         this._super();

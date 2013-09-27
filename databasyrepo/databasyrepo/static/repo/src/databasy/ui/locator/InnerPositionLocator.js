@@ -1,5 +1,5 @@
-databasy.ui.locators.InnerPositionLocator= draw2d.layout.locator.Locator.extend({
-    NAME : "databasy.ui.locators.InnerPositionLocator",
+databasy.ui.locator.InnerPositionLocator= draw2d.layout.locator.Locator.extend({
+    NAME : "databasy.ui.locator.InnerPositionLocator",
 
     init: function(parent, x, y) {
         this._super(parent);

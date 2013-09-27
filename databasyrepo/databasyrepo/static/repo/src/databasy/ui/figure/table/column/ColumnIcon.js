@@ -1,5 +1,5 @@
-databasy.ui.figures.ColumnIcon = draw2d.shape.basic.Image.extend({
-    NAME:"databasy.ui.figures.ColumnIcon",
+databasy.ui.figure.table.column.ColumnIcon = draw2d.shape.basic.Image.extend({
+    NAME:"databasy.ui.figure.table.column.ColumnIcon",
 
     PK_ICON_PATH: '/static/repo/src/img/sprite/key16.png',
     NULL_ICON_PATH: '/static/repo/src/img/sprite/markerBlueEmpty16.png',

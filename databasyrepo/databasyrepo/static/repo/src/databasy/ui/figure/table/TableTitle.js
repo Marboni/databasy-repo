@@ -1,5 +1,5 @@
-databasy.ui.figures.TableTitle = databasy.ui.figures.Rectangle.extend({
-    NAME:"databasy.ui.figures.TableTitle",
+databasy.ui.figure.table.TableTitle = databasy.ui.figure.Rectangle.extend({
+    NAME:"databasy.ui.figure.table.TableTitle",
 
     init: function(tableFigure) {
         this._super(tableFigure.width, 30);
@@ -23,11 +23,11 @@ databasy.ui.figures.TableTitle = databasy.ui.figures.Rectangle.extend({
         databasy.ui.utils.delegateContextMenu(this.icon, this);
         databasy.ui.utils.delegateDoubleClick(this.icon, this);
 
-        this.addFigure(this.icon, new databasy.ui.locators.InnerVerticalCenterLocator(this, 8));
+        this.addFigure(this.icon, new databasy.ui.locator.InnerVerticalCenterLocator(this, 8));
     },
 
     createName: function() {
-        this.name = new databasy.ui.widgets.Label(this, this.width - 32);
+        this.name = new databasy.ui.widget.Label(this, this.width - 32);
         this.name.setBold(true);
         this.name.setRestorePreviousValueIfEmpty(true);
 
@@ -42,7 +42,7 @@ databasy.ui.figures.TableTitle = databasy.ui.figures.Rectangle.extend({
 
         databasy.ui.utils.delegateContextMenu(this.name, this);
 
-        this.addFigure(this.name, new databasy.ui.locators.InnerVerticalCenterLocator(this, 25));
+        this.addFigure(this.name, new databasy.ui.locator.InnerVerticalCenterLocator(this, 25));
     },
 
     startRename: function() {

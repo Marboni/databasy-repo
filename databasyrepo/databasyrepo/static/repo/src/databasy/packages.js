@@ -21,21 +21,23 @@ var databasy = {
     gateway: {
         events: {}
     },
-    adapter: {},
     ui: {
         layout: {
             overview: {},
             property: {},
             canvas: {}
         },
-        locators: {},
-        figures: {},
-        widgets: {},
+        locator: {},
+        figure: {
+            table: {
+                column: {}
+            }
+        },
+        widget: {},
         policy: {
             canvas: {},
-            figures: {}
+            figure: {}
         },
-        events: {},
         utils: {}
     },
     utils: {

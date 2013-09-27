@@ -2,7 +2,7 @@ databasy.ui.layout.canvas.ContextMenu = Class.extend({
     init:function () {
         this.contextMenuPlatforms = {};
 
-        this.createContextMenu('canvasTable', 'databasy.ui.figures.Table', {
+        this.createContextMenu('canvasTable', 'databasy.ui.figure.table.Table', {
             createColumn:{
                 name:'Add Column',
                 handler:function (tableFigure) {
@@ -20,7 +20,7 @@ databasy.ui.layout.canvas.ContextMenu = Class.extend({
             }
         });
 
-        this.createContextMenu('canvasTableColumn', 'databasy.ui.figures.Column', {
+        this.createContextMenu('canvasTableColumn', 'databasy.ui.figure.table.column.Column', {
             createColumn:{
                 name:'Add Column',
                 handler:function (columnFigure) {

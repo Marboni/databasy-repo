@@ -1,9 +1,10 @@
-databasy.ui.locators.InnerVerticalCenterLocator= draw2d.layout.locator.Locator.extend({
-    NAME : "databasy.ui.locators.InnerVerticaCenterLocator",
+databasy.ui.locator.InnerTopRightLocator= draw2d.layout.locator.Locator.extend({
+    NAME : "databasy.ui.locator.InnerTopRightLocator",
 
-    init: function(parent, x) {
+    init:function(parent, offsetX, offsetY) {
         this._super(parent);
-        this.x = x;
+        this.offsetX = offsetX === undefined ? 0 : offsetX;
+        this.offsetY = offsetX === undefined ? 0 : offsetY;
     },
 
     /**
@@ -18,6 +19,6 @@ databasy.ui.locators.InnerVerticalCenterLocator= draw2d.layout.locator.Locator.e
         var boundingBox = parent.getBoundingBox();
         var targetBoundingBox = target.getBoundingBox();
 
-        target.setPosition(this.x, boundingBox.h/2-targetBoundingBox.h/2);
+        target.setPosition(boundingBox.w - targetBoundingBox.w + this.offsetX, this.offsetY);
     }
 });

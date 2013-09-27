@@ -1,5 +1,5 @@
-databasy.ui.locators.EqualItemsLocator = draw2d.layout.locator.Locator.extend({
-    NAME : "databasy.ui.locators.EqualItemsLocator",
+databasy.ui.locator.EqualItemsLocator = draw2d.layout.locator.Locator.extend({
+    NAME : "databasy.ui.locator.EqualItemsLocator",
 
     /**
      * @method
