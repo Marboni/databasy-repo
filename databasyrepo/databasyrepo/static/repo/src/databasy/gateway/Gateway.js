@@ -16,8 +16,9 @@ databasy.gateway.Gateway = Class.extend({
 
     createSocket:function () {
         var socket = io.connect('/models', {
-            'reconnection limit': 4000,
-            query: 'm=' + this.modelId
+            'connect timeout': 30000,
+            'reconnection limit': 30000,
+            'query': 'm=' + this.modelId
         });
 
         $(window).bind('beforeunload', function() {

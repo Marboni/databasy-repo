@@ -27,8 +27,8 @@ def model_exists(model_id, conn):
 
 
 class ModelManager(object):
-    ONLINE_TIMEOUT = 10
-    ACTIVE_TIMEOUT = 30
+    ONLINE_TIMEOUT = 30
+    ACTIVE_TIMEOUT = 15
     ONLINE_STATUS_CHECK_PERIOD = 5
 
     def __init__(self, pool, model_id=None):
@@ -78,7 +78,7 @@ class ModelManager(object):
 
         for user_id in users_to_disconnect:
             try:
-                socket = self.runtime.user_socket(user_id)
+                self.runtime.user_socket(user_id)
             except ValueError:
                 continue
             else:
