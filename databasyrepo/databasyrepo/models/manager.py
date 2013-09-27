@@ -82,7 +82,7 @@ class ModelManager(object):
             except ValueError:
                 continue
             else:
-                socket.disconnect(silent=True)
+                self.pool.disconnect(self.model_id, user_id)
                 self.log('User %s went offline and was disconnected.' % user_id)
 
 
