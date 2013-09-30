@@ -88,7 +88,9 @@ databasy.ui.widget.InplaceEditor = draw2d.ui.LabelEditor.extend({
         $("body").unbind("click", this.commitCallback);
         var labelWidget = this.label.getParent();
         var text = this.html.val();
-        if (!(labelWidget.restoreTextWhenEmpty && text === "")) {
+        if (labelWidget.restoreTextWhenEmpty && text === "") {
+            text = labelWidget.getText();
+        } else {
             labelWidget.setText(text);
         }
         this.html.fadeOut($.proxy(function () {
