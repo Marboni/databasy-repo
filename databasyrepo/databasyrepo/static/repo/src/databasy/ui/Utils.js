@@ -16,3 +16,16 @@ databasy.ui.utils.delegate = function(func, fromFigure, toFigure) {
         fromFigure[func] = $.proxy(toFigure[func], toFigure);
     }
 };
+
+databasy.ui.utils.selectSingleFigure = function(canvas, figure) {
+    var selection = canvas.getSelection();
+    selection.getAll().each(function(i, f) {
+        f.unselect();
+        selection.remove(f);
+    });
+    figure.select(true);
+    selection.setPrimary(figure);
+    canvas.selectionListeners.each(function (i, w) {
+        w.onSelectionChanged(figure);
+    });
+};

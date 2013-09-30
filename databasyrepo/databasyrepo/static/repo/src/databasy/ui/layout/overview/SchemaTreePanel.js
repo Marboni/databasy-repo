@@ -141,16 +141,7 @@ databasy.ui.layout.overview.SchemaTreePanel = Class.extend({
                 if (figure) {
                     canvas.scrollToFigure(figure);
 
-                    var selection = canvas.getSelection();
-                    selection.getAll().each(function(i, f) {
-                        f.unselect();
-                        selection.remove(f);
-                    });
-                    figure.select(true);
-                    selection.setPrimary(figure);
-                    canvas.selectionListeners.each(function (i, w) {
-                        w.onSelectionChanged(figure);
-                    });
+                    databasy.ui.utils.selectSingleFigure(canvas, figure);
 
                     layout.openPropertyPanel();
                 }

@@ -18,6 +18,8 @@ databasy.ui.policy.canvas.CanvasPolicy = draw2d.policy.canvas.CanvasPolicy.exten
             var change = databasy.context.pop('tableReprWidthChanged');
             databasy.service.updateTableReprWidth(change.tableReprId, change.width);
         }
+
+        return true;
     },
 
     applyTool: function(tool, canvas, pos) {
@@ -38,10 +40,7 @@ databasy.ui.policy.canvas.CanvasPolicy = draw2d.policy.canvas.CanvasPolicy.exten
 
         var figure = canvas.getFigureByElementId(tableId);
 
-        var selection = canvas.getSelection();
-        selection.clear();
-        selection.setPrimary(figure);
-        figure.select(true);
+        databasy.ui.utils.selectSingleFigure(canvas, figure);
 
         figure.startRename();
     }
