@@ -80,47 +80,21 @@ databasy.ui.layout.overview.SchemaTreePanel = Class.extend({
     },
 
     initContextMenus:function () {
-        this.contextMenusByNodeType = {};
+        var menu = $('' +
+            '<div id="context-menu">' +
+            '<ul class="dropdown-menu" role="menu">' +
+            '<li><a tabindex="-1" href="#">Action</a></li>' +
+            '<li><a tabindex="-1" href="#">Another action</a></li>' +
+            '<li><a tabindex="-1" href="#">Something else here</a></li>' +
+            '<li class="divider"></li>' +
+            '<li><a tabindex="-1" href="#">Separated link</a></li>' +
+            '</ul>' +
+            '</div>');
+        $('body').append(menu);
 
-        this.createContextMenu('table', {
-            deleteTable:{
-                name:'Delete Table',
-                handler:function (tableId) {
-                    databasy.service.deleteTable(tableId);
-                }
-            }
-        });
-    },
+        $('li').contextmenu({'target':'#context-menu'});
+        $('li').css('position', 'relative');
 
-    createContextMenu:function (nodeType, items) {
-        var menuId = 'schemaTree' + nodeType.charAt(0).toUpperCase() + nodeType.slice(1) + 'Cm';
-
-        var menu = $('<ul id="' + menuId + '" class="jeegoocontext cm_default"></ul>');
-        for (var code in items) {
-            var opts = items[code];
-            $('<li code="' + code + '">' + opts.name + '</li>').appendTo(menu);
-        }
-        menu.appendTo('body');
-
-        this.contextMenusByNodeType[nodeType] = {
-            menuId:menuId,
-            items:items
-        }
-    },
-
-    bindContextMenu:function (treeNode) {
-        var contextMenu = this.contextMenusByNodeType[treeNode.attr('rel')];
-
-        treeNode.jeegoocontext(contextMenu.menuId, {
-            onShow:function (e, context) {
-                return databasy.gw.runtime.isEditor();
-            },
-            onSelect:function (e, context) {
-                var code = $(e.currentTarget).attr('code');
-                var elementId = $(context).attr('elementid');
-                contextMenu.items[code].handler(elementId);
-            }
-        });
     },
 
     initDblClickListener:function () {
@@ -142,7 +116,7 @@ databasy.ui.layout.overview.SchemaTreePanel = Class.extend({
                     canvas.scrollToFigure(figure);
 
                     var selection = canvas.getSelection();
-                    selection.getAll().each(function(i, f) {
+                    selection.getAll().each(function (i, f) {
                         f.unselect();
                         selection.remove(f);
                     });
@@ -225,7 +199,6 @@ databasy.ui.layout.overview.SchemaTreePanel = Class.extend({
         };
         var node = this.schemaTree.jstree('create', '#schemaTreeTables', 'last', tableNode, false, true);
         node.attr('elementid', tableId);
-        this.bindContextMenu(node);
     },
 
     renameNode:function (elementId, name) {
