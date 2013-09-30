@@ -59,6 +59,11 @@ databasy.ui.widget.InplaceEditor = draw2d.ui.LabelEditor.extend({
             e.preventDefault();
         });
 
+        this.html.bind("dblclick", function (e) {
+            e.stopPropagation();
+            e.preventDefault();
+        });
+
         this.label.setText(text);
 
         var bb = this.label.getBoundingBox();
