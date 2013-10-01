@@ -142,8 +142,13 @@ databasy.ui.figure.table.Table = databasy.ui.figure.Rectangle.extend({
         if (!databasy.gw.runtime.isEditor()) {
             return false;
         }
+
         this._super(relativeX, relativeY);
-        this._dragStartPosition = this.getPosition();
+
+        if (!this._dragStartPosition) {
+            this._dragStartPosition = this.getPosition();
+        }
+
         return true;
     },
 
@@ -157,6 +162,7 @@ databasy.ui.figure.table.Table = databasy.ui.figure.Rectangle.extend({
         if (!this._dragStartPosition.equals(dragEndPosition)) {
             databasy.service.updateTableReprPosition(this.tableReprId, dragEndPosition.getX(), dragEndPosition.getY());
         }
+        this._dragStartPosition = undefined;
     },
 
     onContextMenu:function (x, y) {
