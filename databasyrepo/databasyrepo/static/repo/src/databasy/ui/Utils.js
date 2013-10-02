@@ -29,3 +29,14 @@ databasy.ui.utils.selectSingleFigure = function(canvas, figure) {
         w.onSelectionChanged(figure);
     });
 };
+
+databasy.ui.utils.executeSequentially = function (functions) {
+    if (functions.length == 0) {
+        return;
+    }
+    setTimeout(function() {
+        functions[0]();
+        functions.splice(0, 1);
+        databasy.ui.utils.executeSequentially(functions);
+    }, 0);
+};

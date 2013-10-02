@@ -16,12 +16,11 @@ databasy.gateway.Gateway = Class.extend({
 
     createSocket:function () {
         var socket = io.connect('/models', {
-            'connect timeout': 30000,
-            'reconnection limit': 30000,
-            'query': 'm=' + this.modelId
+            'reconnection limit':30000,
+            'query':'m=' + this.modelId
         });
 
-        $(window).bind('beforeunload', function() {
+        $(window).bind('beforeunload', function () {
             socket.disconnect();
         });
         databasy.utils.socket.registerListeners(socket, this);
@@ -29,10 +28,10 @@ databasy.gateway.Gateway = Class.extend({
         return socket;
     },
 
-    listenActivity: function() {
+    listenActivity:function () {
         this.activity = false;
         var that = this;
-        $('body').bind('mousedown keydown', function(event) {
+        $('body').bind('mousedown keydown', function (event) {
             that.activity = true;
         });
     },
@@ -41,7 +40,7 @@ databasy.gateway.Gateway = Class.extend({
     on_connect:function () {
         this.socket.emit('enter');
     },
-    on_server_disconnect: function() {
+    on_server_disconnect:function () {
         this.disconnecting = true;
         setTimeout("document.location.href='/'", 300);
     },
@@ -74,7 +73,7 @@ databasy.gateway.Gateway = Class.extend({
     on_runtime_changed:function (runtime) {
         this.changeRuntime(runtime);
     },
-    on_reload: function(cause) {
+    on_reload:function (cause) {
         if ('role_changed' == cause) {
             alert('Model owner changed your permissions. Model will be reloaded.');
         } else {
@@ -83,7 +82,7 @@ databasy.gateway.Gateway = Class.extend({
         this.disconnecting = true;
         window.location.href = '/models/' + this.modelId;
     },
-    on_exec:function(serializedCommand) {
+    on_exec:function (serializedCommand) {
         var command = databasy.model.core.serializing.Serializable.deserialize(serializedCommand);
         this._applyCommand(command);
     },
@@ -94,9 +93,9 @@ databasy.gateway.Gateway = Class.extend({
         this._commandQueue.push(command);
     },
 
-    _applyCommand: function(command) {
+    _applyCommand:function (command) {
         var events = this.model.execute_command(command, this.userId);
-        $.each(events, $.proxy(function(i, event) {
+        $.each(events, $.proxy(function (i, event) {
             this.fire(new databasy.gateway.events.ModelChanged(event));
         }, this));
     },
@@ -116,7 +115,7 @@ databasy.gateway.Gateway = Class.extend({
     /**
      * Applicant cancels its control request.
      */
-    cancelControlRequest: function() {
+    cancelControlRequest:function () {
         this.runtime.cancelControlRequest();
         this.fire(new databasy.gateway.events.RuntimeChanged(this.runtime));
         this.socket.emit('cancel_control_request');
@@ -125,7 +124,7 @@ databasy.gateway.Gateway = Class.extend({
     /**
      * Editor rejects control requests.
      */
-    rejectControlRequests: function() {
+    rejectControlRequests:function () {
         this.runtime.rejectControlRequests();
         this.fire(new databasy.gateway.events.RuntimeChanged(this.runtime));
         this.socket.emit('reject_control_requests');
@@ -134,24 +133,22 @@ databasy.gateway.Gateway = Class.extend({
     initializeModel:function (serializedModel) {
         databasy.utils.preloader.openPreloader(false);
 
-        try {
-            this.model = databasy.model.core.serializing.Serializable.deserialize(serializedModel);
-            databasy.service = new databasy.gateway.Service(this.model);
+        this.model = databasy.model.core.serializing.Serializable.deserialize(serializedModel);
+        databasy.service = new databasy.gateway.Service(this.model);
 
-            this.layout = new databasy.ui.layout.Layout();
-
-            this.reportActivity();
-        } finally {
+        this.layout = new databasy.ui.layout.Layout($.proxy(function () {
+            this.startReportActivity();
+            this._observer.setActive(true); // Fire all events received during rendering.
             databasy.utils.preloader.closePreloader();
-        }
+        }, this));
     },
 
-    reportActivity: function() {
+    startReportActivity:function () {
         this.activity = false;
         var that = this;
         var delay = 5000;
 
-        var ping = function() {
+        var ping = function () {
             that.socket.emit('activity', that.activity);
             that.activity = false;
             clearTimeout(that.activityTimer);
@@ -161,19 +158,19 @@ databasy.gateway.Gateway = Class.extend({
     },
 
     changeRuntime:function (serializedRoles) {
-        this.runtime = new databasy.gateway.Runtime(this.userId, serializedRoles);
+        this.runtime = new databasy.gateway.Runtime(serializedRoles);
         this.fire(new databasy.gateway.events.RuntimeChanged(this.runtime));
     },
 
-    fire:function(event) {
+    fire:function (event) {
         this._observer.fire(event);
     },
 
-    addListener:function(listener) {
+    addListener:function (listener) {
         this._observer.addListener(listener);
     },
 
-    removeListener:function(listener) {
+    removeListener:function (listener) {
         this._observer.removeListener(listener);
     }
 });

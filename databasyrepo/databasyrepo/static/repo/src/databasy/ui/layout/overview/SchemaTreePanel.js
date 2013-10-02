@@ -9,12 +9,17 @@ databasy.ui.layout.overview.SchemaTreePanel = Class.extend({
     renderSchemaTree:function () {
         var schemaTreePanel = this;
         var tables = databasy.gw.model.val_as_node('tables', databasy.gw.model);
+        var functions = [];
         if (tables.length > 0) {
             $.each(tables, function (index, table) {
-                schemaTreePanel.createTableNode(table);
+                functions.push($.proxy(schemaTreePanel.createTableNode, schemaTreePanel, table));
             });
-            schemaTreePanel.openTableNode();
+            functions.push($.proxy(schemaTreePanel.openTableNode, schemaTreePanel));
         }
+        functions.push(function() {
+            databasy.gw.layout.schemaTreeInitialized = true;
+        });
+        databasy.ui.utils.executeSequentially(functions);
     },
 
     createSchemaTreePanel:function () {

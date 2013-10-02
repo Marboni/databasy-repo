@@ -26,11 +26,19 @@ databasy.ui.layout.canvas.Canvas = draw2d.Canvas.extend({
 
     renderFigures:function () {
         var that = this;
+        var functions = [];
+
         var canvas = databasy.gw.model.node(this.canvasId);
         var reprs = canvas.val_as_node('reprs', databasy.gw.model);
         $.each(reprs, function (index, repr) {
-            that.renderFigure(repr);
+            functions.push($.proxy(that.renderFigure, that, repr));
         });
+
+        functions.push(function() {
+            databasy.gw.layout.canvasInitialized = true;
+        });
+
+        databasy.ui.utils.executeSequentially(functions);
     },
 
     renderFigure:function (repr) {

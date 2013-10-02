@@ -2,17 +2,35 @@ databasy.ui.layout.Layout = Class.extend({
     TOOLBAR_SIZE:44,
     TOOLBAR_SLIDE_SPEED:300,
 
-    init:function () {
+    init:function (onInitialized) {
         databasy.gw.addListener(this);
 
         this.createHtml();
         this.createLayout();
+
+        this.canvasInitialized = false;
+        this.schemaTreeInitialized = false;
+
+        this.onInitilized = onInitialized;
 
         this.canvas = new databasy.ui.layout.canvas.Canvas('canvas');
         this.menuPanel = new databasy.ui.layout.MenuPanel();
         this.toolbar = new databasy.ui.layout.Toolbar();
         this.propertyPanel = new databasy.ui.layout.property.PropertyPanel();
         this.overviewPanel = new databasy.ui.layout.overview.OverviewPanel();
+
+        this.waitInitialization();
+    },
+
+    waitInitialization: function() {
+        var that = this;
+        setTimeout(function() {
+            if (that.canvasInitialized && that.schemaTreeInitialized) {
+                that.onInitilized();
+            } else {
+                that.waitInitialization();
+            }
+        }, 500);
     },
 
     createLayout:function () {
