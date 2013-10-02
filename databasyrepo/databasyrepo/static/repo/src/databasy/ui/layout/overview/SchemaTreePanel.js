@@ -6,22 +6,6 @@ databasy.ui.layout.overview.SchemaTreePanel = Class.extend({
         this.createSchemaTree();
     },
 
-    renderSchemaTree:function () {
-        var schemaTreePanel = this;
-        var tables = databasy.gw.model.val_as_node('tables', databasy.gw.model);
-        var functions = [];
-        if (tables.length > 0) {
-            $.each(tables, function (index, table) {
-                functions.push($.proxy(schemaTreePanel.createTableNode, schemaTreePanel, table));
-            });
-            functions.push($.proxy(schemaTreePanel.openTableNode, schemaTreePanel));
-        }
-        functions.push(function() {
-            databasy.gw.layout.schemaTreeInitialized = true;
-        });
-        databasy.ui.utils.executeSequentially(functions);
-    },
-
     createSchemaTreePanel:function () {
         this.schemaTreePanel = $('<div id="schemaTreePanel"></div>');
         $('#overviewPanel').append(this.schemaTreePanel);
@@ -33,12 +17,15 @@ databasy.ui.layout.overview.SchemaTreePanel = Class.extend({
         this.schemaTree = $('<div id="schemaTree"></div>');
         this.schemaTreePanel.append(this.schemaTree);
 
-        var initialTree = this.initialTree();
+        var treeNodes = this.createTreeNodes();
 
         this.schemaTree
             .bind("loaded.jstree", function (event, data) {
-                that.initSchemaTree();
-                that.renderSchemaTree();
+                that.initContextMenus();
+                that.bindContextMenuToTableNodes();
+                that.initDblClickListener();
+                that.openTableNode();
+                databasy.gw.layout.schemaTreeInitialized = true;
             })
             .jstree({
                 plugins:['themes', 'json_data', 'ui', 'crrm', 'sort', 'types'],
@@ -51,7 +38,7 @@ databasy.ui.layout.overview.SchemaTreePanel = Class.extend({
                     dots:false
                 },
                 json_data:{
-                    data:initialTree
+                    data:treeNodes
                 },
                 sort:this.compareNodes,
                 types:{
@@ -79,9 +66,73 @@ databasy.ui.layout.overview.SchemaTreePanel = Class.extend({
             });
     },
 
-    initSchemaTree:function () {
-        this.initContextMenus();
-        this.initDblClickListener();
+    createTreeNodes:function () {
+        var tablesNode = {
+            data:'Tables',
+            attr:{
+                id:'schemaTreeTables',
+                class:'notSortable',
+                rel:'dir'
+            },
+            children:[
+
+            ]
+        };
+
+        var viewsNode = {
+            data:'Views',
+            attr:{
+                id:'schemaTreeViews',
+                class:'notSortable',
+                rel:'dir'
+            },
+            children:[
+
+            ]
+        };
+
+        var that = this;
+        var tables = databasy.gw.model.val_as_node('tables', databasy.gw.model);
+        if (tables.length > 0) {
+            $.each(tables, function (index, table) {
+                tablesNode.children.push(that.createTableNode(table));
+            });
+        }
+
+        return {
+            data:'Schema',
+            attr:{
+                id:'schemaTreeRoot',
+                class:'openOnDblClick',
+                rel:'schema'
+            },
+            state:'open',
+            children:[
+                tablesNode,
+                viewsNode
+            ]
+        };
+    },
+
+    createTableNode: function(table) {
+        var tableId = table.id();
+        var tableName = table.val('name');
+        return {
+            data:{
+                title:tableName
+            },
+            attr:{
+                rel:'table',
+                elementid: tableId
+            },
+            children:null
+        };
+    },
+
+    renderTableNode:function (table) {
+        var tn = this.createTableNode(table);
+        var node = this.schemaTree.jstree('create', '#schemaTreeTables', 'last', tn, false, true);
+        this.bindContextMenu(node);
     },
 
     initContextMenus:function () {
@@ -128,6 +179,13 @@ databasy.ui.layout.overview.SchemaTreePanel = Class.extend({
         });
     },
 
+    bindContextMenuToTableNodes: function() {
+        var that = this;
+        $('li[rel=table]').each(function() {
+            that.bindContextMenu($(this));
+        });
+    },
+
     initDblClickListener:function () {
         var that = this;
 
@@ -167,63 +225,6 @@ databasy.ui.layout.overview.SchemaTreePanel = Class.extend({
         return this.get_text(a) > this.get_text(b) ? 1 : -1;
     },
 
-    initialTree:function () {
-        var tablesNode = {
-            data:'Tables',
-            attr:{
-                id:'schemaTreeTables',
-                class:'notSortable',
-                rel:'dir'
-            },
-            children:[
-
-            ]
-        };
-
-        var viewsNode = {
-            data:'Views',
-            attr:{
-                id:'schemaTreeViews',
-                class:'notSortable',
-                rel:'dir'
-            },
-            children:[
-
-            ]
-        };
-
-        return {
-            data:'Schema',
-            attr:{
-                id:'schemaTreeRoot',
-                class:'openOnDblClick',
-                rel:'schema'
-            },
-            state:'open',
-            children:[
-                tablesNode,
-                viewsNode
-            ]
-        };
-    },
-
-    createTableNode:function (table) {
-        var tableId = table.id();
-        var tableName = table.val('name');
-        var tableNode = {
-            data:{
-                title:tableName
-            },
-            attr:{
-                rel:'table'
-            },
-            children:null
-        };
-        var node = this.schemaTree.jstree('create', '#schemaTreeTables', 'last', tableNode, false, true);
-        node.attr('elementid', tableId);
-        this.bindContextMenu(node);
-    },
-
     renameNode:function (elementId, name) {
         var treeNode = this.treeNode(elementId);
         this.schemaTree.jstree('rename_node', treeNode, name);
@@ -245,7 +246,7 @@ databasy.ui.layout.overview.SchemaTreePanel = Class.extend({
         if (event.matches(eventTypes.ItemInserted, {node_id:null, field:'tables'})) {
             // Table inserted to the model.
             var table = modelEvent.val('item').ref_node(databasy.gw.model);
-            this.createTableNode(table);
+            this.renderTableNode(table);
 
         } else if (event.matches(eventTypes.PropertyChanged, {field:'name'})) {
             var node = databasy.gw.model.node(modelEvent.val('node_id'));
