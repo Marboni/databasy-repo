@@ -27,7 +27,7 @@ databasy.ui.layout.gojs.Table = Class.extendFrom(go.Node, {
             strokeWidth:2,
             parameter1: 8,
             spot1:new go.Spot(0, 0, 2, 0),
-            spot2:new go.Spot(1, 1, -2, -4)
+            spot2:new go.Spot(1, 1, -2, -8)
         }));
 
         // Content panel.

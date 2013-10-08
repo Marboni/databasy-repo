@@ -10,7 +10,7 @@ databasy.ui.layout.gojs.Title = Class.extendFrom(go.Panel, {
 
     create:function () {
         this.stretch = go.GraphObject.Fill;
-        this.padding = 4;
+        this.padding = new go.Margin(6, 6, 4, 6);
 
         // .icn-database16
         var tableIcon = mk(go.Picture, {

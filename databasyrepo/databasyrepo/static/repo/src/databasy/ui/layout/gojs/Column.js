@@ -10,8 +10,8 @@ databasy.ui.layout.gojs.Column = Class.extendFrom(go.Panel, {
 
     create:function () {
         this.stretch = go.GraphObject.Fill;
-        this.margin = new go.Margin(2, 0, 2, 0);
-        this.padding = new go.Margin(0, 0, 0, 4);
+        this.margin = new go.Margin(1, 0, 1, 0);
+        this.padding = new go.Margin(0, 0, 0, 6);
 
         var tableIcon = mk(go.Shape, {
             figure:'circle',
