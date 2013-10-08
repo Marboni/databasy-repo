@@ -9,6 +9,10 @@
 
     window.Class = function() {};
 
+    Class.extendFrom = function(parent, props, staticProps) {
+        parent.prototype.init = parent;
+        return Class.extend.call(parent, props, staticProps);
+    };
 
     Class.extend = function(props, staticProps) {
 

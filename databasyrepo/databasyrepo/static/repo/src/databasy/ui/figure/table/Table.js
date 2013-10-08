@@ -23,7 +23,7 @@ databasy.ui.figure.table.Table = databasy.ui.figure.Rectangle.extend({
         this.setStroke(2);
         this.setRadius(8);
 
-        this.createTitle();
+        this.createTitlePanel();
         this.createColumnPanel();
 
         this.addComment();
@@ -54,7 +54,7 @@ databasy.ui.figure.table.Table = databasy.ui.figure.Rectangle.extend({
         return this.tableReprId;
     },
 
-    createTitle:function () {
+    createTitlePanel:function () {
         this.title = new databasy.ui.figure.table.TableTitle(this);
         this.addFigure(this.title, new databasy.ui.locator.InnerPositionLocator(this, 0, 0));
     },

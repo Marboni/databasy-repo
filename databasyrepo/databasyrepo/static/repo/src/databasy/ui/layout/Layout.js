@@ -7,13 +7,15 @@ databasy.ui.layout.Layout = Class.extend({
 
         this.createHtml();
         this.createLayout();
+    },
+
+    initializePanels: function(onInitialized) {
+        this.onInitilized = onInitialized;
 
         this.canvasInitialized = false;
         this.schemaTreeInitialized = false;
 
-        this.onInitilized = onInitialized;
-
-        this.canvas = new databasy.ui.layout.canvas.Canvas('canvas');
+        this.canvas = new databasy.ui.layout.gojs.Canvas('canvas');
         this.menuPanel = new databasy.ui.layout.MenuPanel();
         this.toolbar = new databasy.ui.layout.Toolbar();
         this.propertyPanel = new databasy.ui.layout.property.PropertyPanel();
@@ -102,9 +104,7 @@ databasy.ui.layout.Layout = Class.extend({
         contentPanel.append('<div id="canvasWrapper"></div>');
         contentPanel.append('<div id="propertyPanel"></div>');
 
-        $('#canvasWrapper').append(
-            '<div id="canvas" onselectstart="javascript:/*IE8 hack*/return false" ' +
-                'style="width:1500px; height:1500px;-webkit-tap-highlight-color: rgba(0,0,0,0); "></div>');
+        $('#canvasWrapper').append('<div id="canvas" style="width:2000px; height:2000px;"></div>');
     },
 
     openToolbar:function () {

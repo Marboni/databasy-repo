@@ -11,7 +11,7 @@ databasy.ui.layout.property.TablePropertyPanel = Class.extend({
 
     createPanel:function () {
         this.panel = $('<div class="tableProperties"></div>');
-        this.createTitle();
+        this.createTitlePanel();
 
         $('#propertyPanel').append(this.panel);
 
@@ -23,7 +23,7 @@ databasy.ui.layout.property.TablePropertyPanel = Class.extend({
         this.setName(table.val('name'));
     },
 
-    createTitle:function () {
+    createTitlePanel:function () {
         this.titlePanel = $('<div class="titlePanel"></div>');
         this.panel.append(this.titlePanel);
 

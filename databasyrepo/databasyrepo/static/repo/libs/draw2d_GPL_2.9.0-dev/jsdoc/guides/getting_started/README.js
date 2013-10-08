@@ -1,1 +1,0 @@
-Ext.data.JsonP.getting_started({"guide":"<h1>Getting Started.</h1>\n\n<p>to be filled</p>\n","title":"Getting Started"});
