@@ -389,7 +389,7 @@ class UpdateTableRepr(UpdateCommand):
     def obj_changeable_fields_and_validators(self):
         return {
             'position': [Iterable(2, 2)],
-            'width': [Integer(TableRepr.MIN_REPR_WIDTH, TableRepr.MAX_REPR_WIDTH)],
+            'width': [Integer(TableRepr.MIN_REPR_WIDTH)],
         }
 
 class DeleteTableRepr(Command):

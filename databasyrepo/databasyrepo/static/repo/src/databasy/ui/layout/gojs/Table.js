@@ -3,6 +3,7 @@ databasy.ui.layout.gojs.Table = Class.extendFrom(go.Node, {
         this._super(go.Panel.Auto);
 
         this.width = databasy.model.core.reprs.TableRepr.REPR_DEFAULT_WIDTH;
+        this.minSize = new go.Size(databasy.model.core.reprs.TableRepr.REPR_MIN_WIDTH, 30);
         this.selectionAdornmentTemplate =
             mk(go.Adornment, "Auto",
                 mk(go.Shape, "RoundedRectangle", {

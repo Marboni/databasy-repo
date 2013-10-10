@@ -17,8 +17,7 @@ class Repr(Node):
 
 class TableRepr(Repr):
     DEFAULT_REPR_WIDTH = 180
-    MIN_REPR_WIDTH = 65
-    MAX_REPR_WIDTH = 1000
+    MIN_REPR_WIDTH = 80
 
     def __init__(self, id=None):
         super(TableRepr, self).__init__(id)

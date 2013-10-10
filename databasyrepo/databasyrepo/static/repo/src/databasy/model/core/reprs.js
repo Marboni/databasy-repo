@@ -30,6 +30,5 @@ databasy.model.core.reprs.TableRepr = databasy.model.core.reprs.Repr.extend({
     CODE:'core.reprs.TableRepr',
 
     REPR_DEFAULT_WIDTH: 180,
-    REPR_MIN_WIDTH: 65,
-    REPR_MAX_WIDTH: 1000
+    REPR_MIN_WIDTH: 80
 });
