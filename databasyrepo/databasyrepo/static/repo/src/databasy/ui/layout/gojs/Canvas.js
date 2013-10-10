@@ -17,7 +17,8 @@ databasy.ui.layout.gojs.Canvas = Class.extend({
         //noinspection JSUndeclaredVariable
         mk = go.GraphObject.make;
 
-        this.diagram = new go.Diagram(domElementId)
+        this.diagram = new go.Diagram(domElementId);
+        this.diagram.initialContentAlignment = go.Spot.Center;
     },
 
     renderFigures:function () {
