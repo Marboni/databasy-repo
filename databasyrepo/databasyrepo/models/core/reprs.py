@@ -16,7 +16,7 @@ class Repr(Node):
     pass
 
 class TableRepr(Repr):
-    DEFAULT_REPR_WIDTH = 180
+    DEFAULT_REPR_WIDTH = 220
     MIN_REPR_WIDTH = 80
 
     def __init__(self, id=None):

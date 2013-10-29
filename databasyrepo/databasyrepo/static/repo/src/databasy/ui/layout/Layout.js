@@ -15,7 +15,7 @@ databasy.ui.layout.Layout = Class.extend({
         this.canvasInitialized = false;
         this.schemaTreeInitialized = false;
 
-        this.canvas = new databasy.ui.layout.gojs.Canvas('canvas');
+        this.canvas = new databasy.ui.layout.gojs.Canvas('canvasWrapper');
         this.menuPanel = new databasy.ui.layout.MenuPanel();
         this.toolbar = new databasy.ui.layout.Toolbar();
         this.propertyPanel = new databasy.ui.layout.property.PropertyPanel();
@@ -53,6 +53,7 @@ databasy.ui.layout.Layout = Class.extend({
             },
             east:{
                 paneSelector:'#chatPanel',
+                size:300,
                 closable:true
             },
             west:{
@@ -103,8 +104,6 @@ databasy.ui.layout.Layout = Class.extend({
         contentPanel.append('<div id="toolbar"></div>');
         contentPanel.append('<div id="canvasWrapper"></div>');
         contentPanel.append('<div id="propertyPanel"></div>');
-
-        $('#canvasWrapper').append('<div id="canvas" style="width:2000px; height:2000px;"></div>');
     },
 
     openToolbar:function () {
