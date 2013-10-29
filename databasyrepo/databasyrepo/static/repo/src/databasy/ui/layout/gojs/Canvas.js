@@ -33,16 +33,13 @@ databasy.ui.layout.gojs.Canvas = Class.extend({
 
         this.diagramModel.createTable('t2', 'RPT_FA_PRE_CONNECT', [250, 10], 150);
 
+        this.diagramModel.createView('v1', 'V_MY_VIEW', [350, 100], 200);
+
         databasy.gw.layout.canvasInitialized = true;
 
         var that = this;
         this.diagram.click = function() {
-            that.diagramModel.removeColumn('c1');
-            that.diagramModel.removeColumn('c2');
-            that.diagramModel.removeColumn('c3');
-            that.diagramModel.removeColumn('c4');
-            that.diagramModel.removeColumn('c5');
-            that.diagramModel.removeColumn('c6');
+            that.diagramModel.updateView('v1', {name: 'AAA', position: [0, 0], width: 300});
         }
     }
 

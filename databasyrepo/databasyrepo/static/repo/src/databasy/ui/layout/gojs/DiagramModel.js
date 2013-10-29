@@ -4,6 +4,8 @@ databasy.ui.layout.gojs.DiagramModel = Class.extend({
 
         this._tableDataByReprId = {};
         this._tableDataByColumnElementId = {};
+
+        this._viewDataByReprId = {};
     },
 
 
@@ -28,7 +30,7 @@ databasy.ui.layout.gojs.DiagramModel = Class.extend({
         this._tableDataByReprId[tableReprId] = data;
     },
 
-    modifyTable: function(tableReprId, props) {
+    updateTable: function(tableReprId, props) {
         var data = this._findTableData(tableReprId);
         this._inTransaction(function(model) {
             for (var prop in props) {
@@ -87,7 +89,7 @@ databasy.ui.layout.gojs.DiagramModel = Class.extend({
         });
     },
 
-    modifyColumn: function(columnElementId, props) {
+    updateColumn: function(columnElementId, props) {
         if ('icon' in props) {
             this._validateColumnIcon(props.icon);
         }
@@ -110,6 +112,44 @@ databasy.ui.layout.gojs.DiagramModel = Class.extend({
             model.removeArrayItem(tableData.columns, columnIndex);
         });
         delete this._tableDataByColumnElementId[columnElementId];
+    },
+
+    createView: function(viewReprId, name, position, width) {
+        var data = {
+            key: viewReprId,
+            name: name,
+            position: position,
+            width: width,
+            category: 'view'
+        };
+
+        if (this._viewDataExists(viewReprId)) {
+            throw new Error('View with repr ID ' + viewReprId + ' already exists in the diagram.');
+        }
+
+        this._inTransaction(function(model) {
+            model.addNodeData(data);
+        });
+
+        this._viewDataByReprId[viewReprId] = data;
+    },
+
+    updateView: function(viewReprId, props) {
+        var data = this._findViewData(viewReprId);
+        this._inTransaction(function(model) {
+            for (var prop in props) {
+                model.setDataProperty(data, prop, props[prop]);
+            }
+        });
+    },
+
+    removeView: function(viewReprId) {
+        var data = this._findViewData(viewReprId);
+        this._inTransaction(function(model) {
+            model.removeNodeData(data);
+        });
+
+        delete this._viewDataByReprId[viewReprId];
     },
 
     _findTableData: function(reprId) {
@@ -139,6 +179,18 @@ databasy.ui.layout.gojs.DiagramModel = Class.extend({
 
     _tableDataExists: function(reprId) {
         return !!this._tableDataByReprId[reprId];
+    },
+
+    _findViewData: function(reprId) {
+        var data = this._viewDataByReprId[reprId];
+        if (!data) {
+            throw new Error('Table with repr ID ' + reprId + ' not exists in the diagram.');
+        }
+        return data;
+    },
+
+    _viewDataExists: function(reprId) {
+        return !!this._viewDataByReprId[reprId];
     },
 
     _validateColumnIcon: function(icon) {

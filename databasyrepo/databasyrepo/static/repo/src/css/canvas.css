@@ -2,10 +2,12 @@
     padding: 0 !important;
 }
 
-#canvas {
+#canvasWrapper {
     background: transparent url(../img/canvas.png) !important;
 }
 
-#canvas.readonly {
+#canvasWrapper.readonly {
     background: transparent url(../img/canvas_readonly.png) !important;
+    color: #f599ff;
+    background-color: #c674d0;
 }

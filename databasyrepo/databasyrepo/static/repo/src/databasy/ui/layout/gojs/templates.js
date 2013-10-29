@@ -4,6 +4,7 @@ databasy.ui.layout.gojs.templates.createNodeTemplateMap = function () {
     var t = databasy.ui.layout.gojs.templates;
     var templates = new go.Map('string', go.Node);
     templates.add('table', t.table);
+    templates.add('view', t.view);
     return templates;
 };
 
@@ -43,6 +44,11 @@ databasy.ui.layout.gojs.templates.table = mk(go.Node, 'Auto', {
         resizeAdornmentTemplate:databasy.ui.layout.gojs.templates.resizeAdornmentTemplate,
         resizable:true
     },
+
+    new go.Binding('position', 'position', function (pos) {
+        return new go.Point(pos[0], pos[1]);
+    }),
+    new go.Binding('width', 'width'),
 
     // Background - rounded rectangle.
     mk(go.Shape, {
@@ -192,10 +198,62 @@ databasy.ui.layout.gojs.templates.table = mk(go.Node, 'Auto', {
                 return new go.Size(s.width - 4, s.height); // 2*2 (bounds)
             }).ofObject()
         )
-    ),
+    )
+);
+
+
+databasy.ui.layout.gojs.templates.view = mk(go.Node, 'Auto', {
+        width:databasy.model.core.reprs.TableRepr.REPR_DEFAULT_WIDTH, // TODO Replace with view's constants.
+        minSize:new go.Size(databasy.model.core.reprs.TableRepr.REPR_MIN_WIDTH, 30), // TODO Replace with view's constants.
+        selectionAdornmentTemplate:databasy.ui.layout.gojs.templates.selectionAdornmentTemplate,
+        resizeAdornmentTemplate:databasy.ui.layout.gojs.templates.resizeAdornmentTemplate,
+        resizable:true
+    },
 
     new go.Binding('position', 'position', function (pos) {
         return new go.Point(pos[0], pos[1]);
     }),
-    new go.Binding('width', 'width')
+    new go.Binding('width', 'width'),
+
+    // Background - rounded rectangle.
+    mk(go.Shape, {
+            figure:'RoundedRectangle',
+            fill:'#f599ff',
+            stroke:'#c674d0',
+            strokeWidth:2,
+            parameter1:8,
+            spot1:new go.Spot(0, 0, 2, 0),
+            spot2:new go.Spot(1, 1, -2, 0)
+        }
+    ),
+
+    // Content panel.
+    mk(go.Panel, 'Vertical', {
+            stretch:go.GraphObject.Fill
+        },
+
+        // Title panel.
+        mk(go.Panel, 'Position', {
+                stretch:go.GraphObject.Horizontal,
+                padding:new go.Margin(6, 6, 4, 6)
+            },
+            mk(go.Picture, {
+                source:'/static/repo/src/img/sprites.png',
+                sourceRect:new go.Rect(22, 116, 16, 16),
+                position:new go.Point(0, 0)
+            }),
+            mk(go.TextBlock, {
+                    position:new go.Point(22, 1),
+                    font:'bold 14px "Helvetica Neue",​ Helvetica, Arial, Sans-serif',
+                    editable:true,
+                    isMultiline:false,
+                    wrap:go.TextBlock.None
+                },
+                new go.Binding('text', 'name')
+            ),
+            new go.Binding('maxSize', 'desiredSize', function (s) {
+                return new go.Size(s.width - 4, s.height); // 2*2 (bounds)
+            }).ofObject()
+        )
+    )
 );
