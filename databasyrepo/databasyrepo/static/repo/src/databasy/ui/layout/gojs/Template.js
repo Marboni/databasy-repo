@@ -3,8 +3,8 @@ mk = go.GraphObject.make;
 databasy.ui.layout.gojs.Templates = Class.extend({
     tableColor:'#009acd',
     tableBackground:'#00bfff',
-    viewColor:'#f599ff',
-    viewBackground:'#c674d0',
+    viewColor:'#c674d0',
+    viewBackground:'#f599ff',
     titleFont:'bold 14px "Helvetica Neue",​ Helvetica, Arial, Sans-serif',
     columnFont:'14px "Helvetica Neue",​ Helvetica, Arial, Sans-serif',
     columnBackground:'#ffffff',
@@ -71,7 +71,9 @@ databasy.ui.layout.gojs.Templates = Class.extend({
                 background:this.columnBackground,
                 margin:new go.Margin(0, 0, 1, 0),
                 mouseEnter:function (e, panel) {
+                    panel.diagram.startTransaction('tx');
                     panel.background = that.highlightedColumnBackground;
+                    panel.diagram.commitTransaction('tx');
                 },
                 mouseLeave:function (e, panel) {
                     panel.background = that.columnBackground;

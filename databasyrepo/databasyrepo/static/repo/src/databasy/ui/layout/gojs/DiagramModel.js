@@ -1,97 +1,88 @@
 databasy.ui.layout.gojs.DiagramModel = Class.extend({
-    init: function(diagram) {
+    init:function (diagram) {
         this.diagram = diagram;
+        this.model = diagram.model;
 
-        this._tableDataByReprId = {};
+        this._dataByReprId = {};
         this._tableDataByColumnElementId = {};
-
-        this._viewDataByReprId = {};
-        this._relDataByReprId = {};
     },
 
+    startTransaction:function () {
+        this.diagram.startTransaction('tx');
+    },
 
-    createTable: function(tableReprId, name, position, width) {
+    commitTransaction:function () {
+        this.diagram.commitTransaction('tx');
+    },
+
+    createTable:function (tableReprId, name, position) {
         var data = {
-            key: tableReprId,
-            name: name,
-            position: position,
-            width: width,
-            columns: [],
-            category: 'table'
+            key:tableReprId,
+            name:name,
+            position:position,
+            width:undefined, // default
+            columns:[],
+            category:'table'
         };
 
-        if (this._tableDataExists(tableReprId)) {
+        if (this._dataExists(tableReprId)) {
             throw new Error('Table with repr ID ' + tableReprId + ' already exists in the diagram.');
         }
 
-        this._inTransaction(function(model) {
-            model.addNodeData(data);
-        });
-
-        this._tableDataByReprId[tableReprId] = data;
+        this.model.addNodeData(data);
+        this._dataByReprId[tableReprId] = data;
     },
 
-    updateTable: function(tableReprId, props) {
-        var data = this._findTableData(tableReprId);
-        this._inTransaction(function(model) {
-            for (var prop in props) {
-                model.setDataProperty(data, prop, props[prop]);
-            }
-        });
+    updateTable:function (tableReprId, props) {
+        this._update(tableReprId, props);
     },
 
-    removeTable: function(tableReprId) {
-        var data = this._findTableData(tableReprId);
-        this._inTransaction(function(model) {
-            model.removeNodeData(data);
-        });
+    removeTable:function (tableReprId) {
+        var data = this._findData(tableReprId);
+        this.model.removeNodeData(data);
 
         var that = this;
         if (data.columns) {
-            $.each(data.columns, function(i, column) {
+            $.each(data.columns, function (i, column) {
                 delete that._tableDataByColumnElementId[column.elementId];
             })
         }
-        delete this._tableDataByReprId[tableReprId];
+        delete this._dataByReprId[tableReprId];
     },
 
-    addColumn: function(tableReprId, columnElementId, icon, name, type) {
-        var tableData = this._findTableData(tableReprId);
+    addColumn:function (tableReprId, columnElementId, icon, name, type) {
+        var tableData = this._findData(tableReprId);
         var index = tableData.columns.length;
         this.insertColumn(tableReprId, index, columnElementId, icon, name, type);
     },
 
-    insertColumn: function(tableReprId, index, columnElementId, icon, name, type) {
+    insertColumn:function (tableReprId, index, columnElementId, icon, name, type) {
         this._validateColumnIcon(icon);
 
         var columnData = {
-            elementId: columnElementId,
-            icon: icon,
-            name: name,
-            type: type
+            elementId:columnElementId,
+            icon:icon,
+            name:name,
+            type:type
         };
 
-        var tableData = this._findTableData(tableReprId);
+        var tableData = this._findData(tableReprId);
 
-        this._inTransaction(function(model) {
-            model.insertArrayItem(tableData.columns, index, columnData);
-            model.updateTargetBindings(tableData, 'columns');
-        });
+        this.model.insertArrayItem(tableData.columns, index, columnData);
+        this.model.updateTargetBindings(tableData, 'columns');
 
         this._tableDataByColumnElementId[columnElementId] = tableData;
     },
 
-    moveColumn: function(columnElementId, newIndex) {
+    moveColumn:function (columnElementId, newIndex) {
         var tableData = this._findTableDataByColumnElementId(columnElementId);
         var columnIndex = this._columnIndex(tableData, columnElementId);
         var columnData = tableData.columns[columnIndex];
-        this._inTransaction(function(model) {
-            model.removeArrayItem(tableData.columns, columnIndex);
-            model.insertArrayItem(tableData.columns, newIndex, columnData);
-        });
+        this.model.removeArrayItem(tableData.columns, columnIndex);
+        this.model.insertArrayItem(tableData.columns, newIndex, columnData);
     },
 
-    updateColumn: function(columnElementId, props) {
+    updateColumn:function (columnElementId, props) {
         if ('icon' in props) {
             this._validateColumnIcon(props.icon);
         }
@@ -101,111 +92,85 @@ databasy.ui.layout.gojs.DiagramModel = Class.extend({
         for (var prop in props) {
             columnData[prop] = props[prop];
         }
-        this._inTransaction(function(model) {
-            model.removeArrayItem(tableData.columns, columnIndex);
-            model.insertArrayItem(tableData.columns, columnIndex, columnData);
-        });
+        this.model.removeArrayItem(tableData.columns, columnIndex);
+        this.model.insertArrayItem(tableData.columns, columnIndex, columnData);
     },
 
-    removeColumn: function(columnElementId) {
+    removeColumn:function (columnElementId) {
         var tableData = this._findTableDataByColumnElementId(columnElementId);
         var columnIndex = this._columnIndex(tableData, columnElementId);
-        this._inTransaction(function(model) {
-            model.removeArrayItem(tableData.columns, columnIndex);
-            model.updateTargetBindings(tableData, 'columns');
-        });
+        this.model.removeArrayItem(tableData.columns, columnIndex);
+        this.model.updateTargetBindings(tableData, 'columns');
         delete this._tableDataByColumnElementId[columnElementId];
     },
 
-    createView: function(viewReprId, name, position, width) {
+    createView:function (viewReprId, name, position) {
         var data = {
-            key: viewReprId,
-            name: name,
-            position: position,
-            width: width,
-            category: 'view'
+            key:viewReprId,
+            name:name,
+            position:position,
+            width:undefined, // default
+            category:'view'
         };
 
-        if (this._viewDataExists(viewReprId)) {
-            throw new Error('View with repr ID ' + viewReprId + ' already exists in the diagram.');
+        if (this._dataExists(viewReprId)) {
+            throw new Error('Repr ID ' + viewReprId + ' already exists in the diagram.');
         }
 
-        this._inTransaction(function(model) {
-            model.addNodeData(data);
-        });
+        this.model.addNodeData(data);
 
-        this._viewDataByReprId[viewReprId] = data;
+        this._dataByReprId[viewReprId] = data;
     },
 
-    updateView: function(viewReprId, props) {
-        var data = this._findViewData(viewReprId);
-        this._inTransaction(function(model) {
-            for (var prop in props) {
-                model.setDataProperty(data, prop, props[prop]);
-            }
-        });
+    updateView:function (viewReprId, props) {
+        this._update(viewReprId, props);
     },
 
-    removeView: function(viewReprId) {
-        var data = this._findViewData(viewReprId);
-        this._inTransaction(function(model) {
-            model.removeNodeData(data);
-        });
-
-        delete this._viewDataByReprId[viewReprId];
+    removeView:function (viewReprId) {
+        var data = this._findData(viewReprId);
+        this.model.removeNodeData(data);
+        delete this._dataByReprId[viewReprId];
     },
 
-    createRelationship: function(relReprId,
-                                 fromTableReprId, fromCardinality, fromColumnElementIds,
-                                 toTableReprId, toCardinality, toColumnElementIds) {
+    createRelationship:function (relReprId, fromTableReprId, fromCardinality, fromColumnElementIds, toTableReprId, toCardinality, toColumnElementIds) {
         var data = {
-            key: relReprId,
-            from: fromTableReprId,
-            fromCardinality: fromCardinality,
-            fromColumnElementIds: fromColumnElementIds,
-            to: toTableReprId,
-            toCardinality: toCardinality,
-            toColumnElementIds: toColumnElementIds
+            key:relReprId,
+            from:fromTableReprId,
+            fromCardinality:fromCardinality,
+            fromColumnElementIds:fromColumnElementIds,
+            to:toTableReprId,
+            toCardinality:toCardinality,
+            toColumnElementIds:toColumnElementIds
         };
 
-        if (this._relDataExists(relReprId)) {
+        if (this._dataExists(relReprId)) {
             throw new Error('Relationship with repr ID ' + relReprId + ' already exists in the diagram.');
         }
 
-        this._inTransaction(function(model) {
-            model.addLinkData(data);
-        });
+        this.model.addLinkData(data);
 
-        this._relDataByReprId[relReprId] = data;
+        this._dataByReprId[relReprId] = data;
     },
 
-    updateRelationship: function(relReprId, props) {
-        var data = this._findRelData(relReprId);
-        this._inTransaction(function(model) {
-            for (var prop in props) {
-                model.setDataProperty(data, prop, props[prop]);
-            }
-        });
+    updateRelationship:function (relReprId, props) {
+        this._update(relReprId, props);
     },
 
-    removeRelationship: function(relReprId) {
-        var data = this._findRelData(relReprId);
-        this._inTransaction(function(model) {
-            model.removeLinkData(data);
-        });
-
-        delete this._relDataByReprId[relReprId];
+    removeRelationship:function (relReprId) {
+        var data = this._findData(relReprId);
+        this.model.removeLinkData(data);
+        delete this._dataByReprId[relReprId];
     },
 
-    _findTableData: function(reprId) {
-        var data = this._tableDataByReprId[reprId];
+    _findData:function (reprId) {
+        var data = this._dataByReprId[reprId];
         if (!data) {
-            throw new Error('Table with repr ID ' + reprId + ' not exists in the diagram.');
+            throw new Error('Repr ID ' + reprId + ' not exists in the diagram.');
         }
         return data;
     },
 
-    _findTableDataByColumnElementId: function(columnElementId) {
+    _findTableDataByColumnElementId:function (columnElementId) {
         var data = this._tableDataByColumnElementId[columnElementId];
         if (!data) {
             throw new Error('Column with ID ' + columnElementId + ' not exists in the diagram.');
@@ -213,7 +178,18 @@ databasy.ui.layout.gojs.DiagramModel = Class.extend({
         return data;
     },
 
-    _columnIndex: function(tableData, columnElementId) {
+    _dataExists:function (reprId) {
+        return !!this._dataByReprId[reprId];
+    },
+
+    _update:function (reprId, props) {
+        var data = this._findData(reprId);
+        for (var prop in props) {
+            this.model.setDataProperty(data, prop, props[prop]);
+        }
+    },
+
+    _columnIndex:function (tableData, columnElementId) {
         for (var i = 0; i < tableData.columns.length; i++) {
             if (tableData.columns[i].elementId == columnElementId) {
                 return i;
@@ -222,45 +198,11 @@ databasy.ui.layout.gojs.DiagramModel = Class.extend({
         throw new Error('Column with ID ' + columnElementId + ' exists in registry, but not found in the diagram\'s table.');
     },
 
-    _tableDataExists: function(reprId) {
-        return !!this._tableDataByReprId[reprId];
-    },
-
-    _findViewData: function(reprId) {
-        var data = this._viewDataByReprId[reprId];
-        if (!data) {
-            throw new Error('Table with repr ID ' + reprId + ' not exists in the diagram.');
-        }
-        return data;
-    },
-
-    _viewDataExists: function(reprId) {
-        return !!this._viewDataByReprId[reprId];
-    },
-
-    _relDataExists: function(relReprId) {
-        return !!this._relDataByReprId[relReprId];
-    },
-
-    _findRelData: function(relReprId) {
-        var data = this._relDataByReprId[relReprId];
-        if (!data) {
-            throw new Error('Relationship with repr ID ' + relReprId + ' not exists in the diagram.');
-        }
-        return data;
-    },
-
-    _validateColumnIcon: function(icon) {
+    _validateColumnIcon:function (icon) {
         if ($.inArray(icon, databasy.ui.layout.gojs.DiagramModel.COLUMN_ICONS) == -1) {
             throw new Error('Incorrect column icon: ' + icon + '.');
         }
-    },
-
-    _inTransaction: function(func) {
-        this.diagram.startTransaction('tx');
-        func(this.diagram.model);
-        this.diagram.commitTransaction('tx');
     }
 }, {
-    COLUMN_ICONS: ['pk', 'null', 'not_null', 'fk_null', 'fk_not_null']
+    COLUMN_ICONS:['pk', 'null', 'not_null', 'fk_null', 'fk_not_null']
 });
