@@ -26,9 +26,7 @@ var databasy = {
             overview: {},
             property: {},
             canvas: {},
-            gojs: {
-                templates: {}
-            }
+            gojs: {}
         },
         locator: {},
         figure: {

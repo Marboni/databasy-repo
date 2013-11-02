@@ -1,5 +1,5 @@
 databasy.ui.layout.gojs.Canvas = Class.extend({
-    init: function(domElementId) {
+    init:function (domElementId) {
 //        databasy.gw.addListener(this);
 
 //        this.figureByReprId = {};
@@ -13,33 +13,38 @@ databasy.ui.layout.gojs.Canvas = Class.extend({
         this.renderFigures();
     },
 
-    initGo: function(domElementId) {
+    initGo:function (domElementId) {
         this.diagram = new go.Diagram(domElementId);
         this.diagram.initialContentAlignment = go.Spot.Center;
         this.diagram.padding = 300;
-        this.diagram.nodeTemplateMap = databasy.ui.layout.gojs.templates.createNodeTemplateMap();
+        var templates = new databasy.ui.layout.gojs.Templates();
+        this.diagram.nodeTemplateMap = templates.createNodeTemplateMap();
+        this.diagram.linkTemplateMap = templates.createLinkTemplateMap();
 
         this.diagramModel = new databasy.ui.layout.gojs.DiagramModel(this.diagram);
     },
 
-    renderFigures: function() {
-        this.diagramModel.createTable('t1', 'RPT_FA_POST_CONNECT', [10, 10], 200);
-        this.diagramModel.addColumn('t1', 'c1', 'pk', 'id', 'BIGINT');
-        this.diagramModel.addColumn('t1', 'c2', 'not_null', 'name', 'VARCHAR(255)');
-        this.diagramModel.addColumn('t1', 'c3', 'null', 'l_name', 'VARCHAR(255)');
-        this.diagramModel.addColumn('t1', 'c4', 'fk_null', 'phone_id', 'BIGINT');
-        this.diagramModel.addColumn('t1', 'c5', 'fk_not_null', 'address_id', 'BIGINT');
-        this.diagramModel.addColumn('t1', 'c6', 'not_null', 'created_at', 'TIMESTAMPTZ');
+    renderFigures:function () {
+        this.diagramModel.createTable('t1', 'T1', [0, 0], 200);
+        this.diagramModel.addColumn('t1', 'c11', 'pk', 'col1', 'BIGINT');
+        this.diagramModel.addColumn('t1', 'c12', 'null', 'col2', 'BIGINT');
+        this.diagramModel.addColumn('t1', 'c13', 'null', 'col3', 'BIGINT');
 
-        this.diagramModel.createTable('t2', 'RPT_FA_PRE_CONNECT', [250, 10], 150);
+        this.diagramModel.createTable('t2', 'T2', [200, 200], 200);
+        this.diagramModel.addColumn('t2', 'c21', 'pk', 'col1', 'BIGINT');
+        this.diagramModel.addColumn('t2', 'c22', 'null', 'col2', 'BIGINT');
+        this.diagramModel.addColumn('t2', 'c23', 'null', 'col3', 'BIGINT');
 
-        this.diagramModel.createView('v1', 'V_MY_VIEW', [350, 100], 200);
+        this.diagramModel.createRelationship('r1', 't1', '0..1', ['c11', 'c12'], 't2', '0..1', ['c21', 'c22']);
+        this.diagramModel.createRelationship('r2', 't1', '0..1', ['c11', 'c13'], 't2', '0..1', ['c21', 'c23']);
 
+        this.diagram.updateAllTargetBindings();
         databasy.gw.layout.canvasInitialized = true;
 
         var that = this;
-        this.diagram.click = function() {
-            that.diagramModel.updateView('v1', {name: 'AAA', position: [0, 0], width: 300});
+        this.diagram.click = function () {
+//            that.diagramModel.updateRelationship('r4', {fromCardinality:'0..1', toCardinality:'1..1'});
+//            that.diagramModel.removeRelationship('r3');
         }
     }
 

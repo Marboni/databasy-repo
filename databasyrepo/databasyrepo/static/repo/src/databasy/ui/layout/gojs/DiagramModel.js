@@ -6,6 +6,7 @@ databasy.ui.layout.gojs.DiagramModel = Class.extend({
         this._tableDataByColumnElementId = {};
 
         this._viewDataByReprId = {};
+        this._relDataByReprId = {};
     },
 
 
@@ -74,6 +75,7 @@ databasy.ui.layout.gojs.DiagramModel = Class.extend({
 
         this._inTransaction(function(model) {
             model.insertArrayItem(tableData.columns, index, columnData);
+            model.updateTargetBindings(tableData, 'columns');
         });
 
         this._tableDataByColumnElementId[columnElementId] = tableData;
@@ -110,6 +112,7 @@ databasy.ui.layout.gojs.DiagramModel = Class.extend({
         var columnIndex = this._columnIndex(tableData, columnElementId);
         this._inTransaction(function(model) {
             model.removeArrayItem(tableData.columns, columnIndex);
+            model.updateTargetBindings(tableData, 'columns');
         });
         delete this._tableDataByColumnElementId[columnElementId];
     },
@@ -152,6 +155,48 @@ databasy.ui.layout.gojs.DiagramModel = Class.extend({
         delete this._viewDataByReprId[viewReprId];
     },
 
+    createRelationship: function(relReprId,
+                                 fromTableReprId, fromCardinality, fromColumnElementIds,
+                                 toTableReprId, toCardinality, toColumnElementIds) {
+        var data = {
+            key: relReprId,
+            from: fromTableReprId,
+            fromCardinality: fromCardinality,
+            fromColumnElementIds: fromColumnElementIds,
+            to: toTableReprId,
+            toCardinality: toCardinality,
+            toColumnElementIds: toColumnElementIds
+        };
+
+        if (this._relDataExists(relReprId)) {
+            throw new Error('Relationship with repr ID ' + relReprId + ' already exists in the diagram.');
+        }
+
+        this._inTransaction(function(model) {
+            model.addLinkData(data);
+        });
+
+        this._relDataByReprId[relReprId] = data;
+    },
+
+    updateRelationship: function(relReprId, props) {
+        var data = this._findRelData(relReprId);
+        this._inTransaction(function(model) {
+            for (var prop in props) {
+                model.setDataProperty(data, prop, props[prop]);
+            }
+        });
+    },
+
+    removeRelationship: function(relReprId) {
+        var data = this._findRelData(relReprId);
+        this._inTransaction(function(model) {
+            model.removeLinkData(data);
+        });
+
+        delete this._relDataByReprId[relReprId];
+    },
+
     _findTableData: function(reprId) {
         var data = this._tableDataByReprId[reprId];
         if (!data) {
@@ -191,6 +236,18 @@ databasy.ui.layout.gojs.DiagramModel = Class.extend({
 
     _viewDataExists: function(reprId) {
         return !!this._viewDataByReprId[reprId];
+    },
+
+    _relDataExists: function(relReprId) {
+        return !!this._relDataByReprId[relReprId];
+    },
+
+    _findRelData: function(relReprId) {
+        var data = this._relDataByReprId[relReprId];
+        if (!data) {
+            throw new Error('Relationship with repr ID ' + relReprId + ' not exists in the diagram.');
+        }
+        return data;
     },
 
     _validateColumnIcon: function(icon) {
