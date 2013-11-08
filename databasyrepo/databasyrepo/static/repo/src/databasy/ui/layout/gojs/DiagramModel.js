@@ -15,6 +15,17 @@ databasy.ui.layout.gojs.DiagramModel = Class.extend({
         this.diagram.commitTransaction('tx');
     },
 
+    setReadOnly: function(readOnly) {
+        this.diagram.isReadOnly = readOnly;
+        this.diagram.allowResize = !readOnly;
+        var canvasWrapper = $('#canvasWrapper');
+        if (readOnly) {
+            canvasWrapper.addClass('readonly');
+        } else {
+            canvasWrapper.removeClass('readonly');
+        }
+    },
+
     createTable:function (tableReprId, name, position) {
         var data = {
             key:tableReprId,
