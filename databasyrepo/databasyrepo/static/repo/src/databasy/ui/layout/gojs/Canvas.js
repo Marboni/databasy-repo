@@ -27,13 +27,12 @@ databasy.ui.layout.gojs.Canvas = Class.extend({
     renderFigures:function () {
         this.diagramModel.startTransaction();
 
-        this.diagramModel.createTable('t0', 'T0', [0, 0]);
-        this.diagramModel.removeTable('t0');
+        this.diagramModel.createTable('t0', 'T0', [-50, 250]);
 
-        this.diagramModel.createTable('t1', 'T1', [0, 0]);
-        this.diagramModel.addColumn('t1', 'c11', 'pk', 'col1', 'BIGINT');
-        this.diagramModel.addColumn('t1', 'c12', 'null', 'col2', 'BIGINT');
-        this.diagramModel.addColumn('t1', 'c13', 'null', 'col3', 'BIGINT');
+        this.diagramModel.createTable('t1', 'table_name', [0, 0]);
+        this.diagramModel.addColumn('t1', 'c11', 'pk', 'column_name', 'BIGINT');
+        this.diagramModel.addColumn('t1', 'c12', 'null', 'column_name', 'BIGINT');
+        this.diagramModel.addColumn('t1', 'c13', 'null', 'column_name', 'BIGINT');
 
         this.diagramModel.createTable('t2', 'T2', [200, 200]);
         this.diagramModel.addColumn('t2', 'c21', 'pk', 'col1', 'BIGINT');
@@ -43,12 +42,20 @@ databasy.ui.layout.gojs.Canvas = Class.extend({
         this.diagramModel.createRelationship('r1', 't1', '0..1', ['c11', 'c12'], 't2', '0..1', ['c21', 'c22']);
         this.diagramModel.createRelationship('r2', 't1', '0..1', ['c11', 'c13'], 't2', '0..1', ['c21', 'c23']);
 
-        this.diagramModel.createView('v0', 'V0', [0, 0], 100);
+        this.diagramModel.createView('v0', 'view_name', [0, 0]);
         this.diagramModel.removeView('v0');
 
-        this.diagramModel.createView('v1', 'V1', [400, 400], 100);
+        this.diagramModel.createView('v1', 'V1', [400, 400]);
 
         this.diagramModel.commitTransaction();
+
+//        var that = this;
+//        this.diagram.click = function() {
+//            that.diagramModel.updateRelationship('r1', {hasOpenDiscussions: true});
+//            that.diagram.click = function() {
+//                that.diagramModel.updateRelationship('r1', {hasOpenDiscussions: false});
+//            }
+//        };
 
         databasy.gw.layout.canvasInitialized = true;
     }

@@ -1,17 +1,26 @@
 mk = go.GraphObject.make;
 
 databasy.ui.layout.gojs.Templates = Class.extend({
+    textColor:'#333333',
+    titleFont:'bold 14px "Helvetica Neue",​ Helvetica, Arial, Sans-serif',
+
     tableColor:'#009acd',
     tableBackground:'#00bfff',
-    viewColor:'#c674d0',
-    viewBackground:'#f599ff',
-    titleFont:'bold 14px "Helvetica Neue",​ Helvetica, Arial, Sans-serif',
     columnFont:'14px "Helvetica Neue",​ Helvetica, Arial, Sans-serif',
     columnBackground:'#ffffff',
     highlightedColumnBackground:'#ddf3ff',
     columnIconColor:'#00a9e7',
     pkColumnIconColor:'#ffcb00',
     fkColumnIconColor:'#9f52ff',
+
+    viewColor:'#c674d0',
+    viewBackground:'#f599ff',
+
+    discussionGeometryString:'FM15.985,5.972c-7.563,0-13.695,4.077-13.695,9.106c0,2.877,2.013,5.44,5.147,7.108c-0.446,1.479-1.336,3.117-3.056,4.566c0,0,4.015-0.266,6.851-3.143c0.163,0.04,0.332,0.07,0.497,0.107c-0.155-0.462-0.246-0.943-0.246-1.443c0-3.393,3.776-6.05,8.599-6.05c3.464,0,6.379,1.376,7.751,3.406c1.168-1.34,1.847-2.892,1.847-4.552C29.68,10.049,23.548,5.972,15.985,5.972zM27.68,22.274c0-2.79-3.401-5.053-7.599-5.053c-4.196,0-7.599,2.263-7.599,5.053c0,2.791,3.403,5.053,7.599,5.053c0.929,0,1.814-0.116,2.637-0.319c1.573,1.597,3.801,1.744,3.801,1.744c-0.954-0.804-1.447-1.713-1.695-2.534C26.562,25.293,27.68,23.871,27.68,22.274z',
+    discussionColor:'#5d5d5d',
+    hoverDiscussionColor:'#000000',
+    discussionSize:new go.Size(16, 16),
+
     linkColor:'#000000',
     highlightedLinkColor:'#009acd',
     selectedLinkColor:'#6e53ff',
@@ -63,13 +72,43 @@ databasy.ui.layout.gojs.Templates = Class.extend({
         )
     },
 
+    mkDiscussionShape:function (additionalParams, bindings) {
+        var that = this;
+        var discussion = mk(go.Shape, {
+                geometryString:this.discussionGeometryString,
+                fill:this.discussionColor,
+                stroke:null,
+                desiredSize:this.discussionSize,
+                mouseEnter:function (e, shape) {
+                    shape.fill = that.hoverDiscussionColor;
+                },
+                mouseLeave:function (e, shape) {
+                    shape.fill = that.discussionColor;
+                }
+            }
+        );
+        if (additionalParams) {
+            $.each(additionalParams, function (name, value) {
+                discussion[name] = value;
+            })
+        }
+        if (bindings) {
+            $.each(bindings, function(i, binding) {
+                discussion.bind(binding);
+            });
+        }
+        return discussion;
+    },
+
     columnTemplate:function () {
         var that = this;
 
-        return mk(go.Panel, 'Vertical', {
-                stretch:go.GraphObject.Fill,
+        return mk(go.Panel, 'Table', {
+                stretch:go.GraphObject.Horizontal,
+                defaultAlignment:go.Spot.Left,
                 background:this.columnBackground,
                 margin:new go.Margin(0, 0, 1, 0),
+                padding:new go.Margin(2, 6, 0, 6),
                 mouseEnter:function (e, panel) {
                     panel.diagram.startTransaction('tx');
                     panel.background = that.highlightedColumnBackground;
@@ -80,78 +119,88 @@ databasy.ui.layout.gojs.Templates = Class.extend({
                 }
             },
             new go.Binding('name', 'elementId'),
+            new go.Binding('', 'hasOpenDiscussions', function(hasOpenDiscussions, panel) {
+                panel.getColumnDefinition(2).width = hasOpenDiscussions ? 17 : 0;
+            }),
+            mk(go.RowColumnDefinition, { column:0, width:16 }),
+            mk(go.RowColumnDefinition, { column:1}),
+            mk(go.RowColumnDefinition, { column:2, width:17 }),
+            mk(go.Shape, {
+                    figure:'circle',
+                    width:6,
+                    height:6,
+                    position:new go.Point(5, 5),
+                    margin:4,
+                    strokeWidth:2,
+                    row:0,
+                    column:0
+                },
+                new go.Binding('figure', 'icon', function (icon) {
+                    switch (icon) {
+                        case 'pk':
+                            return 'pointer';
+                        case 'null':
+                            return 'circle';
+                        case 'not_null':
+                            return 'circle';
+                        case 'fk_null':
+                            return 'diamond';
+                        case 'fk_not_null':
+                            return 'diamond';
+                        default:
+                        {
+                            console.error('Unknown column icon "' + icon + '".');
+                            return 'circle';
+                        }
+                    }
+                }),
+                new go.Binding('stroke', 'icon', function (icon) {
+                    switch (icon) {
+                        case 'pk':
+                            return that.pkColumnIconColor;
+                        case 'null':
+                            return that.columnIconColor;
+                        case 'not_null':
+                            return that.columnIconColor;
+                        case 'fk_null':
+                            return that.fkColumnIconColor;
+                        case 'fk_not_null':
+                            return that.fkColumnIconColor;
+                        default:
+                        {
+                            console.error('Unknown column icon "' + icon + '".');
+                            return that.columnBackground;
+                        }
+                    }
+                }),
+                new go.Binding('fill', 'icon', function (icon) {
+                    switch (icon) {
+                        case 'pk':
+                            return that.pkColumnIconColor;
+                        case 'null':
+                            return null;
+                        case 'not_null':
+                            return that.columnIconColor;
+                        case 'fk_null':
+                            return null;
+                        case 'fk_not_null':
+                            return that.fkColumnIconColor;
+                        default:
+                        {
+                            console.error('Unknown column icon "' + icon + '".');
+                            return null;
+                        }
+                    }
+                })
+            ),
             mk(go.Panel, 'Position', {
                     stretch:go.GraphObject.Horizontal,
-                    margin:new go.Margin(2, 0, 1, 0),
-                    padding:new go.Margin(0, 6, 0, 6)
+                    row:0,
+                    column:1,
+                    padding:new go.Margin(0, 0, 0, 4)
                 },
-                mk(go.Shape, {
-                        figure:'circle',
-                        width:6,
-                        height:6,
-                        position:new go.Point(5, 5),
-                        strokeWidth:2
-                    },
-                    new go.Binding('figure', 'icon', function (icon) {
-                        switch (icon) {
-                            case 'pk':
-                                return 'pointer';
-                            case 'null':
-                                return 'circle';
-                            case 'not_null':
-                                return 'circle';
-                            case 'fk_null':
-                                return 'diamond';
-                            case 'fk_not_null':
-                                return 'diamond';
-                            default:
-                            {
-                                console.error('Unknown column icon "' + icon + '".');
-                                return 'circle';
-                            }
-                        }
-                    }),
-                    new go.Binding('stroke', 'icon', function (icon) {
-                        switch (icon) {
-                            case 'pk':
-                                return that.pkColumnIconColor;
-                            case 'null':
-                                return that.columnIconColor;
-                            case 'not_null':
-                                return that.columnIconColor;
-                            case 'fk_null':
-                                return that.fkColumnIconColor;
-                            case 'fk_not_null':
-                                return that.fkColumnIconColor;
-                            default:
-                            {
-                                console.error('Unknown column icon "' + icon + '".');
-                                return that.columnBackground;
-                            }
-                        }
-                    }),
-                    new go.Binding('fill', 'icon', function (icon) {
-                        switch (icon) {
-                            case 'pk':
-                                return that.pkColumnIconColor;
-                            case 'null':
-                                return null;
-                            case 'not_null':
-                                return that.columnIconColor;
-                            case 'fk_null':
-                                return null;
-                            case 'fk_not_null':
-                                return that.fkColumnIconColor;
-                            default:
-                            {
-                                console.error('Unknown column icon "' + icon + '".');
-                                return null;
-                            }
-                        }
-                    })
-                ),
                 mk(go.TextBlock, {
-                        position:new go.Point(22, 1),
+                        stroke:this.textColor,
                         font:this.columnFont,
                         editable:true,
                         isMultiline:false,
@@ -161,11 +210,15 @@ databasy.ui.layout.gojs.Templates = Class.extend({
                         return col.name + ' ' + col.type;
                     })
                 )
-            )
+            ),
+
+            this.mkDiscussionShape({ row:0, column:2 })
         )
     },
 
     tableTemplate:function () {
+        var that = this;
+
         return mk(go.Node, 'Auto', {
                 width:databasy.model.core.reprs.TableRepr.REPR_DEFAULT_WIDTH,
                 minSize:new go.Size(databasy.model.core.reprs.TableRepr.REPR_MIN_WIDTH, 30),
@@ -203,27 +256,40 @@ databasy.ui.layout.gojs.Templates = Class.extend({
                 },
 
                 // Title panel.
-                mk(go.Panel, 'Position', {
+                mk(go.Panel, 'Table', {
                         stretch:go.GraphObject.Horizontal,
-                        padding:new go.Margin(6, 6, 4, 6)
+                        defaultAlignment:go.Spot.Left,
+                        padding:new go.Margin(4, 6, 4, 6)
                     },
+                    new go.Binding('', 'hasOpenDiscussions', function(hasOpenDiscussions, panel) {
+                        panel.getColumnDefinition(2).width = hasOpenDiscussions ? 17 : 0;
+                    }),
+                    mk(go.RowColumnDefinition, { column:0, width:16 }),
+                    mk(go.RowColumnDefinition, { column:1}),
+                    mk(go.RowColumnDefinition, { column:2, width:17 }),
                     mk(go.Picture, {
                         source:'/static/repo/src/img/sprites.png',
                         sourceRect:new go.Rect(22, 116, 16, 16),
-                        position:new go.Point(0, 0)
+                        row:0,
+                        column:0
                     }),
-                    mk(go.TextBlock, {
-                            position:new go.Point(22, 1),
-                            font:this.titleFont,
-                            editable:true,
-                            isMultiline:false,
-                            wrap:go.TextBlock.None
+                    mk(go.Panel, 'Position', {
+                            stretch:go.GraphObject.Horizontal,
+                            padding:new go.Margin(0, 0, 0, 4),
+                            row:0,
+                            column:1
                         },
-                        new go.Binding('text', 'name')
-                    ),
-                    new go.Binding('maxSize', 'desiredSize', function (s) {
-                        return new go.Size(s.width - 4, s.height); // 2*2 (bounds)
-                    }).ofObject()
+                        mk(go.TextBlock, {
+                                position:new go.Point(0, 3),
+                                stroke:this.textColor,
+                                font:this.titleFont,
+                                editable:true,
+                                isMultiline:false,
+                                wrap:go.TextBlock.None
+                            },
+                            new go.Binding('text', 'name')
+                        )),
+                    this.mkDiscussionShape({ row:0, column:2 })
                 ),
 
                 // Columns panel.
@@ -234,10 +300,7 @@ databasy.ui.layout.gojs.Templates = Class.extend({
                         // Column panel.
                         itemTemplate:this.columnTemplate()
                     },
-                    new go.Binding('itemArray', 'columns'),
-                    new go.Binding('maxSize', 'desiredSize', function (s) {
-                        return new go.Size(s.width - 4, s.height); // 2*2 (bounds)
-                    }).ofObject()
+                    new go.Binding('itemArray', 'columns')
                 )
             )
         )
@@ -271,31 +334,45 @@ databasy.ui.layout.gojs.Templates = Class.extend({
 
             // Content panel.
             mk(go.Panel, 'Vertical', {
-                    stretch:go.GraphObject.Fill
+                    stretch:go.GraphObject.Fill,
+                    minSize:new go.Size(1, 1)
                 },
 
                 // Title panel.
-                mk(go.Panel, 'Position', {
+                mk(go.Panel, 'Table', {
                         stretch:go.GraphObject.Horizontal,
-                        padding:new go.Margin(6, 6, 4, 6)
+                        defaultAlignment:go.Spot.Left,
+                        padding:new go.Margin(4, 6, 4, 6)
                     },
+                    new go.Binding('', 'hasOpenDiscussions', function(hasOpenDiscussions, panel) {
+                        panel.getColumnDefinition(2).width = hasOpenDiscussions ? 17 : 0;
+                    }),
+                    mk(go.RowColumnDefinition, { column:0, width:16 }),
+                    mk(go.RowColumnDefinition, { column:1}),
+                    mk(go.RowColumnDefinition, { column:2, width:17 }),
                     mk(go.Picture, {
                         source:'/static/repo/src/img/sprites.png',
                         sourceRect:new go.Rect(22, 116, 16, 16),
-                        position:new go.Point(0, 0)
+                        row:0,
+                        column:0
                     }),
-                    mk(go.TextBlock, {
-                            position:new go.Point(22, 1),
-                            font:this.titleFont,
-                            editable:true,
-                            isMultiline:false,
-                            wrap:go.TextBlock.None
+                    mk(go.Panel, 'Position', {
+                            stretch:go.GraphObject.Horizontal,
+                            padding:new go.Margin(0, 0, 0, 4),
+                            row:0,
+                            column:1
                         },
-                        new go.Binding('text', 'name')
-                    ),
-                    new go.Binding('maxSize', 'desiredSize', function (s) {
-                        return new go.Size(s.width - 4, s.height); // 2*2 (bounds)
-                    }).ofObject()
+                        mk(go.TextBlock, {
+                                position:new go.Point(0, 3),
+                                stroke:this.textColor,
+                                font:this.titleFont,
+                                editable:true,
+                                isMultiline:false,
+                                wrap:go.TextBlock.None
+                            },
+                            new go.Binding('text', 'name')
+                        )),
+                    this.mkDiscussionShape({ row:0, column:2 })
                 )
             )
         )
@@ -391,7 +468,10 @@ databasy.ui.layout.gojs.Templates = Class.extend({
                             toArrow:'CircleFork'
                         },
                         new go.Binding('toArrow', 'toCardinality', this.fromLinkArrow)
-                    )
+                    ),
+                    this.mkDiscussionShape(null, [
+                        new go.Binding('visible', 'hasOpenDiscussions')
+                    ])
                 )
             },
             mk(go.Shape, {
@@ -428,7 +508,12 @@ databasy.ui.layout.gojs.Templates = Class.extend({
                     toArrow:'CircleFork'
                 },
                 new go.Binding('toArrow', 'toCardinality', this.toLinkArrow)
-            )
+            ),
+            this.mkDiscussionShape(null, [
+                new go.Binding('visible', 'hasOpenDiscussions')
+            ])
         )
     }
 });
+
+

@@ -21,6 +21,7 @@ databasy.ui.layout.gojs.DiagramModel = Class.extend({
             name:name,
             position:position,
             width:undefined, // default
+            hasOpenDiscussions: false,
             columns:[],
             category:'table'
         };
@@ -63,6 +64,7 @@ databasy.ui.layout.gojs.DiagramModel = Class.extend({
             elementId:columnElementId,
             icon:icon,
             name:name,
+            hasOpenDiscussions: false,
             type:type
         };
 
@@ -110,6 +112,7 @@ databasy.ui.layout.gojs.DiagramModel = Class.extend({
             name:name,
             position:position,
             width:undefined, // default
+            hasOpenDiscussions: false,
             category:'view'
         };
 
@@ -140,7 +143,8 @@ databasy.ui.layout.gojs.DiagramModel = Class.extend({
             fromColumnElementIds:fromColumnElementIds,
             to:toTableReprId,
             toCardinality:toCardinality,
-            toColumnElementIds:toColumnElementIds
+            toColumnElementIds:toColumnElementIds,
+            hasOpenDiscussions: false
         };
 
         if (this._dataExists(relReprId)) {
