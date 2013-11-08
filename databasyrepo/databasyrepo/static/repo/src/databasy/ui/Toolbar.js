@@ -1,4 +1,4 @@
-databasy.ui.layout.Toolbar = Class.extend({
+databasy.ui.Toolbar = Class.extend({
     init:function () {
         this._currentTool = null;
         this._defaultTool = 'pointer';
@@ -8,7 +8,7 @@ databasy.ui.layout.Toolbar = Class.extend({
 
         this.toolbar.append(this.toolPanel);
 
-        var constant = databasy.ui.layout.Toolbar;
+        var constant = databasy.ui.Toolbar;
         this.createToolbarButton(constant.POINTER, 'icn-pointer24', 'Select');
         this.createToolbarButton(constant.CREATE_TABLE, 'icn-table24', 'Create Table');
 

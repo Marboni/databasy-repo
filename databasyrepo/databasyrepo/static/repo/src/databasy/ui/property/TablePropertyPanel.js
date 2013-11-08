@@ -1,4 +1,4 @@
-databasy.ui.layout.property.TablePropertyPanel = Class.extend({
+databasy.ui.property.TablePropertyPanel = Class.extend({
     init:function (tableId) {
         this.tableId = tableId;
 

@@ -1,4 +1,4 @@
-databasy.ui.layout.MenuPanel = Class.extend({
+databasy.ui.MenuPanel = Class.extend({
     CONTROL_BTN_LABEL_EDIT:'Edit',
     CONTROL_BTN_LABEL_EDITING_DONE:"I'm done",
     CONTROL_BTN_LABEL_REQUEST_CONTROL:'Request control',

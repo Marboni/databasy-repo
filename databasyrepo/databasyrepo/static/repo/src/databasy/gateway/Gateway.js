@@ -136,7 +136,7 @@ databasy.gateway.Gateway = Class.extend({
         this.model = databasy.model.core.serializing.Serializable.deserialize(serializedModel);
         databasy.service = new databasy.gateway.Service(this.model);
 
-        this.layout = new databasy.ui.layout.Layout();
+        this.layout = new databasy.ui.Layout();
         this.layout.initializePanels($.proxy(function () {
             this.startReportActivity();
             this._observer.setActive(true); // Fire all events received during rendering.

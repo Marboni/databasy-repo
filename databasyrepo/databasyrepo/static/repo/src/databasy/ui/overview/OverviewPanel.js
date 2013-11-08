@@ -1,7 +1,7 @@
-databasy.ui.layout.overview.OverviewPanel = Class.extend({
+databasy.ui.overview.OverviewPanel = Class.extend({
     init:function () {
         this.createOverviewPanel();
-        this.schemaTreePanel = new databasy.ui.layout.overview.SchemaTreePanel();
+        this.schemaTreePanel = new databasy.ui.overview.SchemaTreePanel();
     },
 
     createOverviewPanel:function () {

@@ -1,4 +1,4 @@
-databasy.ui.layout.gojs.DiagramModel = Class.extend({
+databasy.ui.gojs.DiagramModel = Class.extend({
     init:function (diagram) {
         this.diagram = diagram;
         this.model = diagram.model;
@@ -214,7 +214,7 @@ databasy.ui.layout.gojs.DiagramModel = Class.extend({
     },
 
     _validateColumnIcon:function (icon) {
-        if ($.inArray(icon, databasy.ui.layout.gojs.DiagramModel.COLUMN_ICONS) == -1) {
+        if ($.inArray(icon, databasy.ui.gojs.DiagramModel.COLUMN_ICONS) == -1) {
             throw new Error('Incorrect column icon: ' + icon + '.');
         }
     }

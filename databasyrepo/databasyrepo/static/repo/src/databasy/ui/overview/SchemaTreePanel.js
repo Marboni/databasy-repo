@@ -1,4 +1,4 @@
-databasy.ui.layout.overview.SchemaTreePanel = Class.extend({
+databasy.ui.overview.SchemaTreePanel = Class.extend({
     init:function () {
         databasy.gw.addListener(this);
 

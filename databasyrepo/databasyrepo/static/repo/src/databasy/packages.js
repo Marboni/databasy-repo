@@ -22,24 +22,9 @@ var databasy = {
         events: {}
     },
     ui: {
-        layout: {
-            overview: {},
-            property: {},
-            canvas: {},
-            gojs: {}
-        },
-        locator: {},
-        figure: {
-            table: {
-                column: {}
-            }
-        },
-        widget: {},
-        policy: {
-            canvas: {},
-            figure: {}
-        },
-        utils: {}
+        overview: {},
+        property: {},
+        gojs: {}
     },
     utils: {
         events: {},

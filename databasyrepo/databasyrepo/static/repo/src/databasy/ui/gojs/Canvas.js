@@ -1,4 +1,4 @@
-databasy.ui.layout.gojs.Canvas = Class.extend({
+databasy.ui.gojs.Canvas = Class.extend({
     init:function (domElementId) {
 //        databasy.gw.addListener(this);
 
@@ -17,11 +17,11 @@ databasy.ui.layout.gojs.Canvas = Class.extend({
         this.diagram = new go.Diagram(domElementId);
         this.diagram.initialContentAlignment = go.Spot.Center;
         this.diagram.padding = 300;
-        var templates = new databasy.ui.layout.gojs.Templates();
+        var templates = new databasy.ui.gojs.Templates();
         this.diagram.nodeTemplateMap = templates.createNodeTemplateMap();
         this.diagram.linkTemplateMap = templates.createLinkTemplateMap();
 
-        this.diagramModel = new databasy.ui.layout.gojs.DiagramModel(this.diagram);
+        this.diagramModel = new databasy.ui.gojs.DiagramModel(this.diagram);
     },
 
     renderFigures:function () {

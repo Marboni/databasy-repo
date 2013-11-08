@@ -1,6 +1,6 @@
 mk = go.GraphObject.make;
 
-databasy.ui.layout.gojs.Templates = Class.extend({
+databasy.ui.gojs.Templates = Class.extend({
     textColor:'#333333',
     titleFont:'bold 14px "Helvetica Neue",​ Helvetica, Arial, Sans-serif',
 

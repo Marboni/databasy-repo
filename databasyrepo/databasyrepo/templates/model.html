@@ -43,7 +43,6 @@
 
                     .script("{{ url_for('static', filename='repo/libs/gojs/go.js') }}")
 
-                // ============ END DRAW2D FOR DEVELOPMENT ============
 
                     .script("{{ url_for('static', filename='repo/src/databasy/packages.js') }}")
 
@@ -52,7 +51,6 @@
                     .script("{{ url_for('static', filename='repo/src/databasy/utils/events/Observer.js') }}")
                     .script("{{ url_for('static', filename='repo/src/databasy/utils/events/Event.js') }}")
 
-                // Model
                     .script("{{ url_for('static', filename='repo/src/databasy/model/core/serializing.js') }}")
                     .script("{{ url_for('static', filename='repo/src/databasy/model/core/nodes.js') }}")
                     .script("{{ url_for('static', filename='repo/src/databasy/model/core/checkers.js') }}")
@@ -68,24 +66,20 @@
 
                     .script("{{ url_for('static', filename='repo/src/databasy/model/register.js') }}")
                     .script("{{ url_for('static', filename='repo/src/databasy/model/utils.js') }}")
-                // Model end
 
-                // UI
-                    .script("{{ url_for('static', filename='repo/src/databasy/ui/utils.js') }}")
 
-                    .script("{{ url_for('static', filename='repo/src/databasy/ui/layout/Layout.js') }}")
-                    .script("{{ url_for('static', filename='repo/src/databasy/ui/layout/MenuPanel.js') }}")
-                    .script("{{ url_for('static', filename='repo/src/databasy/ui/layout/Toolbar.js') }}")
-                    .script("{{ url_for('static', filename='repo/src/databasy/ui/layout/gojs/Canvas.js') }}")
-                    .script("{{ url_for('static', filename='repo/src/databasy/ui/layout/gojs/DiagramModel.js') }}")
-                    .script("{{ url_for('static', filename='repo/src/databasy/ui/layout/gojs/Template.js') }}")
-                    .script("{{ url_for('static', filename='repo/src/databasy/ui/layout/property/PropertyPanel.js') }}")
-                    .script("{{ url_for('static', filename='repo/src/databasy/ui/layout/property/TablePropertyPanel.js') }}")
-                    .script("{{ url_for('static', filename='repo/src/databasy/ui/layout/overview/OverviewPanel.js') }}")
-                    .script("{{ url_for('static', filename='repo/src/databasy/ui/layout/overview/SchemaTreePanel.js') }}")
-                // UI end
+                    .script("{{ url_for('static', filename='repo/src/databasy/ui/Layout.js') }}")
+                    .script("{{ url_for('static', filename='repo/src/databasy/ui/MenuPanel.js') }}")
+                    .script("{{ url_for('static', filename='repo/src/databasy/ui/Toolbar.js') }}")
+                    .script("{{ url_for('static', filename='repo/src/databasy/ui/gojs/Canvas.js') }}")
+                    .script("{{ url_for('static', filename='repo/src/databasy/ui/gojs/DiagramModel.js') }}")
+                    .script("{{ url_for('static', filename='repo/src/databasy/ui/gojs/Template.js') }}")
+                    .script("{{ url_for('static', filename='repo/src/databasy/ui/property/PropertyPanel.js') }}")
+                    .script("{{ url_for('static', filename='repo/src/databasy/ui/property/TablePropertyPanel.js') }}")
+                    .script("{{ url_for('static', filename='repo/src/databasy/ui/overview/OverviewPanel.js') }}")
+                    .script("{{ url_for('static', filename='repo/src/databasy/ui/overview/SchemaTreePanel.js') }}")
 
-                // Gateway
+
                     .script("{{ url_for('static', filename='repo/src/databasy/gateway/Gateway.js') }}")
                     .script("{{ url_for('static', filename='repo/src/databasy/gateway/Context.js') }}")
                     .script("{{ url_for('static', filename='repo/src/databasy/gateway/CommandQueue.js') }}")
@@ -96,7 +90,7 @@
 
                     .script("{{ url_for('static', filename='repo/src/databasy/gateway/events/RuntimeChanged.js') }}")
                     .script("{{ url_for('static', filename='repo/src/databasy/gateway/events/ModelChanged.js') }}")
-                // Gateway end
+
 
                     .wait(function () {
                         try {

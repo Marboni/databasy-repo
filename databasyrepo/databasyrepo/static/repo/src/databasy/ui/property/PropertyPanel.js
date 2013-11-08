@@ -1,4 +1,4 @@
-databasy.ui.layout.property.PropertyPanel = Class.extend({
+databasy.ui.property.PropertyPanel = Class.extend({
     init:function () {
         this.element = null;
         this.propertyPanel = $('#propertyPanel');
@@ -41,7 +41,7 @@ databasy.ui.layout.property.PropertyPanel = Class.extend({
         var code = element.code();
         switch (code) {
             case 'core.elements.Table':
-                this.properties = new databasy.ui.layout.property.TablePropertyPanel(element.id());
+                this.properties = new databasy.ui.property.TablePropertyPanel(element.id());
                 break;
             default:
                 throw new Error('Properties for element ' + code + ' not implemented.');

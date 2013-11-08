@@ -1,5 +1,5 @@
-databasy.ui.layout.canvas.Canvas = draw2d.Canvas.extend({
-    NAME:"databasy.ui.layout.canvas.Canvas",
+databasy.ui.canvas.Canvas = draw2d.Canvas.extend({
+    NAME:"databasy.ui.canvas.Canvas",
 
     init:function (domNodeId) {
         this._super(domNodeId);

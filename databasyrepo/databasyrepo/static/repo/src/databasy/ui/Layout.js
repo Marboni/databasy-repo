@@ -1,4 +1,4 @@
-databasy.ui.layout.Layout = Class.extend({
+databasy.ui.Layout = Class.extend({
     TOOLBAR_SIZE:44,
     TOOLBAR_SLIDE_SPEED:300,
 
@@ -15,11 +15,11 @@ databasy.ui.layout.Layout = Class.extend({
         this.canvasInitialized = false;
         this.schemaTreeInitialized = false;
 
-        this.canvas = new databasy.ui.layout.gojs.Canvas('canvasWrapper');
-        this.menuPanel = new databasy.ui.layout.MenuPanel();
-        this.toolbar = new databasy.ui.layout.Toolbar();
-        this.propertyPanel = new databasy.ui.layout.property.PropertyPanel();
-        this.overviewPanel = new databasy.ui.layout.overview.OverviewPanel();
+        this.canvas = new databasy.ui.gojs.Canvas('canvasWrapper');
+        this.menuPanel = new databasy.ui.MenuPanel();
+        this.toolbar = new databasy.ui.Toolbar();
+        this.propertyPanel = new databasy.ui.property.PropertyPanel();
+        this.overviewPanel = new databasy.ui.overview.OverviewPanel();
 
         this.waitInitialization();
     },
