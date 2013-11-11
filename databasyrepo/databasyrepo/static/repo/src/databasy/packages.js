@@ -22,7 +22,7 @@ var databasy = {
         events: {}
     },
     ui: {
-        overview: {},
+        general: {},
         property: {},
         gojs: {}
     },

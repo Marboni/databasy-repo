@@ -1,4 +1,4 @@
-databasy.ui.overview.SchemaTreePanel = Class.extend({
+databasy.ui.general.SchemaTreePanel = Class.extend({
     init:function () {
         databasy.gw.addListener(this);
 
@@ -8,7 +8,7 @@ databasy.ui.overview.SchemaTreePanel = Class.extend({
 
     createSchemaTreePanel:function () {
         this.schemaTreePanel = $('<div id="schemaTreePanel"></div>');
-        $('#overviewPanel').append(this.schemaTreePanel);
+        $('#generalPanel').append(this.schemaTreePanel);
     },
 
     createSchemaTree:function () {
@@ -43,7 +43,7 @@ databasy.ui.overview.SchemaTreePanel = Class.extend({
                 sort:this.compareNodes,
                 types:{
                     types:{
-                        schema:{
+                        general:{
                             icon:{
                                 image:'/static/repo/src/img/sprites.png',
                                 position:'-17px -265px'
@@ -104,7 +104,7 @@ databasy.ui.overview.SchemaTreePanel = Class.extend({
             attr:{
                 id:'schemaTreeRoot',
                 class:'openOnDblClick',
-                rel:'schema'
+                rel:'general'
             },
             state:'open',
             children:[

@@ -19,7 +19,7 @@ databasy.ui.Layout = Class.extend({
         this.menuPanel = new databasy.ui.MenuPanel();
         this.toolbar = new databasy.ui.Toolbar();
         this.propertyPanel = new databasy.ui.property.PropertyPanel();
-        this.overviewPanel = new databasy.ui.overview.OverviewPanel();
+        this.generalPanel = new databasy.ui.general.GeneralPanel();
 
         this.waitInitialization();
     },
@@ -57,7 +57,7 @@ databasy.ui.Layout = Class.extend({
                 closable:true
             },
             west:{
-                paneSelector:'#overviewPanel',
+                paneSelector:'#generalPanel',
                 closable:true
             },
             center:{
@@ -97,7 +97,7 @@ databasy.ui.Layout = Class.extend({
 
         application.append('<div id="menuPanel"></div>');
         application.append('<div id="chatPanel"></div>');
-        application.append('<div id="overviewPanel"></div>');
+        application.append('<div id="generalPanel"></div>');
         application.append('<div id="contentPanel"></div>');
 
         var contentPanel = $('#contentPanel');
