@@ -2,13 +2,9 @@ databasy.ui.general.SchemaTreePanel = Class.extend({
     init:function () {
         databasy.gw.addListener(this);
 
-        this.createSchemaTreePanel();
-        this.createSchemaTree();
-    },
+        this.schemaTreePanel = $('#schemaTreePanel');
 
-    createSchemaTreePanel:function () {
-        this.schemaTreePanel = $('<div id="schemaTreePanel"></div>');
-        $('#generalPanel').append(this.schemaTreePanel);
+        this.createSchemaTree();
     },
 
     createSchemaTree:function () {

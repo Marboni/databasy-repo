@@ -1,8 +1,9 @@
 databasy.ui.Layout = Class.extend({
     TOOLBAR_SIZE:44,
+    OVERVIEW_SIZE:150,
     TOOLBAR_SLIDE_SPEED:300,
 
-    init:function (onInitialized) {
+    init:function () {
         databasy.gw.addListener(this);
 
         this.createHtml();
@@ -58,7 +59,19 @@ databasy.ui.Layout = Class.extend({
             },
             west:{
                 paneSelector:'#generalPanel',
-                closable:true
+                closable:true,
+                childOptions:{
+                    applyDefaultStyles:true,
+                    defaults:defaults,
+                    north:{
+                        paneSelector:"#overviewPanel",
+                        size:this.OVERVIEW_SIZE,
+                        initClosed:false
+                    },
+                    center:{
+                        paneSelector:"#schemaTreePanel"
+                    }
+                }
             },
             center:{
                 paneSelector:'#contentPanel',
@@ -104,6 +117,10 @@ databasy.ui.Layout = Class.extend({
         contentPanel.append('<div id="toolbar"></div>');
         contentPanel.append('<div id="canvasWrapper"></div>');
         contentPanel.append('<div id="propertyPanel"></div>');
+
+        var generalPanel = $('#generalPanel');
+        generalPanel.append('<div id="overviewPanel"></div>');
+        generalPanel.append('<div id="schemaTreePanel"></div>');
     },
 
     openToolbar:function () {

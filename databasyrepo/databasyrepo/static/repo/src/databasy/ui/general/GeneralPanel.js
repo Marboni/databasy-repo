@@ -1,11 +1,6 @@
 databasy.ui.general.GeneralPanel = Class.extend({
     init:function () {
-        this.createGeneralPanel();
+        this.overviewPabel = new databasy.ui.general.OverviewPanel();
         this.schemaTreePanel = new databasy.ui.general.SchemaTreePanel();
-    },
-
-    createGeneralPanel:function () {
-        this.generalPanel = $('#generalPanel');
-        this.generalPanel.empty();
     }
 });

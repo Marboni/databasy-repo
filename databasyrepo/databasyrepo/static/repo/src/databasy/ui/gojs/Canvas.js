@@ -47,6 +47,9 @@ databasy.ui.gojs.Canvas = Class.extend({
 
         this.diagramModel.createView('v1', 'V1', [400, 400]);
 
+        this.diagramModel.updateTable('t1', {hasOpenDiscussions: true});
+        this.diagramModel.updateRelationship('r1', {hasOpenDiscussions: true});
+
         this.diagramModel.commitTransaction();
 
 //        var that = this;
