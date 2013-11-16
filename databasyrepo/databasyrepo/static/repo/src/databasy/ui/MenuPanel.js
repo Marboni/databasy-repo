@@ -26,15 +26,15 @@ databasy.ui.MenuPanel = Class.extend({
     },
 
     createControlPanel:function () {
-        this.controlPanel = $('<div id="controlPanel"></div>');
-        this.menuPanel.append(this.controlPanel);
+        this.controlTools = $('<div id="controlPanel"></div>');
+        this.menuPanel.append(this.controlTools);
     },
 
     createControlButton:function () {
         this.controlButton = $('<a id="controlButton" class="btn btn-info"></a>')
             .text(this.CONTROL_BTN_LABEL_EDIT)
             .click($.proxy(this.controlButtonClick, this));
-        this.controlPanel.append(this.controlButton);
+        this.controlTools.append(this.controlButton);
         if (!databasy.gw.role.includes(databasy.gateway.ModelRole.DEVELOPER)) {
             this.controlButton.attr('disabled', true);
         }
@@ -43,7 +43,7 @@ databasy.ui.MenuPanel = Class.extend({
     createStatusMsg:function () {
         this.controlStatusMsg = $('<p id="controlStatusMsg"></p>');
         this.controlStatusMsg.text(this.NOBODY_EDITING_MSG);
-        this.controlPanel.append(this.controlStatusMsg);
+        this.controlTools.append(this.controlStatusMsg);
     },
 
     createControlPassDialog:function () {

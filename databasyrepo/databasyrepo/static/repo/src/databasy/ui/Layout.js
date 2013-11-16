@@ -1,7 +1,6 @@
 databasy.ui.Layout = Class.extend({
     TOOLBAR_SIZE:44,
     OVERVIEW_SIZE:150,
-    TOOLBAR_SLIDE_SPEED:300,
 
     init:function () {
         databasy.gw.addListener(this);
@@ -80,13 +79,10 @@ databasy.ui.Layout = Class.extend({
                     defaults:defaults,
                     west:{
                         paneSelector:"#toolbar",
-                        fxName:'slide',
-                        fxSpeed: this.TOOLBAR_SLIDE_SPEED,
-                        initClosed:true,
+                        initClosed:false,
                         size:this.TOOLBAR_SIZE,
                         spacing_open:0,
-                        spacing_closed:0,
-                        closable:true
+                        spacing_closed:0
                     },
                     center:{
                         paneSelector:"#canvasWrapper"

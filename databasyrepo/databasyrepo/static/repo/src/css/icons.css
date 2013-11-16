@@ -1,45 +1,93 @@
-.icon-database16, .icon-folder16, .icon-pointer24, .icon-table16, .icon-table24, .icon-minus14, .icon-plus14 {
+.icon-database16, .icon-pointer24, .icon-minus14, .icon-plus14, .icon-column16, .icon-column24, .icon-folder16, .icon-move24, .icon-rel16, .icon-rel24, .icon-table16, .icon-table24, .icon-view16, .icon-view24, .icon-discussion24 {
     background: url(../img/sprites.png) no-repeat;
 }
 
-.icon-database16{
-    background-position: -16px -216px ;
+.icon-database16 {
+    background-position: -16px -216px;
     width: 16px;
     height: 16px;
 }
 
-.icon-folder16{
-    background-position: -19px -165px ;
-    width: 16px;
-    height: 16px;
-}
-
-.icon-pointer24{
-    background-position: -14px -62px ;
+.icon-pointer24 {
+    background-position: -14px -62px;
     width: 24px;
     height: 24px;
 }
 
-.icon-table16{
-    background-position: -22px -116px ;
+.icon-minus14 {
+    background-position: -17px -317px;
+    width: 14px;
+    height: 14px;
+}
+
+.icon-plus14 {
+    background-position: -17px -263px;
+    width: 14px;
+    height: 14px;
+}
+
+.icon-column16 {
+    background-position: -66px -163px;
     width: 16px;
     height: 16px;
 }
 
-.icon-table24{
-    background-position: -13px -9px ;
+.icon-column24 {
+    background-position: -63px -110px;
     width: 24px;
     height: 24px;
 }
 
-.icon-minus14{
-    background-position: -17px -317px ;
-    width: 14px;
-    height: 14px;
+.icon-folder16 {
+    background-position: -67px -313px;
+    width: 16px;
+    height: 16px;
 }
 
-.icon-plus14{
-    background-position: -15px -265px ;
-    width: 14px;
-    height: 14px;
+.icon-move24 {
+    background-position: -14px -12px;
+    width: 24px;
+    height: 24px;
+}
+
+.icon-rel16 {
+    background-position: -22px -164px;
+    width: 16px;
+    height: 16px;
+}
+
+.icon-rel24 {
+    background-position: -13px -112px;
+    width: 24px;
+    height: 24px;
+}
+
+.icon-table16 {
+    background-position: -66px -64px;
+    width: 16px;
+    height: 16px;
+}
+
+.icon-table24 {
+    background-position: -63px -12px;
+    width: 24px;
+    height: 24px;
+}
+
+.icon-view16 {
+    background-position: -65px -263px;
+    width: 16px;
+    height: 16px;
+}
+
+.icon-view24 {
+    background-position: -61px -213px;
+    width: 24px;
+    height: 24px;
+}
+
+.icon-discussion24 {
+    background-position: -15px -363px;
+    width: 24px;
+    height: 24px;
 }

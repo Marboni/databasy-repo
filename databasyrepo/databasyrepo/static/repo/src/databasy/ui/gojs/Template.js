@@ -269,7 +269,7 @@ databasy.ui.gojs.Templates = Class.extend({
                     mk(go.RowColumnDefinition, { column:2, width:17 }),
                     mk(go.Picture, {
                         source:'/static/repo/src/img/sprites.png',
-                        sourceRect:new go.Rect(22, 116, 16, 16),
+                        sourceRect:new go.Rect(66, 64, 16, 16),
                         row:0,
                         column:0
                     }),
@@ -352,7 +352,7 @@ databasy.ui.gojs.Templates = Class.extend({
                     mk(go.RowColumnDefinition, { column:2, width:17 }),
                     mk(go.Picture, {
                         source:'/static/repo/src/img/sprites.png',
-                        sourceRect:new go.Rect(22, 116, 16, 16),
+                        sourceRect:new go.Rect(65, 263, 16, 16),
                         row:0,
                         column:0
                     }),

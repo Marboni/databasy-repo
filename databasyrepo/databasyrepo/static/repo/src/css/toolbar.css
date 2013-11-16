@@ -1,11 +1,12 @@
 #toolbar.ui-layout-pane {
-    padding: 0 !important;
+    padding: 2px !important;
+    line-height: 0;
 }
 
-#toolPanel {
-    margin: 2px 2px;
-}
-
-#toolPanel button {
+#toolbar button {
     padding: 6px;
+}
+
+#toolbar .btn-group-vertical {
+    margin-bottom: 10px;
 }
