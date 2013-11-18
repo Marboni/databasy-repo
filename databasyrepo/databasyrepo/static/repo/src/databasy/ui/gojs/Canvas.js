@@ -1,156 +1,147 @@
 databasy.ui.gojs.Canvas = Class.extend({
     init:function (domElementId) {
-//        databasy.gw.addListener(this);
+        databasy.gw.addListener(this);
 
-//        this.figureByReprId = {};
-//        this.figureByElementId = {};
-
-        //this.canvasId = this.getDefaultCanvasNode().id();
-
-//        this.setEditable(false);
+        this.canvasId = this.getDefaultCanvasNode().id();
 
         this.initGo(domElementId);
         this.renderFigures();
+
+        this.diagramModel.setReadOnly(true);
     },
 
     initGo:function (domElementId) {
         this.diagram = new go.Diagram(domElementId);
         this.diagram.initialContentAlignment = go.Spot.Center;
         this.diagram.padding = 300;
+
         var templates = new databasy.ui.gojs.Templates();
+        this.diagram.contextMenu = templates.contextMenuTemplate();
         this.diagram.nodeTemplateMap = templates.createNodeTemplateMap();
         this.diagram.linkTemplateMap = templates.createLinkTemplateMap();
+
+        this.diagram.addDiagramListener('PartResized', function(diagramEvent) {
+            if (!databasy.gw.runtime.isEditor()) {
+                return;
+            }
+            var part = diagramEvent.subject;
+            var data = part.data;
+            switch (data.category) {
+                case 'table': {
+                    databasy.service.updateTableReprWidth(data.key, part.width);
+                    break;
+                }
+            }
+        });
+
+        this.diagram.addDiagramListener('SelectionMoved', function(diagramEvent) {
+            if (!databasy.gw.runtime.isEditor()) {
+                return;
+            }
+            var movedPartsIt = diagramEvent.diagram.selection.iterator;
+            while(movedPartsIt.next()) {
+                var part = movedPartsIt.value;
+                var position = part.position;
+                var data = part.data;
+                switch (data.category) {
+                    case 'table': {
+                        databasy.service.updateTableReprPosition(data.key, position.x, position.y);
+                        break;
+                    }
+                }
+            }
+        });
 
         this.diagramModel = new databasy.ui.gojs.DiagramModel(this.diagram);
     },
 
     renderFigures:function () {
+        var that = this;
+        var functions = [];
+
+        var canvas = databasy.gw.model.node(this.canvasId);
+        var reprs = canvas.val_as_node('reprs', databasy.gw.model);
+        $.each(reprs, function (index, repr) {
+            functions.push($.proxy(that.renderFigure, that, repr));
+        });
+
+        functions.push(function() {
+            databasy.gw.layout.canvasInitialized = true;
+        });
+
+        databasy.ui.utils.executeSequentially(functions);
+    },
+
+    renderFigure:function (repr) {
+        var code = repr.code();
+        switch (code) {
+            case databasy.model.core.reprs.TableRepr.CODE:
+                this.renderTable(repr);
+                break;
+            default:
+                throw new Error('Unknown representation code.')
+        }
+    },
+
+    renderTable:function (tableRepr) {
+        var model = databasy.gw.model;
+
+        var tableReprId = tableRepr.id();
+        var tableId = tableRepr.val('table').ref_id();
+        var table = model.node(tableId);
+
         this.diagramModel.startTransaction();
 
-        this.diagramModel.createTable('t0', 'T0', [-50, 250]);
-
-        this.diagramModel.createTable('t1', 'table_name', [0, 0]);
-        this.diagramModel.addColumn('t1', 'c11', 'pk', 'column_name', 'BIGINT');
-        this.diagramModel.addColumn('t1', 'c12', 'null', 'column_name', 'BIGINT');
-        this.diagramModel.addColumn('t1', 'c13', 'null', 'column_name', 'BIGINT');
-
-        this.diagramModel.createTable('t2', 'T2', [200, 200]);
-        this.diagramModel.addColumn('t2', 'c21', 'pk', 'col1', 'BIGINT');
-        this.diagramModel.addColumn('t2', 'c22', 'null', 'col2', 'BIGINT');
-        this.diagramModel.addColumn('t2', 'c23', 'null', 'col3', 'BIGINT');
-
-        this.diagramModel.createRelationship('r1', 't1', '0..1', ['c11', 'c12'], 't2', '0..1', ['c21', 'c22']);
-        this.diagramModel.createRelationship('r2', 't1', '0..1', ['c11', 'c13'], 't2', '0..1', ['c21', 'c23']);
-
-        this.diagramModel.createView('v0', 'view_name', [0, 0]);
-        this.diagramModel.removeView('v0');
-
-        this.diagramModel.createView('v1', 'V1', [400, 400]);
-
-        this.diagramModel.updateTable('t1', {hasOpenDiscussions: true});
-        this.diagramModel.updateRelationship('r1', {hasOpenDiscussions: true});
+        this.diagramModel.createTable(tableReprId, table.val('name'), tableRepr.val('width'), tableRepr.val('position'));
+        var columns = table.val_as_node('columns', model);
+        $.each(columns, $.proxy(function(i, column) {
+            this.diagramModel.addColumn(tableReprId, column.id(), 'null', column.val('name'), '')
+        }, this));
 
         this.diagramModel.commitTransaction();
+    },
 
-//        var that = this;
-//        this.diagram.click = function() {
-//            that.diagramModel.updateRelationship('r1', {hasOpenDiscussions: true});
-//            that.diagram.click = function() {
-//                that.diagramModel.updateRelationship('r1', {hasOpenDiscussions: false});
-//            }
-//        };
+    getDefaultCanvasNode:function () {
+        var model = databasy.gw.model;
+        return model.val_as_node('canvases', model)[0]
+    },
 
-        databasy.gw.layout.canvasInitialized = true;
+    onModelChanged:function (event) {
+        var diagramModel = this.diagramModel;
+
+        var modelEvent = event.modelEvent;
+        var model = databasy.gw.model;
+
+        var eventTypes = databasy.model.core.events;
+
+        if (event.matches(eventTypes.ItemInserted, {node_id:this.canvasId, field:'reprs'})) {
+            var repr = modelEvent.val('item').ref_node(model);
+            this.renderFigure(repr);
+        } else if (event.matches(eventTypes.PropertyChanged, {field: 'width'})) {
+            var nodeId = modelEvent.val('node_id');
+            var repr = model.node(nodeId);
+            if (repr instanceof databasy.model.core.reprs.TableRepr) {
+                var width = modelEvent.val('new_value');
+                diagramModel.startTransaction();
+                diagramModel.updateTable(repr.id(), {width: width});
+                diagramModel.commitTransaction();
+            }
+        } else if (event.matches(eventTypes.PropertyChanged, {field: 'position'})) {
+            var nodeId = modelEvent.val('node_id');
+            var repr = model.node(nodeId);
+            if (repr instanceof databasy.model.core.reprs.TableRepr) {
+                var position = modelEvent.val('new_value');
+                diagramModel.startTransaction();
+                diagramModel.updateTable(repr.id(), {position: position});
+                diagramModel.commitTransaction();
+            }
+        }
+    },
+
+    onRuntimeChanged:function (event) {
+        var rt = event.runtime;
+        var editable = rt.isEditor();
+
+        this.diagramModel.setReadOnly(!editable);
     }
-
-//    renderFigures:function () {
-//        var that = this;
-//        var functions = [];
-//
-//        var canvas = databasy.gw.model.node(this.canvasId);
-//        var reprs = canvas.val_as_node('reprs', databasy.gw.model);
-//        $.each(reprs, function (index, repr) {
-//            functions.push($.proxy(that.renderFigure, that, repr));
-//        });
-//
-//        functions.push(function() {
-//            databasy.gw.layout.canvasInitialized = true;
-//        });
-//
-//        databasy.ui.utils.executeSequentially(functions);
-//    },
-//
-//    renderFigure:function (repr) {
-//        var code = repr.code();
-//        switch (code) {
-//            case databasy.model.core.reprs.TableRepr.CODE:
-//                this.renderTable(repr);
-//                break;
-//            default:
-//                throw new Error('Unknown representation code.')
-//        }
-//    },
-//
-//    renderTable:function (tableRepr) {
-//        var tableId = tableRepr.val('table').ref_id();
-//        var tableReprId = tableRepr.id();
-//
-//        var tableFigure = new databasy.ui.layout.gojs.Table(tableId, tableReprId);
-//        this.diagram.add(tableFigure);
-//        this.cache(tableFigure);
-//    },
-//
-//    getDefaultCanvasNode:function () {
-//        var model = databasy.gw.model;
-//        return model.val_as_node('canvases', model)[0]
-//    },
-//
-//    getFigureByReprId:function (reprId) {
-//        return this.figureByReprId[reprId];
-//    },
-//
-//    getFigureByRepr:function (repr) {
-//        return this.getFigureByReprId(repr.id());
-//    },
-//
-//    getFigureByElementId:function (elementId) {
-//        return this.figureByElementId[elementId];
-//    },
-//
-//    getFigureByElement:function (element) {
-//        return this.getFigureByElementId(element.id());
-//    },
-
-//    cache:function (figure) {
-//        this.figureByReprId[figure.getReprId()] = figure;
-//        this.figureByElementId[figure.getElementId()] = figure;
-//    },
-//
-//    onModelChanged:function (event) {
-//        var modelEvent = event.modelEvent;
-//        var model = databasy.gw.model;
-//
-//        var eventTypes = databasy.model.core.events;
-//
-////        if (event.matches(eventTypes.ItemInserted, {node_id:this.canvasId, field:'reprs'})) {
-////            var repr = modelEvent.val('item').ref_node(model);
-////            this.renderFigure(repr);
-////        }
-//    },
-//
-//    setEditable:function (editable) {
-//        var canvasPane = $('#canvas');
-//        if (editable) {
-//            canvasPane.removeClass('readonly');
-//        } else {
-//            canvasPane.addClass('readonly');
-//        }
-//    },
-//
-//    onRuntimeChanged:function (event) {
-//        var rt = event.runtime;
-//        var editable = rt.isEditor();
-//
-//        this.setEditable(editable);
-//    }
 });

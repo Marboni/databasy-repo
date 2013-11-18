@@ -17,8 +17,8 @@ databasy.ui.general.SchemaTreePanel = Class.extend({
 
         this.schemaTree
             .bind("loaded.jstree", function (event, data) {
-                that.initContextMenus();
-                that.bindContextMenuToTableNodes();
+                //that.initContextMenus();
+                //that.bindContextMenuToTableNodes();
                 that.initDblClickListener();
                 that.openTableNode();
                 databasy.gw.layout.schemaTreeInitialized = true;
@@ -128,59 +128,59 @@ databasy.ui.general.SchemaTreePanel = Class.extend({
     renderTableNode:function (table) {
         var tn = this.createTableNode(table);
         var node = this.schemaTree.jstree('create', '#schemaTreeTables', 'last', tn, false, true);
-        this.bindContextMenu(node);
+        //this.bindContextMenu(node);
     },
 
-    initContextMenus:function () {
-        this.contextMenusByNodeType = {};
+//    initContextMenus:function () {
+//        this.contextMenusByNodeType = {};
+//
+//        this.createContextMenu('table', {
+//            deleteTable:{
+//                name:'Delete Table',
+//                handler:function (tableId) {
+//                    databasy.service.deleteTable(tableId);
+//                }
+//            }
+//        });
+//    },
+//
+//    createContextMenu:function (nodeType, items) {
+//        var menuId = 'schemaTree' + nodeType.charAt(0).toUpperCase() + nodeType.slice(1) + 'Cm';
+//
+//        var menu = $('<ul id="' + menuId + '" class="jeegoocontext cm_default"></ul>');
+//        for (var code in items) {
+//            var opts = items[code];
+//            $('<li code="' + code + '">' + opts.name + '</li>').appendTo(menu);
+//        }
+//        menu.appendTo('body');
+//
+//        this.contextMenusByNodeType[nodeType] = {
+//            menuId:menuId,
+//            items:items
+//        }
+//    },
 
-        this.createContextMenu('table', {
-            deleteTable:{
-                name:'Delete Table',
-                handler:function (tableId) {
-                    databasy.service.deleteTable(tableId);
-                }
-            }
-        });
-    },
+//    bindContextMenu:function (treeNode) {
+//        var contextMenu = this.contextMenusByNodeType[treeNode.attr('rel')];
+//
+//        treeNode.jeegoocontext(contextMenu.menuId, {
+//            onShow:function (e, context) {
+//                return databasy.gw.runtime.isEditor();
+//            },
+//            onSelect:function (e, context) {
+//                var code = $(e.currentTarget).attr('code');
+//                var elementId = $(context).attr('elementid');
+//                contextMenu.items[code].handler(elementId);
+//            }
+//        });
+//    },
 
-    createContextMenu:function (nodeType, items) {
-        var menuId = 'schemaTree' + nodeType.charAt(0).toUpperCase() + nodeType.slice(1) + 'Cm';
-
-        var menu = $('<ul id="' + menuId + '" class="jeegoocontext cm_default"></ul>');
-        for (var code in items) {
-            var opts = items[code];
-            $('<li code="' + code + '">' + opts.name + '</li>').appendTo(menu);
-        }
-        menu.appendTo('body');
-
-        this.contextMenusByNodeType[nodeType] = {
-            menuId:menuId,
-            items:items
-        }
-    },
-
-    bindContextMenu:function (treeNode) {
-        var contextMenu = this.contextMenusByNodeType[treeNode.attr('rel')];
-
-        treeNode.jeegoocontext(contextMenu.menuId, {
-            onShow:function (e, context) {
-                return databasy.gw.runtime.isEditor();
-            },
-            onSelect:function (e, context) {
-                var code = $(e.currentTarget).attr('code');
-                var elementId = $(context).attr('elementid');
-                contextMenu.items[code].handler(elementId);
-            }
-        });
-    },
-
-    bindContextMenuToTableNodes: function() {
-        var that = this;
-        $('li[rel=table]').each(function() {
-            that.bindContextMenu($(this));
-        });
-    },
+//    bindContextMenuToTableNodes: function() {
+//        var that = this;
+//        $('li[rel=table]').each(function() {
+//            that.bindContextMenu($(this));
+//        });
+//    },
 
     initDblClickListener:function () {
         var that = this;

@@ -1,4 +1,4 @@
-// Type definitions for GoJS 1.2
+// Type definitions for GoJS 1.3
 // Project: http://gojs.net
 // Definitions by: Barbara Duckworth <https://github.com/barbara42/>
 // Definitions: https://github.com/borisyankov/DefinitelyTyped
@@ -299,7 +299,7 @@ declare module go {
 
     /**
     * Open the context menu of a given GraphObject.
-    * The given GraphObject must have a {@link GraphObject#contextMenu}
+    * The given GraphObject must have a GraphObject#contextMenu
     * defined in order to show anything.
     * @param {GraphObject|Diagram=} obj a GraphObject or Diagram with a contextMenu defined.
     * If none is given, this method will use the first selected object, or else the Diagram.
@@ -679,6 +679,7 @@ declare module go {
 
     /**
     * Commit the changes of the current transaction.
+    * This just calls UndoManager#commitTransaction.
     * @param {string} tname a descriptive name for the transaction.
     */
     commitTransaction(tname: string): boolean;
@@ -693,6 +694,14 @@ declare module go {
     * @param {Iterable} coll a collection of Parts.
     */
     computePartsBounds(coll: Iterable): Rect;
+
+    /**
+    * Make a copy of a collection of Parts and return them in a Map mapping each original Part to its copy.
+    * @param {Iterable} coll  A List or a Set or Iterator of Parts.
+    * @param {Diagram} diagram  The destination diagram; if null, the copied parts are not added to this diagram.
+    * @param {boolean} check  Whether to check Part#canCopy on each part.
+    */
+    copyParts(coll: Iterable, diagram: Diagram, check: boolean);
 
     /**
     * Updates the diagram immediately, then resets initialization flags so that actions taken in the argument function will be considered part of Diagram initialization, and will participate in initial layouts, #initialAutoScale, #initialContentAlignment, etc.
@@ -746,8 +755,8 @@ declare module go {
     * defaulting to a predicate that always returns true.
     * @param {List|Set=} coll An optional collection (List or Set) to add the results to.
     */
-    findObjectsAt(p: Point, navig?: (obj: GraphObject) => GraphObject, pred?: (obj: GraphObject) => boolean, coll?: List): Iterable;
-    findObjectsAt(p: Point, navig?: (obj: GraphObject) => GraphObject, pred?: (obj: GraphObject) => boolean, coll?: Set): Iterable;
+    findObjectsAt(p: Point, navig?: (obj: GraphObject) => GraphObject, pred?: (obj: GraphObject) => boolean, coll: List): List;
+    findObjectsAt(p: Point, navig?: (obj: GraphObject) => GraphObject, pred?: (obj: GraphObject) => boolean, coll?: Set): Set;
 
     /**
     * Returns a collection of all GraphObjects that are inside or that intersect a given Rect in document coordinates.
@@ -762,8 +771,8 @@ declare module go {
     * if it must be entirely inside the rectangular area (false).  The default value is false.
     * @param {List|Set=} coll An optional collection (List or Set) to add the results to.
     */
-    findObjectsIn(r: Rect, navig?: (obj: GraphObject) => GraphObject, pred?: (obj: GraphObject) => boolean, partialInclusion?: boolean, coll?: List): Iterable;
-    findObjectsIn(r: Rect, navig?: (obj: GraphObject) => GraphObject, pred?: (obj: GraphObject) => boolean, partialInclusion?: boolean, coll?: Set): Iterable;
+    findObjectsIn(r: Rect, navig?: (obj: GraphObject) => GraphObject, pred?: (obj: GraphObject) => boolean, partialInclusion?: boolean, coll: List): List;
+    findObjectsIn(r: Rect, navig?: (obj: GraphObject) => GraphObject, pred?: (obj: GraphObject) => boolean, partialInclusion?: boolean, coll?: Set): Set;
 
     /**
     * Returns a collection of all GraphObjects that are within a certain distance of a given point in document coordinates.
@@ -780,8 +789,8 @@ declare module go {
     * The default is true.
     * @param {List|Set=} coll An optional collection (List or Set) to add the results to.
     */
-    findObjectsNear(p: Point, dist: number, navig?: (obj: GraphObject) => GraphObject, pred?: (obj: GraphObject) => boolean, partialInclusion?: boolean, coll?: List): Iterable;
-    findObjectsNear(p: Point, dist: number, navig?: (obj: GraphObject) => GraphObject, pred?: (obj: GraphObject) => boolean, partialInclusion?: boolean, coll?: Set): Iterable;
+    findObjectsNear(p: Point, dist: number, navig?: (obj: GraphObject) => GraphObject, pred?: (obj: GraphObject) => boolean, partialInclusion?: boolean, coll: List): List;
+    findObjectsNear(p: Point, dist: number, navig?: (obj: GraphObject) => GraphObject, pred?: (obj: GraphObject) => boolean, partialInclusion?: boolean, coll?: Set): Set;
 
     /**
     * This convenience function finds the front-most Part that is at a given point and that might be selectable.
@@ -828,7 +837,7 @@ declare module go {
     * @param {Function} derivedclass
     * @param {Function} baseclass
     */
-        static inherit(derivedclass: new(...args: any[]) => Object, baseclass: new(...args: any[]) => Object);
+    static inherit(derivedclass: new (...args: any[]) => Object, baseclass: new (...args: any[]) => Object);
 
     /**
     * Perform all invalid layouts.
@@ -857,6 +866,14 @@ declare module go {
         details: Object}=} properties a JavaScript object detailing optional arguments for image creation, to be passed to makeImageData.
     */
     makeImageData(properties?: Object): string;
+
+    /**
+    * Move a collection of Parts in this Diagram by a given offset.
+    * @param {Iterable} coll  A List or a Set or Iterator of Parts.
+    * @param {Point} offset  the X and Y change to be made to each Part, in document coordinates.
+    * @param {boolean} check  Whether to check Part#canMove on each part.
+    */
+    moveParts(coll: Iterable, offset: Point, check: boolean);
 
     /**
     * Remove all of the Parts created from model data and then create them again.
@@ -889,7 +906,15 @@ declare module go {
     removeLayer(layer: Layer);
 
     /**
+    * This method removes from this Diagram all of the Parts in a collection.
+    * @param {Iterable} coll A List or Set or Iterator of Parts.
+    * @param {boolean} check Whether to check Part#canDelete on each part.
+    */
+    removeParts(coll: Iterable, check: boolean);
+
+    /**
     * Rollback the current transaction, undoing any recorded changes.
+    * This just calls UndoManager#rollbackTransaction.
     */
     rollbackTransaction(): boolean;
 
@@ -922,6 +947,7 @@ declare module go {
 
     /**
     * Begin a transaction, where the changes are held by a Transaction object in the UndoManager.
+    * This just calls UndoManager#startTransaction.
     * @param {string=} tname a descriptive name for the transaction.
     */
     startTransaction(tname?: string): boolean;
@@ -1333,6 +1359,9 @@ declare module go {
     /**Gets or sets whether the size of the area of the Group's #placeholder should remain the same during a DraggingTool move until a drop occurs.*/
     computesBoundsAfterDrag: boolean;
 
+    /**Gets or sets whether the bounds of a Group's Placeholder includes the bounds of member Links.*/
+    computesBoundsIncludingLinks: boolean;
+
     /**Gets or sets whether the subgraph contained by this group is expanded.*/
     isSubGraphExpanded: boolean;
 
@@ -1587,8 +1616,8 @@ declare module go {
     * defaulting to a predicate that always returns true.
     * @param {List|Set=} coll An optional collection (List or Set) to add the results to.
     */
-    findObjectsAt(p: Point, navig?: (obj: GraphObject) => GraphObject, pred?: (obj: GraphObject) => boolean, coll?: List): Iterable;
-    findObjectsAt(p: Point, navig?: (obj: GraphObject) => GraphObject, pred?: (obj: GraphObject) => boolean, coll?: Set): Iterable;
+    findObjectsAt(p: Point, navig?: (obj: GraphObject) => GraphObject, pred?: (obj: GraphObject) => boolean, coll: List): List;
+    findObjectsAt(p: Point, navig?: (obj: GraphObject) => GraphObject, pred?: (obj: GraphObject) => boolean, coll?: Set): Set;
 
     /**
     * Returns a collection of all GraphObjects that are inside or that intersect a given Rect in document coordinates.
@@ -1603,8 +1632,8 @@ declare module go {
     * if it must be entirely inside the rectangular area (false).  The default value is false.
     * @param {List|Set=} coll An optional collection (List or Set) to add the results to.
     */
-    findObjectsIn(r: Rect, navig?: (obj: GraphObject) => GraphObject, pred?: (obj: GraphObject) => boolean, partialInclusion?: boolean, coll?: List): Iterable;
-    findObjectsIn(r: Rect, navig?: (obj: GraphObject) => GraphObject, pred?: (obj: GraphObject) => boolean, partialInclusion?: boolean, coll?: Set): Iterable;
+    findObjectsIn(r: Rect, navig?: (obj: GraphObject) => GraphObject, pred?: (obj: GraphObject) => boolean, partialInclusion?: boolean, coll: List): List;
+    findObjectsIn(r: Rect, navig?: (obj: GraphObject) => GraphObject, pred?: (obj: GraphObject) => boolean, partialInclusion?: boolean, coll?: Set): Set;
 
     /**
     * Returns a collection of all GraphObjects that are within a certain distance of a given point in document coordinates.
@@ -1620,8 +1649,8 @@ declare module go {
     * if it must be entirely inside the circular area (false).  The default value is true.
     * @param {List|Set=} coll An optional collection (List or Set) to add the results to.
     */
-    findObjectsNear(p: Point, dist: number, navig?: (obj: GraphObject) => GraphObject, pred?: (obj: GraphObject) => boolean, partialInclusion?: boolean, coll?: List): Iterable;
-    findObjectsNear(p: Point, dist: number, navig?: (obj: GraphObject) => GraphObject, pred?: (obj: GraphObject) => boolean, partialInclusion?: boolean, coll?: Set): Iterable;
+    findObjectsNear(p: Point, dist: number, navig?: (obj: GraphObject) => GraphObject, pred?: (obj: GraphObject) => boolean, partialInclusion?: boolean, coll: List): List;
+    findObjectsNear(p: Point, dist: number, navig?: (obj: GraphObject) => GraphObject, pred?: (obj: GraphObject) => boolean, partialInclusion?: boolean, coll?: Set): Set;
   }
 
   /**
@@ -1770,31 +1799,31 @@ declare module go {
     */
     getLinkDirection(node: Node, port: GraphObject, linkpoint: Point, spot: Spot, from: boolean, ortho: boolean, othernode: Node, otherport: GraphObject): number;
 
-        /**
-        * Compute the point on a node/port at which the route of a link should end.
-        * @param {Node} node
-        * @param {GraphObject} port the GraphObject representing a port on the node.
-        * @param {Spot} spot a Spot value describing where the link should connect.
-        * @param {boolean} from true if the link is coming out of the port; false if going to the port.
-        * @param {boolean} ortho whether the link should have orthogonal segments.
-        * @param {Node} othernode the node at the other end of the link.
-        * @param {GraphObject} otherport the GraphObject port at the other end of the link.
-        * @param {Point=} result an optional Point that is modified and returned; otherwise it allocates and returns a new Point
-        */
-        getLinkPoint(node: Node, port: GraphObject, spot: Spot, from: boolean, ortho: boolean, othernode: Node, otherport: GraphObject, result?: Point)
+    /**
+    * Compute the point on a node/port at which the route of a link should end.
+    * @param {Node} node
+    * @param {GraphObject} port the GraphObject representing a port on the node.
+    * @param {Spot} spot a Spot value describing where the link should connect.
+    * @param {boolean} from true if the link is coming out of the port; false if going to the port.
+    * @param {boolean} ortho whether the link should have orthogonal segments.
+    * @param {Node} othernode the node at the other end of the link.
+    * @param {GraphObject} otherport the GraphObject port at the other end of the link.
+    * @param {Point=} result an optional Point that is modified and returned; otherwise it allocates and returns a new Point
+    */
+    getLinkPoint(node: Node, port: GraphObject, spot: Spot, from: boolean, ortho: boolean, othernode: Node, otherport: GraphObject, result?: Point): Point;
 
-        /**
-        * Compute the intersection point for the edge of a particular port GraphObject, given a point, when no particular spot or side has been specified.
-        * @param {Node} node
-        * @param {GraphObject} port the GraphObject representing a port on the node.
-        * @param {Point} focus the point in document coordinates to/from which the link should point,
-        *   normally the center of the port.
-        * @param {Point} p often this point is far away from the node, to give a general direction,
-        *   particularly an orthogonal one.
-        * @param {boolean} from true if the link is coming out of the port; false if going to the port.
-        * @param {Point=} result an optional Point that is modified and returned; otherwise it allocates and returns a new Point
-        */
-        getLinkPointFromPoint(node: Node, port: GraphObject, focus: Point, p: Point, from: boolean, result?: Point): Point;
+    /**
+    * Compute the intersection point for the edge of a particular port GraphObject, given a point, when no particular spot or side has been specified.
+    * @param {Node} node
+    * @param {GraphObject} port the GraphObject representing a port on the node.
+    * @param {Point} focus the point in document coordinates to/from which the link should point,
+    *   normally the center of the port.
+    * @param {Point} p often this point is far away from the node, to give a general direction,
+    *   particularly an orthogonal one.
+    * @param {boolean} from true if the link is coming out of the port; false if going to the port.
+    * @param {Point=} result an optional Point that is modified and returned; otherwise it allocates and returns a new Point
+    */
+    getLinkPointFromPoint(node: Node, port: GraphObject, focus: Point, p: Point, from: boolean, result?: Point): Point;
 
     /**
     * Given a Node, return the node at the other end of this link.
@@ -1911,6 +1940,9 @@ declare module go {
 
     /**Gets or sets the function that is called after a Link has been disconnected from this Node.*/
     linkDisconnected: (a: Node, b: Link, c: GraphObject) => void;
+
+    /**Gets or sets a predicate that determines whether or not a Link may be connected with this node; any of the arguments may be null.*/
+    linkValidation: (from: Node, fromPort: GraphObject, to: Node, toPort: GraphObject, link: Link) => boolean;
 
     /**Gets an iterator over all of the Links that are connected with this node.*/
     linksConnected: Iterator;
@@ -4116,29 +4148,86 @@ declare module go {
     */
     constructor(targetprop?: string, sourceprop?: string, conv?: (a: any, b?: any) => any);
 
-    /**Gets or sets a converter function to apply to the GraphObject property value in order to produce the value to set to a data property.*/
+    /**
+    * Gets or sets a converter function to apply to the GraphObject property value
+    * in order to produce the value to set to a data property.
+    * This conversion function is only used in a TwoWay binding,
+    * when transferring a value from the target to the source.
+    * The default value is null -- no conversion takes place.
+    * Otherwise the value should be a function that takes one or two arguments
+    * and returns the desired value.
+    * However, the return value is ignored when the #sourceProperty
+    * is the empty string.
+    * The function is passed the value from the target
+    * (the first argument) and the source Panel#data object (the second argument).
+    * If the #sourceProperty is a property name, that property is set to
+    * the function's return value.
+    * If the #sourceProperty is the empty string, the function should
+    * modify the second argument, which will be the source data object.
+    */
     backConverter: (a: any, b?: any) => any;
 
-    /**Gets or sets a converter function to apply to the data property value in order to produce the value to set to the target property.*/
+    /**
+    * Gets or sets a converter function to apply to the data property value
+    * in order to produce the value to set to the target property.
+    * This conversion function is used in both OneWay and TwoWay bindings,
+    * when transferring a value from the source to the target.
+    * The default value is null -- no conversion takes place.
+    * Otherwise the value should be a function that takes one or two arguments
+    * and returns the desired value.
+    * However, the return value is ignored when the #targetProperty
+    * is the empty string.
+    * The function is passed the value from the source
+    * (the first argument) and the target GraphObject (the second argument).
+    * If the #targetProperty is a property name, that property is set to
+    * the function's return value.
+    * If the #targetProperty is the empty string, the function should
+    * modify the second argument, which will be the target object.
+    */
     converter: (a: any, b?: any) => any;
 
-    /**Gets or sets the directions and frequency in which the binding may be evaluated.*/
+    /**
+    * Gets or sets the directions and frequency in which the binding may be evaluated.
+    * The default value is Binding#OneWay.
+    * Binding#TwoWay is the other choice.
+    * Use OneWay bindings to initialize GraphObject properties based on model data,
+    * or to modify GraphObject properties when the model data changes will a call to Model#setDataProperty.
+    * Use TwoWay bindings to keep model data in sync with changes to GraphObject properties.
+    * For efficiency, avoid TwoWay bindings on GraphObject properties that do not change value in your app.
+    * You should not have a TwoWay binding on a node data object's key property.
+    */
     mode: EnumValue;
 
-    /**Gets or sets the name of the GraphObject that should act as a source object whose property should be gotten by this data binding.*/
+    /**
+    * Gets or sets the name of the GraphObject that should act as a source object
+    * whose property should be gotten by this data binding.
+    * The default value is null, which uses the bound Panel#data as the source.
+    * If the value is a string, it should be the name of a GraphObject in the
+    * visual tree of the Panel that is bound to the data.
+    * Use the empty string to refer to the root panel.
+    */
     sourceName: string;
 
-    /**Gets or sets the name of the property to get from the bound data object, the value of Panel#data.*/
+    /**
+    * Gets or sets the name of the property to get from the bound data object,
+    * the value of Panel#data.
+    * The default value is the empty string, which results in setting the target
+    * property to the whole data object, rather than to a property value of the data object.
+    */
     sourceProperty: string;
 
-    /**Gets or sets the name of the property to be set on the target GraphObject.*/
+    /**
+    * Gets or sets the name of the property to be set on the target GraphObject.
+    * The default value is the empty string; you normally set this to be the name of a property.
+    */
     targetProperty: string;
 
     /**
     * Modify this Binding to set its #mode to be Binding#TwoWay, and
     * provide an optional conversion function to convert GraphObject property
     * values back to data values.
-    *
+    * Use TwoWay bindings to keep model data in sync with changes to GraphObject properties.
+    * For efficiency, avoid TwoWay bindings on GraphObject properties that do not change value in your app.
     * You should not have a TwoWay binding on a node data object's key property.
     * @param {function(*,*=) | null=} backconv
     */
@@ -4153,12 +4242,25 @@ declare module go {
     ofObject(srcname?: string): Binding;
 
     /**
-    * This static method can be used to create a function that parses a string into an enumerated value, given the class that the enumeration values are defined on and a default value if the string cannot be parsed successfully.
+    * This static method can be used to create a function that parses
+    * a string into an enumerated value, given the class that the enumeration values
+    * are defined on and a default value if the string cannot be parsed successfully.
+    * The normal usage is to pass the result of this function as the conversion function of a Binding.
+    * This binding will try to parse the string that is the value of the bound data's "dataPropName" property.
+    * If it is a legitimate enumerated value defined on the Link class, the conversion
+    * function will return that value.
+    * If the bound data's "dataPropName" property is not present or has an unrecognized value,
+    * the Link#routing property gets the default value, Link#Normal.
+    * @param {function()} ctor the class constructor that defines the enumerated values that are being parsed.
+    * @param {EnumValue} defval the default enumerated value to return if it fails to parse the given string.
     */
-        static parseEnum(ctor: new(...args: any[]) => Object, defval: EnumValue): (a: string) => EnumValue;
+    static parseEnum(ctor: new (...args: any[]) => Object, defval: EnumValue): (a: string) => EnumValue;
 
     /**
-    * This static method can be used to convert an object to a string, looking for commonly defined data properties, such as "text", "name", "key", or "id".
+    * This static method can be used to convert an object to a string,
+    * looking for commonly defined data properties, such as "text", "name", "key", or "id".
+    * If none are found, this just calls toString() on it.
+    * @param {*} val
     */
     static toString(val: any): string;
 
@@ -4285,16 +4387,35 @@ declare module go {
     */
     constructor(nodedataarray?: Array<Object>, linkdataarray?: Array<Object>);
 
-    /**Gets or sets a data object that will be copied and added to the model as a new node data each time there is a link reference (either the "to" or the "from" of a link data) to a node key that does not yet exist in the model.*/
+    /**
+    * Gets or sets a data object that will be copied and added to the model as a new node data each time there
+    * is a link reference (either the "to" or the "from" of a link data) to a node key that does not yet exist in the model.
+    * The default value is null -- node data is not automatically copied and added to the model
+    * when there is an unresolved reference in a link data.
+    * When adding or modifying a link data if there is a "from" or "to" key value for which Model#findNodeDataForKey returns null,
+    * it will call Model#copyNodeData on this property value and Model#addNodeData on the result.
+    */
     archetypeNodeData: Object;
 
-    /**Gets or sets a function that makes a copy of a link data object.*/
+    /**
+    * Gets or sets a function that makes a copy of a link data object.
+    * You may need to set this property in order to ensure that a copied Link is bound
+    * to data that does not share certain data structures between the original link data and the copied link data.
+    * The value may be null in order to cause #copyLinkData to make a shallow copy of a JavaScript Object.
+    * The default value is null.
+    */
     copyLinkDataFunction: (obj: Object, model: GraphLinksModel) => Object;
 
-    /**Gets or sets the name of the data property that returns a string describing that data's category, or a function that takes a link data object and returns that category string; the default value is the name 'category'.*/
+    /**
+    * Gets or sets the name of the data property that returns a string naming that data's category,
+    * or a function that takes a link data object and returns that category string;
+    * the default value is the name 'category'.
+    * This is used by the diagram to distinguish between different kinds of links.
+    * The name must not be null.
+    */
     linkCategoryProperty: any;
 
-    /**Gets or sets the array of link data objects that correspond to Links in the Diagram.*/
+    /**Gets or sets the array of link data objects that correspond to Links in the Diagram; the initial value is an empty Array.*/
     linkDataArray: Array<Object>;
 
     /**
@@ -4308,26 +4429,64 @@ declare module go {
     */
     linkFromKeyProperty: any;
 
-    /**Gets or sets the name of the data property that returns the optional parameter naming a "port" element on the node that the link data is connected from, or a function that takes a link data object and returns that string.*/
+    /**
+    * Gets or sets the name of the data property that returns the optional parameter naming a "port" element on the node that the link data is connected from,
+    * or a function that takes a link data object and returns that string.
+    * The default value is the empty string indicating that one cannot distinguish
+    * different logical connection points for any links.
+    * The name must not be null.
+    */
     linkFromPortIdProperty: any;
 
-    /**Gets or sets the name of the data property that returns an array of keys of node data that are labels on that link data, or a function that takes a link data object and returns such an array; the default value is the empty string: ''.*/
+    /**
+    * Gets or sets the name of the data property that returns
+    * an array of keys of node data that are labels on that link data,
+    * or a function that takes a link data object and returns such an array;
+    * the default value is the empty string: ''.
+    * The name must not be null.
+    * If the value is an empty string,
+    * #getLabelKeysForLinkData will return an empty array for all link data objects.
+    * You will need to set this property in order to support nodes as link labels.
+    */
     linkLabelKeysProperty: any;
 
-    /**Gets or sets the name of the data property that returns the key of the node data that the link data is going to, or a function that takes a link data object and returns that key; the default value is the name 'to'.*/
+    /**
+    * Gets or sets the name of the data property that returns
+    * the key of the node data that the link data is going to,
+    * or a function that takes a link data object and returns that key;
+    * the default value is the name 'to'.
+    * The name must not be null.
+    */
     linkToKeyProperty: any;
 
-    /**Gets or sets the name of the data property that returns the optional parameter naming a "port" element on the node that the link data is connected to, or a function that takes a link data object and returns that string.*/
+    /**
+    * Gets or sets the name of the data property that returns
+    * the optional parameter naming a "port" element on the node that the link data is connected to,
+    * or a function that takes a link data object and returns that string.
+    * The default value is the empty string indicating that one cannot distinguish
+    * different logical connection points for any links.
+    * The name must not be null.
+    */
     linkToPortIdProperty: any;
 
-    /**Gets or sets the name of the property on node data that specifies the string or number key of the group data that "owns" that node data, or a function that takes a node data object and returns that group key.*/
+    /**
+    * Gets or sets the name of the property on node data that specifies
+    * the string or number key of the group data that "owns" that node data,
+    * or a function that takes a node data object and returns that group key.
+    * the default value is the name 'group'.
+    * The value must not be null.
+    */
     nodeGroupKeyProperty: any;
 
-    /**Gets or sets the name of the boolean property on node data that indicates whether the data should be represented as a group of nodes and links or as a simple node, or a function that takes a node data object and returns true or false; the default value is the name 'isGroup'.*/
+    /**
+    * Gets or sets the name of the boolean property on node data that indicates
+    * whether the data should be represented as a group of nodes and links or
+    * as a simple node,
+    * or a function that takes a node data object and returns true or false;
+    * the default value is the name 'isGroup'.
+    * The value must not be null.
+    */
     nodeIsGroupProperty: any;
-
-        /**Gets or sets the name of the boolean property on node data that indicates whether the data should be represented as a node acting as a label on a link instead of being a regular node, or a function that takes a node data object and returns true or false; the default value is the empty string: ''.*/
-        nodeIsLinkLabelProperty: any;
 
     /**
     * Adds a node key value that identifies a node data acting as a new label node on the given link data.
@@ -4356,11 +4515,13 @@ declare module go {
     containsLinkData(linkdata: Object): boolean;
 
     /**
-    * Gets or sets a function that makes a copy of a link data object.
-    * You may need to set this property in order to ensure that a copied Link is bound
-    * to data that does not share certain data structures between the original link data and the copied link data.
-    * The value may be null in order to cause #copyLinkData to make a shallow copy of a JavaScript Object.
-    * The default value is null.
+    * Make a copy of a link data object.
+    * This uses the value of #copyLinkDataFunction to actually perform the copy,
+    * unless it is null, in which case this method just makes a shallow copy of the JavaScript Object.
+    * This does not modify the model -- the returned data object is not added to this model.
+    * This assumes that the data's constructor can be called with no arguments.
+    * This also makes sure there is no reference to either the "from" or the "to" node of the original data.
+    * @param {Object} linkdata a JavaScript object representing a link.
     */
     copyLinkData(linkdata: Object): Object;
 
@@ -4421,15 +4582,6 @@ declare module go {
     isGroupForNodeData(nodedata: Object): boolean;
 
     /**
-        * See if the given node data should act as a label on a link, in order to support
-        * the appearance and behavior of having links connected to links.
-        * This value must not change as long as the node data is part of the model.
-        * At the current time there is no <code>setIsLinkLabelForNodeData</code> method.
-        * @param {Object} nodedata a JavaScript object representing a node, group, or non-link.
-        */
-        isLinkLabelForNodeData(nodedata: Object): boolean;
-
-        /**
     * Removes a node key value that identifies a node data acting as a former label node on the given link data.
     * Removing a reference to a node data from the collection of link label keys
     * does not automatically remove any node data from the model.
@@ -4454,7 +4606,7 @@ declare module go {
     * Change the category of a given link data, a string naming the link template
     * that the Diagram should use to represent the link data.
     * Changing the link template for a link data will cause the existing Link
-    * to be removed from the Diagram} and replaced with a new Link
+    * to be removed from the Diagram and be replaced with a new Link
     * created by copying the new link template and applying any data-bindings.
     * @param {Object} linkdata a JavaScript object representing a link.
     * @param {string} cat Must not be null.
@@ -4525,34 +4677,37 @@ declare module go {
     */
     constructor(nodedataarray?: Array<Object>);
 
-    /**Gets or sets a function that makes a copy of a node data object.*/
+    /**Gets or sets a function that makes a copy of a node data object; the default value is null, resulting in the standard behavior which is to make a shallow copy of the object.*/
     copyNodeDataFunction: (obj: Object, model: Model) => Object;
 
-    /**Gets or sets the name of the format of the diagram data.*/
+    /**Gets or sets the name of the format of the diagram data; the default value is the empty string.*/
     dataFormat: string;
 
-    /**Gets or sets whether this model may be modified, such as adding nodes.*/
+    /**Gets or sets whether this model may be modified, such as adding nodes; by default this value is false.*/
     isReadOnly: boolean;
 
-    /**Gets or sets a function that returns a unique id number or string for a node data object.*/
-        makeUniqueKeyFunction: (model: Model, obj:Object) => any;
+    /**Gets or sets a function that returns a unique id number or string for a node data object; the default value is null.*/
+    makeUniqueKeyFunction: (model: Model, obj: Object) => any;
 
-    /**Gets or sets the name of this model.*/
+    /**Gets a JavaScript Object that can hold programmer-defined property values for the model as a whole, rather than just for one node or one link; by default this is an object with no properties.*/
+    modelData: Object;
+
+    /**Gets or sets the name of this model; the initial name is an empty string.*/
     name: string;
 
-    /**Gets or sets the name of the node data property that returns a string describing that data's category, or a function that takes a node data object and returns the category name; the default value is the name 'category'.*/
+    /**Gets or sets the name of the node data property that returns a string naming that data's category, or a function that takes a node data object and returns the category name; the default value is the name 'category'.*/
     nodeCategoryProperty: any;
 
-    /**Gets or sets the array of node data objects that correspond to Nodes, Groups, or non-Link Parts in the Diagram.*/
+    /**Gets or sets the array of node data objects that correspond to Nodes, Groups, or non-Link Parts in the Diagram; the initial value is an empty Array.*/
     nodeDataArray: Array<Object>;
 
     /**Gets or sets the name of the data property that returns a unique id number or string for each node data object, or a function taking a node data object and returning the key value; the default value is the name 'key'.*/
     nodeKeyProperty: any;
 
-    /**Gets or sets whether ChangedEvents are not recorded by the UndoManager.*/
+    /**Gets or sets whether ChangedEvents are not recorded by the UndoManager; the initial and normal value is false.*/
     skipsUndoManager: boolean;
 
-    /**Gets or sets the UndoManager for this Model.*/
+    /**Gets or sets the UndoManager for this Model; the default UndoManager has its UndoManager#isEnabled property set to false.*/
     undoManager: UndoManager;
 
     /**
@@ -4570,7 +4725,7 @@ declare module go {
     * This registration does not raise a ChangedEvent.
     * @param {function(ChangedEvent)} listener a function that takes a ChangedEvent as its argument.
     */
-        addChangedListener(listener: (e: ChangedEvent)=>void);
+    addChangedListener(listener: (e: ChangedEvent) => void);
 
     /**
     * When you want to add a node or group to the diagram,
@@ -4585,6 +4740,10 @@ declare module go {
 
     /**
     * Clear out all references to any model data.
+    * This also clears out the UndoManager, so this operation is not undoable.
+    * This method is called by Diagram#clear; it does not notify any Diagrams or other listeners.
+    * Instead of calling this method, you may prefer to set #nodeDataArray to an empty JavaScript Array.
+    * If this model is a GraphLinksModel, you would also want to set GraphLinksModel#linkDataArray to a separate empty JavaScript Array.
     */
     clear();
 
@@ -4620,6 +4779,9 @@ declare module go {
 
     /**
     * This static method parses a string in JSON format and constructs, initializes, and returns a model.
+    * Note that properties with values that are functions are not written out by #toJson,
+    * so reading in such a model will require constructing such a model, initializing its functional property values,
+    * and explicitly passing it in as the second argument.
     * @param {string|Object} s a String in JSON format containing all of the persistent properties of the model, or an Object already read from JSON text.
     * @param {model=} model an optional model to be modified; if not supplied, it constructs and returns a new model whose name is specified by the "class" property.
     */
@@ -4635,6 +4797,7 @@ declare module go {
 
     /**
     * Given a node data object return its unique key: a number or a string.
+    * This returns undefined if there is no key value.
     * It is possible to change the key for a node data object by calling #setKeyForNodeData.
     * @param {Object} nodedata a JavaScript object representing a node, group, or non-link.
     */
@@ -4712,7 +4875,7 @@ declare module go {
     * This deregistration does not raise a ChangedEvent.
     * @param {function(ChangedEvent)} listener a function that takes a ChangedEvent as its argument.
     */
-        removeChangedListener(listener: (e:ChangedEvent) => void);
+    removeChangedListener(listener: (e: ChangedEvent) => void);
 
     /**
     * When you want to remove a node or group from the diagram,
@@ -4731,6 +4894,7 @@ declare module go {
 
     /**
     * Rollback the current transaction, undoing any recorded changes.
+    * This just calls UndoManager#rollbackTransaction.
     */
     rollbackTransaction(): boolean;
 
@@ -4747,12 +4911,10 @@ declare module go {
     setCategoryForNodeData(nodedata: Object, cat: string);
 
     /**
-    * @ignore
     * Change the value of some property of a node data, a link data, or an item data, given a string naming the property
     * and the new value, in a manner that can be undone/redone and that automatically updates any bindings.
-    * This override handles link data as well as node data.
     * This gets the old value of the property; if the value is the same as the new value, no side-effects occur.
-    * @param {Object} data a JavaScript object representing a node, group, or non-link.
+    * @param {Object} data a JavaScript object representing a Node, Link, Group, simple Part, or item in a Panel#itemArray.
     * @param {string} propname a string that is not null or the empty string.
     * @param {*} val the new value for the property.
     */
@@ -4773,18 +4935,25 @@ declare module go {
 
     /**
     * Begin a transaction, where the changes are held by a Transaction object in the UndoManager.
-    * This just calls UndoManager.startTransaction.
+    * This just calls UndoManager#startTransaction.
     * @param {string=} tname a descriptive name for the transaction.
     */
     startTransaction(tname?: string): boolean;
 
     /**
     * Generate a string representation of the persistent data in this model, in JSON format.
-    * Object properties whose names start with "_" are not written out.
+    * Object properties that are not enumerable or whose names start with "_" are not written out.
     * Functions are not able to be written in JSON format, so any properties that have function values
     * will not be saved in the JSON string.
     * There must not be any circular references within the model data.
     * Any sharing of object references will be lost in the written JSON.
+    * Most object classes cannot be serialized into JSON without special knowledge and processing at both ends.
+    * The #toJson and Model#fromJson methods automatically do such processing for numbers that are NaN
+    * and for objects that are of class Point, Size, Rect, Margin, Spot,
+    * Brush (but not for brush patterns), and for Geometry.
+    * However, we recommend that you use Binding converters (static functions named "parse" and "stringify")
+    * to represent Points, Sizes, Rects, Margins, Spots, and Geometries as string values in your data, rather than as Objects.
+    * This makes the JSON text smaller and simpler and easier to read.
     * @param {string=} classname The optional name of the model class to use in the output;
     *     for the standard models, this is their class name prefixed with "go.".
     */
@@ -4859,10 +5028,22 @@ declare module go {
     */
     constructor(nodedataarray?: Array<Object>);
 
-    /**Gets or sets the name of the property on node data that specifies the string or number key of the node data that acts as the "parent" for this "child" node data, or a function that takes a node data object and returns that parent key; the default value is the name 'parent'.*/
+    /**
+    * Gets or sets the name of the property on node data that specifies
+    * the string or number key of the node data that acts as the "parent" for this "child" node data,
+    * or a function that takes a node data object and returns that parent key;
+    * the default value is the name 'parent'.
+    * The value must not be null nor an empty string.
+    */
     nodeParentKeyProperty: any;
 
-    /**Gets or sets the name of the data property that returns a string describing that node data's parent link's category, or a function that takes a node data object and returns its parent link's category string; the default value is the name 'parentLinkCategory'.*/
+    /**
+    * Gets or sets the name of the data property that returns a string describing that node data's parent link's category,
+    * or a function that takes a node data object and returns its parent link's category string;
+    * the default value is the name 'parentLinkCategory'.
+    * This is used by the diagram to distinguish between different kinds of links.
+    * The name must not be null.
+    */
     parentLinkCategoryProperty: any;
 
     /**
@@ -4888,7 +5069,6 @@ declare module go {
     /**
     * Change the category for the parent link of a given child node data, a string naming the link template
     * that the Diagram should use to represent the link.
-    *
     * Changing the link template will cause any existing Link
     * to be removed from the Diagram and replaced with a new Link
     * created by copying the new link template and applying any data-bindings.
@@ -5407,7 +5587,7 @@ declare module go {
     cellSize: Size;
 
     /**Gets or sets the comparison function used to sort the parts.*/
-        comparer: (a:Part, b:Part) => number;
+    comparer: (a: Part, b: Part) => number;
 
     /**Gets or sets what order to place the parts.*/
     sorting: EnumValue;
@@ -6029,7 +6209,7 @@ declare module go {
     alternateCompaction: EnumValue;
 
     /**Gets or sets the default comparison function used for sorting.*/
-        alternateComparer: (a:TreeVertex, b:TreeVertex) => number;
+    alternateComparer: (a: TreeVertex, b: TreeVertex) => number;
 
     /**Gets or sets the object holding the default values for alternate layer TreeVertexes, used when the #treeStyle is #StyleAlternating or #StyleLastParents.*/
     alternateDefaults: TreeVertex;
@@ -6092,7 +6272,7 @@ declare module go {
     compaction: EnumValue;
 
     /**Gets or sets the default comparison function used for sorting.*/
-        comparer: (a:TreeVertex, b:TreeVertex) => number;
+    comparer: (a: TreeVertex, b: TreeVertex) => number;
 
     /**Gets or sets the distance between a parent node and its children.*/
     layerSpacing: number;
@@ -6580,6 +6760,9 @@ declare module go {
     /**Gets the collection of Parts being dragged.*/
     draggedParts: Map;
 
+    /** Gets or sets whether the user can drag a single Link, disconnecting it from its connected nodes and possibly connecting it to valid ports when the link is dropped.*/
+    dragsLink: boolean;
+
     /**Gets or sets whether moving or copying a node also includes all of the node's tree children and their descendants, along with the links to those additional nodes.*/
     dragsTree: boolean;
 
@@ -6709,7 +6892,7 @@ declare module go {
   * There is a temporary part, the #box,
   * that shows the current area encompassed between the mouse-down
   * point and the current mouse point.
-  * The default drag selection box is a magenta rectangle.
+  * The default drag selection box is a blue rectangle.
   * You can change the #box to customize its appearance -- see its documentation for an example.
   */
   class DragSelectingTool extends Tool {
@@ -6775,6 +6958,9 @@ declare module go {
 
     /**Gets whether the linking operation is in the forwards direction, connecting from the "From" port to the "To" port.*/
     isForwards: boolean;
+
+    /**Gets or sets whether it is valid to have partly or completely unconnected links.*/
+    isUnconnectedLinkValid: boolean;
 
     /**Gets or sets a predicate that determines whether or not a new link between two ports would be valid.*/
     linkValidation: (fromNode: Node, fromPort: GraphObject, toNode: Node, toPort: GraphObject, link: Link) => boolean;
@@ -7038,6 +7224,19 @@ declare module go {
     doMouseUp();
 
     /**
+    * Get the permitted reshaping behavior for a particular reshape handle.
+    * @param {GraphObject} obj a reshape handle in the "LinkReshaping" Adornment.
+    */
+    getReshapingBehavior(obj: GraphObject): EnumValue;
+
+    /**
+    * Set the permitted reshaping behavior for a particular reshape handle.
+    * @param {GraphObject} obj a reshape handle in the "LinkReshaping" Adornment.
+    * @param {EnumValue} behavior one of LinkReshapingTool.All, .Vertical, .Horizontal, or .None
+    */
+    setReshapingBehavior(obj: GraphObject, behavior: EnumValue);
+
+    /**
     * Change the route of the #adornedLink by moving the point corresponding to the current #handle to be at the given Point.
     * @param {Point} newPoint
     */
@@ -7132,6 +7331,13 @@ declare module go {
     * This tool can run when the diagram allows relinking, the model is modifiable, and there is a relink handle at the mouse-down point.
     */
     canStart(): boolean;
+
+    /**
+    * Make a temporary link look and act like the real Link being relinked.
+    * @param {Link} reallink
+    * @param {Link} templink
+    */
+    copyLinkProperties(reallink: Link, templink: Link);
 
     /**
     * Start the relinking operation.
@@ -7829,7 +8035,7 @@ declare module go {
     * This creates a List that checks the type of the values to be instances of a particular kind of Object.
     * @param {function(...)} type this must be a class function/constructor.
     */
-        constructor(type: new(...args: any[]) => Object);
+    constructor(type: new (...args: any[]) => Object);
     /**
     * This creates a List that may check the types of the values.
     * @param {string=} type if supplied, this must be one of: 'number', 'string', 'boolean', or 'function' for the value type.
@@ -7959,19 +8165,19 @@ declare module go {
     * @param {function(...)} keytype if supplied, this must be a class function/constructor.
     * @param {function(...)} valtype if supplied, this must be a class function/constructor.
     */
-        constructor(keytype: new(...args: any[]) => Object, valtype: new(...args: any[]) => Object);
+    constructor(keytype: new (...args: any[]) => Object, valtype: new (...args: any[]) => Object);
     /**
     * This creates a Map that may check the types of the keys and/or values.
     * @param {string=} keytype if supplied, this must be one of: 'number' or 'string' for the key type.
     * @param {function(...)} valtype if supplied, this must be a class function/constructor.
     */
-        constructor(keytype: string, valtype: new(...args: any[]) => Object);
+    constructor(keytype: string, valtype: new (...args: any[]) => Object);
     /**
     * This creates a Map that may check the types of the keys and/or values.
     * @param {function(...)} keytype if supplied, this must be a class function/constructor.
     * @param {string} valtype if supplied, this must be one of: 'number', 'string', 'boolean', or 'function' for the value type.
     */
-        constructor(keytype: new(...args: any[]) => Object, valtype: string);
+    constructor(keytype: new (...args: any[]) => Object, valtype: string);
     /**
     * This creates a Map that may check the types of the keys and/or values.
     * @param {string=} keytype if supplied, this must be one of: 'number' or 'string' for the key type.
@@ -8046,7 +8252,7 @@ declare module go {
     * This creates a Set that checks the type of the values.
     * @param {function(...)} type this must be a class function/constructor.
     */
-        constructor(type: new(...args: any[]) => Object);
+    constructor(type: new (...args: any[]) => Object);
     /**
     * This creates a Set that may check the types of the values.
     * @param {string=} type if supplied, this must be one of: 'number' or 'string' for the key type.

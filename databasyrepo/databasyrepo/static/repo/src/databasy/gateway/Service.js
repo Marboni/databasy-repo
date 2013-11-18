@@ -19,7 +19,10 @@ databasy.gateway.Service = Class.extend({
         });
         databasy.gw.executeCommand(command);
 
-        return tableId;
+        return {
+            elementId: tableId,
+            reprId: reprId
+        };
     },
 
     renameTable: function(tableId, name) {

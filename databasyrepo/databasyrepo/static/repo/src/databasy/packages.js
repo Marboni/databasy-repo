@@ -24,7 +24,8 @@ var databasy = {
     ui: {
         general: {},
         property: {},
-        gojs: {}
+        gojs: {},
+        utils: {}
     },
     utils: {
         events: {},

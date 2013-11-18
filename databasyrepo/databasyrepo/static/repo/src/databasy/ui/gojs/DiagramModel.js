@@ -15,24 +15,49 @@ databasy.ui.gojs.DiagramModel = Class.extend({
         this.diagram.commitTransaction('tx');
     },
 
-    setReadOnly: function(readOnly) {
+    cursorViewPosition: function() {
+        return this.diagram.lastInput.viewPoint;
+    },
+
+    cursorDocPosition: function() {
+        return this.diagram.transformViewToDoc(this.cursorViewPosition())
+    },
+
+    select: function(reprId) {
+        var node = this.diagram.findNodeForKey(reprId);
+        if (!node) {
+            throw new Error('Repr ID ' + reprId + ' not exists in the diagram.');
+        }
+        this.diagram.select(node);
+    },
+
+    setReadOnly:function (readOnly) {
+        if (this.diagram.isReadOnly === readOnly) {
+            return;
+        }
+
         this.diagram.isReadOnly = readOnly;
-        this.diagram.allowResize = !readOnly;
+
         var canvasWrapper = $('#canvasWrapper');
         if (readOnly) {
             canvasWrapper.addClass('readonly');
         } else {
             canvasWrapper.removeClass('readonly');
         }
+
+        var selectionIt = this.diagram.selection.iterator;
+        while (selectionIt.next()) {
+            selectionIt.value.updateAdornments();
+        }
     },
 
-    createTable:function (tableReprId, name, position) {
+    createTable:function (tableReprId, name, width, position) {
         var data = {
             key:tableReprId,
             name:name,
             position:position,
-            width:undefined, // default
-            hasOpenDiscussions: false,
+            width:width,
+            hasOpenDiscussions:false,
             columns:[],
             category:'table'
         };
@@ -75,7 +100,7 @@ databasy.ui.gojs.DiagramModel = Class.extend({
             elementId:columnElementId,
             icon:icon,
             name:name,
-            hasOpenDiscussions: false,
+            hasOpenDiscussions:false,
             type:type
         };
 
@@ -117,13 +142,13 @@ databasy.ui.gojs.DiagramModel = Class.extend({
         delete this._tableDataByColumnElementId[columnElementId];
     },
 
-    createView:function (viewReprId, name, position) {
+    createView:function (viewReprId, name, width, position) {
         var data = {
             key:viewReprId,
             name:name,
             position:position,
-            width:undefined, // default
-            hasOpenDiscussions: false,
+            width:width,
+            hasOpenDiscussions:false,
             category:'view'
         };
 
@@ -155,7 +180,7 @@ databasy.ui.gojs.DiagramModel = Class.extend({
             to:toTableReprId,
             toCardinality:toCardinality,
             toColumnElementIds:toColumnElementIds,
-            hasOpenDiscussions: false
+            hasOpenDiscussions:false
         };
 
         if (this._dataExists(relReprId)) {

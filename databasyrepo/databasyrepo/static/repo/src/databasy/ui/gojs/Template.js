@@ -93,7 +93,7 @@ databasy.ui.gojs.Templates = Class.extend({
             })
         }
         if (bindings) {
-            $.each(bindings, function(i, binding) {
+            $.each(bindings, function (i, binding) {
                 discussion.bind(binding);
             });
         }
@@ -119,7 +119,7 @@ databasy.ui.gojs.Templates = Class.extend({
                 }
             },
             new go.Binding('name', 'elementId'),
-            new go.Binding('', 'hasOpenDiscussions', function(hasOpenDiscussions, panel) {
+            new go.Binding('', 'hasOpenDiscussions', function (hasOpenDiscussions, panel) {
                 panel.getColumnDefinition(2).width = hasOpenDiscussions ? 17 : 0;
             }),
             mk(go.RowColumnDefinition, { column:0, width:16 }),
@@ -261,7 +261,7 @@ databasy.ui.gojs.Templates = Class.extend({
                         defaultAlignment:go.Spot.Left,
                         padding:new go.Margin(4, 6, 4, 6)
                     },
-                    new go.Binding('', 'hasOpenDiscussions', function(hasOpenDiscussions, panel) {
+                    new go.Binding('', 'hasOpenDiscussions', function (hasOpenDiscussions, panel) {
                         panel.getColumnDefinition(2).width = hasOpenDiscussions ? 17 : 0;
                     }),
                     mk(go.RowColumnDefinition, { column:0, width:16 }),
@@ -344,7 +344,7 @@ databasy.ui.gojs.Templates = Class.extend({
                         defaultAlignment:go.Spot.Left,
                         padding:new go.Margin(4, 6, 4, 6)
                     },
-                    new go.Binding('', 'hasOpenDiscussions', function(hasOpenDiscussions, panel) {
+                    new go.Binding('', 'hasOpenDiscussions', function (hasOpenDiscussions, panel) {
                         panel.getColumnDefinition(2).width = hasOpenDiscussions ? 17 : 0;
                     }),
                     mk(go.RowColumnDefinition, { column:0, width:16 }),
@@ -513,6 +513,10 @@ databasy.ui.gojs.Templates = Class.extend({
                 new go.Binding('visible', 'hasOpenDiscussions')
             ])
         )
+    },
+
+    contextMenuTemplate:function () {
+        return mk(go.Adornment, 'Horizontal');
     }
 });
 

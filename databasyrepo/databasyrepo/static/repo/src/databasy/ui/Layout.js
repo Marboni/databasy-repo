@@ -21,6 +21,8 @@ databasy.ui.Layout = Class.extend({
         this.propertyPanel = new databasy.ui.property.PropertyPanel();
         this.generalPanel = new databasy.ui.general.GeneralPanel();
 
+        databasy.ui.utils.initContextMenu();
+
         this.waitInitialization();
     },
 

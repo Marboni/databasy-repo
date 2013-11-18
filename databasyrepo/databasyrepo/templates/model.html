@@ -7,12 +7,12 @@
     <meta name="viewport" content="width=device-width, minimum-scale=1.0"/>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
 
-    <link rel="stylesheet" href="{{ url_for('static', filename='repo/libs/jeegoocontext/skins/cm_default/style.css') }}"
-          type="text/css" media="screen, projection">
     <link rel="stylesheet"
           href="{{ url_for('static', filename='repo/libs/jquery-ui-1.8.23/themes/base/jquery-ui.css') }}"
           type="text/css" media="screen, projection">
     <link rel="stylesheet" href="{{ url_for('static', filename='repo/libs/bootstrap/css/bootstrap.min.css') }}"
+          type="text/css" media="screen, projection">
+    <link rel="stylesheet" href="{{ url_for('static', filename='repo/libs/context/context.bootstrap.css') }}"
           type="text/css" media="screen, projection">
     <link rel="stylesheet" href="{{ url_for('static', filename='repo/libs/bootstrap-slider/css/slider.css') }}"
           type="text/css" media="screen, projection">
@@ -42,7 +42,7 @@
                     .script("{{ url_for('static', filename='repo/libs/bootstrap/js/bootstrap.min.js') }}")
                     .script("{{ url_for('static', filename='repo/libs/bootstrap-slider/js/bootstrap-slider.js') }}")
                     .script("{{ url_for('static', filename='repo/libs/jstree/jquery.jstree.js') }}")
-                    .script("{{ url_for('static', filename='repo/libs/jeegoocontext/jquery.jeegoocontext.js') }}")
+                    .script("{{ url_for('static', filename='repo/libs/context/context.js') }}")
 
                     .script("{{ url_for('static', filename='repo/libs/gojs/go.js') }}")
 
@@ -82,6 +82,7 @@
                     .script("{{ url_for('static', filename='repo/src/databasy/ui/general/GeneralPanel.js') }}")
                     .script("{{ url_for('static', filename='repo/src/databasy/ui/general/SchemaTreePanel.js') }}")
                     .script("{{ url_for('static', filename='repo/src/databasy/ui/general/OverviewPanel.js') }}")
+                    .script("{{ url_for('static', filename='repo/src/databasy/ui/utils.js') }}")
 
 
                     .script("{{ url_for('static', filename='repo/src/databasy/gateway/Gateway.js') }}")
