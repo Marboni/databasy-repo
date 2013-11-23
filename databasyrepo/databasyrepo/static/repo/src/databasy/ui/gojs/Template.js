@@ -217,14 +217,13 @@ databasy.ui.gojs.Templates = Class.extend({
     },
 
     tableTemplate:function () {
-        var that = this;
-
         return mk(go.Node, 'Auto', {
                 width:databasy.model.core.reprs.TableRepr.REPR_DEFAULT_WIDTH,
                 minSize:new go.Size(databasy.model.core.reprs.TableRepr.REPR_MIN_WIDTH, 30),
                 selectionAdornmentTemplate:this.selectionAdornmentTemplate(),
                 resizeAdornmentTemplate:this.resizeAdornmentTemplate(),
                 resizable:true,
+                contextMenu: this.contextMenuTemplate(),
                 fromSpot:go.Spot.AllSides,
                 toSpot:go.Spot.AllSides
             },
@@ -257,6 +256,7 @@ databasy.ui.gojs.Templates = Class.extend({
 
                 // Title panel.
                 mk(go.Panel, 'Table', {
+                        name: 'titlePanel',
                         stretch:go.GraphObject.Horizontal,
                         defaultAlignment:go.Spot.Left,
                         padding:new go.Margin(4, 6, 4, 6)
@@ -280,6 +280,7 @@ databasy.ui.gojs.Templates = Class.extend({
                             column:1
                         },
                         mk(go.TextBlock, {
+                                name: 'titleLabel',
                                 position:new go.Point(0, 3),
                                 stroke:this.textColor,
                                 font:this.titleFont,
@@ -312,7 +313,8 @@ databasy.ui.gojs.Templates = Class.extend({
                 minSize:new go.Size(databasy.model.core.reprs.TableRepr.REPR_MIN_WIDTH, 30), // TODO Replace with view's constants.
                 selectionAdornmentTemplate:this.selectionAdornmentTemplate(),
                 resizeAdornmentTemplate:this.resizeAdornmentTemplate(),
-                resizable:true
+                resizable:true,
+                contextMenu: this.contextMenuTemplate(),
             },
 
             new go.Binding('position', 'position', function (pos) {
@@ -340,6 +342,7 @@ databasy.ui.gojs.Templates = Class.extend({
 
                 // Title panel.
                 mk(go.Panel, 'Table', {
+                        name: 'titlePanel',
                         stretch:go.GraphObject.Horizontal,
                         defaultAlignment:go.Spot.Left,
                         padding:new go.Margin(4, 6, 4, 6)
@@ -363,6 +366,7 @@ databasy.ui.gojs.Templates = Class.extend({
                             column:1
                         },
                         mk(go.TextBlock, {
+                                name: 'titleLabel',
                                 position:new go.Point(0, 3),
                                 stroke:this.textColor,
                                 font:this.titleFont,
@@ -436,6 +440,7 @@ databasy.ui.gojs.Templates = Class.extend({
         return mk(go.Link, {
                 routing:go.Link.Orthogonal,
                 layerName:'Background',
+                contextMenu: this.contextMenuTemplate(),
                 selectionAdornmentTemplate:mk(go.Adornment,
                     mk(go.Shape, {
                             isPanelMain:true,
@@ -476,6 +481,7 @@ databasy.ui.gojs.Templates = Class.extend({
             },
             mk(go.Shape, {
                     strokeWidth:1,
+                    contextMenu: this.contextMenuTemplate(),
                     mouseEnter:function (e, shape) {
                         shape.strokeWidth = 3;
                         shape.stroke = that.highlightedLinkColor;

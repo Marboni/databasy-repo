@@ -31,6 +31,16 @@ databasy.ui.gojs.DiagramModel = Class.extend({
         this.diagram.select(node);
     },
 
+    selectedPartKeys: function() {
+        var selectedKeys = [];
+        var selectionIt = this.diagram.selection.iterator;
+        while(selectionIt.next()) {
+            var part = selectionIt.value;
+            selectedKeys.push(part.data.key);
+        }
+        return selectedKeys;
+    },
+
     setReadOnly:function (readOnly) {
         if (this.diagram.isReadOnly === readOnly) {
             return;
@@ -49,6 +59,16 @@ databasy.ui.gojs.DiagramModel = Class.extend({
         while (selectionIt.next()) {
             selectionIt.value.updateAdornments();
         }
+    },
+
+    startTableNameEditing: function(tableReprId) {
+//        var table = this.diagram.findNodeForKey(tableReprId);
+//        if (table) {
+//            var textEditingTool = this.diagram.toolManager.textEditingTool;
+//            textEditingTool.textBlock = table.findObject('titleLabel');
+//            textEditingTool.doActivate();
+//        }
+        // TODO
     },
 
     createTable:function (tableReprId, name, width, position) {
@@ -74,7 +94,7 @@ databasy.ui.gojs.DiagramModel = Class.extend({
         this._update(tableReprId, props);
     },
 
-    removeTable:function (tableReprId) {
+    deleteTable:function (tableReprId) {
         var data = this._findData(tableReprId);
         this.model.removeNodeData(data);
 
@@ -134,7 +154,7 @@ databasy.ui.gojs.DiagramModel = Class.extend({
         this.model.insertArrayItem(tableData.columns, columnIndex, columnData);
     },
 
-    removeColumn:function (columnElementId) {
+    deleteColumn:function (columnElementId) {
         var tableData = this._findTableDataByColumnElementId(columnElementId);
         var columnIndex = this._columnIndex(tableData, columnElementId);
         this.model.removeArrayItem(tableData.columns, columnIndex);
@@ -165,7 +185,7 @@ databasy.ui.gojs.DiagramModel = Class.extend({
         this._update(viewReprId, props);
     },
 
-    removeView:function (viewReprId) {
+    deleteView:function (viewReprId) {
         var data = this._findData(viewReprId);
         this.model.removeNodeData(data);
         delete this._dataByReprId[viewReprId];
@@ -196,7 +216,7 @@ databasy.ui.gojs.DiagramModel = Class.extend({
         this._update(relReprId, props);
     },
 
-    removeRelationship:function (relReprId) {
+    deleteRelationship:function (relReprId) {
         var data = this._findData(relReprId);
         this.model.removeLinkData(data);
         delete this._dataByReprId[relReprId];

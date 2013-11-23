@@ -180,6 +180,13 @@ databasy.ui.gojs.Canvas = Class.extend({
                 diagramModel.updateTable(tableRepr.id(), {name:name});
                 diagramModel.commitTransaction();
             }
+        } else if (event.matches(eventTypes.NodeUnregistered)) {
+            var node = modelEvent.val('node');
+            if (node instanceof databasy.model.core.reprs.TableRepr) {
+                diagramModel.startTransaction();
+                diagramModel.deleteTable(node.id());
+                diagramModel.commitTransaction();
+            }
         }
     },
 
