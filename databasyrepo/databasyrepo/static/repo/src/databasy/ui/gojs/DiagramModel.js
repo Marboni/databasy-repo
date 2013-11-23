@@ -62,13 +62,11 @@ databasy.ui.gojs.DiagramModel = Class.extend({
     },
 
     startTableNameEditing: function(tableReprId) {
-//        var table = this.diagram.findNodeForKey(tableReprId);
-//        if (table) {
-//            var textEditingTool = this.diagram.toolManager.textEditingTool;
-//            textEditingTool.textBlock = table.findObject('titleLabel');
-//            textEditingTool.doActivate();
-//        }
-        // TODO
+        var table = this.diagram.findNodeForKey(tableReprId);
+        if (table) {
+            this.diagram.commandHandler.editTextBlock(table.findObject('titleLabel'));
+            $(this.diagram.toolManager.textEditingTool.currentTextEditor).select();
+        }
     },
 
     createTable:function (tableReprId, name, width, position) {
