@@ -14,8 +14,6 @@ class Table(Node):
 class Column(Node):
     def __init__(self, id=None):
         super(Column, self).__init__(id)
-        self.set('pk', False)
-        self.set('unique', False)
         self.set('null', True)
 
     def fields(self):
@@ -23,8 +21,8 @@ class Column(Node):
         fields.update({
             'table': Table,
             'name': basestring,
-            'pk': bool,
-            'unique': bool,
-            'null': bool
+            'type': basestring,
+            'null': bool,
+            'default': basestring
             })
         return fields

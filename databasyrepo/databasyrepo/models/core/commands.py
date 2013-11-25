@@ -4,7 +4,7 @@ from databasyrepo.models.core.errors import IllegalCommand
 from databasyrepo.models.core.reprs import Canvas, TableRepr
 from databasyrepo.models.core.serializing import Serializable
 from databasyrepo.models.core.validators import NodeClass, CorrectVersion, UniqueID, IfInFields
-from databasyrepo.utils.validators import InvalidStateError, Always, Length, Iterable, NotEqual, Integer, IfNotNone, Boolean
+from databasyrepo.utils.validators import InvalidStateError, Always, Length, Iterable, NotEqual, Integer, Boolean
 
 __author__ = 'Marboni'
 
@@ -247,6 +247,7 @@ class CreateColumn(Command):
             'table_id': basestring,
             'column_id': basestring,
             'name': basestring,
+            'type': basestring,
             'index': int
         })
         return fields
@@ -257,6 +258,7 @@ class CreateColumn(Command):
             'table_id': Always(NodeClass(model, Table)),
             'column_id': Always(UniqueID(model)),
             'name': Always(Length(1, 512)),
+            'type': Always(Length(1, 512)),
             'index': Always(Integer(min_value=0, max_value=model.node(self.val('table_id')).items_count('columns')))
         })
         return validators
@@ -267,6 +269,7 @@ class CreateColumn(Command):
 
         column = Column(self.val('column_id'))
         column.set('name', self.val('name'))
+        column.set('type', self.val('type'))
         column.set('table', table.ref())
 
         executor.execute(Register(node=column))
@@ -283,34 +286,10 @@ class UpdateColumn(UpdateCommand):
     def obj_changeable_fields_and_validators(self):
         return {
             'name': [Length(1, 512)],
-            'pk': [Boolean()],
-            'unique': [Boolean()],
-            'null': [Boolean()]
+            'type': [Length(1, 512)],
+            'null': [Boolean()],
+            'default': [],
             }
-
-    def post_validation(self, model):
-        super(UpdateColumn, self).post_validation(model)
-        changeable_fields = self.val('fields')
-        column_id = self.val('column_id')
-
-        column = model.node(column_id)
-        old_pk = column.val('pk')
-        new_pk = self.val('pk') if 'pk' in changeable_fields else old_pk
-        if new_pk is True and ('unique' in changeable_fields or 'null' in changeable_fields):
-            raise IllegalCommand('PK column does\'t allow UNIQUE or NULL fields modification.')
-
-    def do(self, executor):
-        super(UpdateColumn, self).do(executor)
-
-        changeable_fields = self.val('fields')
-        became_pk = 'pk' in changeable_fields and self.val('pk') is True
-        if became_pk:
-            column_id = self.val('column_id')
-            column = executor.model.node(column_id)
-            if column.val('unique') is False:
-                executor.execute(Set(column_id, 'unique', True))
-            if column.val('null') is True:
-                executor.execute(Set(column_id, 'null', False))
 
 
 class DeleteColumn(Command):

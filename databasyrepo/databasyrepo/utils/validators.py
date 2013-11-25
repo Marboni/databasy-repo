@@ -104,10 +104,13 @@ class Always(FieldValidator):
         FieldValidator.__init__(self)
         self.validators = validators
         self.message = kwargs.get('message') or 'This field is required.'
+        self.nullable = kwargs.get('nullable') or False
 
     def __call__(self, field, field_values):
         if not field_values.has_key(field):
             raise InvalidStateError('Field is required.')
+        if field_values.get(field) is None and not self.nullable:
+            raise InvalidStateError('Field is not nullable.')
         for validator in self.validators:
             validator(field, field_values)
 

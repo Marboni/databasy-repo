@@ -183,27 +183,10 @@ databasy.model.core.commands.UpdateColumn = databasy.model.core.commands.UpdateC
     obj_changeable_fields:function () {
         return [
             'name',
-            'pk',
-            'unique',
-            'null'
+            'type',
+            'null',
+            'default'
         ]
-    },
-
-    do:function (executor) {
-        this._super(executor);
-
-        var fields = this.val('fields');
-        var became_pk = $.inArray(fields, 'pk') !== -1 && this.val('pk') === true;
-        if (became_pk) {
-            var column_id = this.val('column_id');
-            var column = executor.model.node(column_id);
-            if (column.val('unique') === false) {
-                executor.execute(new databasy.model.core.actions.Set({node_id:column_id, field:'unique', value:true}));
-            }
-            if (column.val('null') === true) {
-                executor.execute(new databasy.model.core.actions.Set({node_id:column_id, field:'null', value:false}));
-            }
-        }
     }
 }, {
     CODE:'core.commands.UpdateColumn'

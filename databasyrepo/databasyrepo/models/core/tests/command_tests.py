@@ -39,6 +39,7 @@ def create_column(model, table):
         table_id=table.id,
         column_id=column_id,
         name='Column',
+        type='VARCHAR',
         index=table.items_count('columns')
     )
 
@@ -165,9 +166,12 @@ class CommandTest(ODMTest):
         column_2_id = str(uuid4())
         column_3_id = str(uuid4())
 
+        column_type = 'VARCHAR'
+
         execute_command(model, CreateColumn,
             table_id=table_id,
             column_id=column_2_id,
+            type=column_type,
             name='Column2',
             index=0
         )
@@ -175,6 +179,7 @@ class CommandTest(ODMTest):
         execute_command(model, CreateColumn,
             table_id=table_id,
             column_id=column_1_id,
+            type=column_type,
             name='Column1',
             index=0
         )
@@ -182,6 +187,7 @@ class CommandTest(ODMTest):
         execute_command(model, CreateColumn,
             table_id=table_id,
             column_id=column_3_id,
+            type=column_type,
             name='Column3',
             index=2
         )
@@ -204,96 +210,32 @@ class CommandTest(ODMTest):
                 table_id=table_id,
                 column_id=str(uuid4()),
                 name='OutOfBoundsColumn',
+                type=column_type,
                 index=4
             )
 
-    def test_rename_column(self):
+
+    def test_update_column(self):
         model = create_model()
         table = create_table(model)
         column = create_column(model, table)
 
+        self.assertTrue(column.val('null'))
+        self.assertIsNone(column.val('default'))
+
         execute_command(model, UpdateColumn,
             column_id=column.id,
-            fields=['name'],
+            fields=['name', 'type', 'null', 'default'],
             name='NewName',
+            type='INT',
+            null=True,
+            default='1'
         )
 
         self.assertEqual('NewName', column.val('name'))
-
-    def test_update_column_constraints(self):
-        model = create_model()
-        table = create_table(model)
-        column = create_column(model, table)
-
-        self.assertFalse(column.val('pk'))
-        self.assertFalse(column.val('unique'))
+        self.assertEqual('INT', column.val('type'))
         self.assertTrue(column.val('null'))
-
-        with self.assertRaises(IllegalCommand):
-            # Unable to modify PK with UNIQUE.
-            execute_command(model, UpdateColumn,
-                column_id=column.id,
-                fields=['pk', 'unique'],
-                pk=True,
-                unique=False,
-            )
-
-        with self.assertRaises(IllegalCommand):
-            # Unable to modify PK with NULL.
-            execute_command(model, UpdateColumn,
-                column_id=column.id,
-                fields=['pk', 'null'],
-                pk=True,
-                null=True,
-            )
-
-        execute_command(model, UpdateColumn,
-            column_id=column.id,
-            fields=['pk'],
-            pk=True
-        )
-
-        self.assertTrue(column.val('pk'))
-
-        with self.assertRaises(IllegalCommand):
-            # Column is already PK, can't modify UNIQUE.
-            execute_command(model, UpdateColumn,
-                column_id=column.id,
-                fields=['unique'],
-                unique=False,
-            )
-
-        with self.assertRaises(IllegalCommand):
-            # Column is already PK, can't modify NULL.
-            execute_command(model, UpdateColumn,
-                column_id=column.id,
-                fields=['null'],
-                null=True,
-            )
-
-        # But can be changed to non-PK and any value of NULL and UNIQUE.
-        execute_command(model, UpdateColumn,
-            column_id=column.id,
-            fields=['pk', 'unique', 'null'],
-            pk=False,
-            unique=False,
-            null=True,
-        )
-
-        self.assertFalse(column.val('pk'))
-        self.assertFalse(column.val('unique'))
-        self.assertTrue(column.val('null'))
-
-        # Setting PK causes change of UNIQUE to True and NULL to False.
-        execute_command(model, UpdateColumn,
-            column_id=column.id,
-            fields=['pk'],
-            pk=True
-        )
-
-        self.assertTrue(column.val('pk'))
-        self.assertTrue(column.val('unique'))
-        self.assertFalse(column.val('null'))
+        self.assertEqual('1', column.val('default'))
 
 
     def test_delete_column(self):
