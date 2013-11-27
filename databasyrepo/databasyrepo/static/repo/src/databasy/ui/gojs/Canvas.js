@@ -197,7 +197,7 @@ databasy.ui.gojs.Canvas = Class.extend({
                 switch (data.entity) {
                     case 'table':
                     {
-                        databasy.service.updateTableReprPosition(data.key, position.x, position.y);
+                        databasy.service.updateTableReprPosition(data.key, Math.round(position.x), Math.round(position.y));
                         break;
                     }
                 }

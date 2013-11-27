@@ -87,7 +87,10 @@ databasy.ui.Layout = Class.extend({
                         spacing_closed:0
                     },
                     center:{
-                        paneSelector:"#canvasWrapper"
+                        paneSelector:"#canvasWrapper",
+                        onresize: function() {
+                            databasy.gw.layout.canvas.diagram.requestUpdate();
+                        }
                     },
                     south:{
                         paneSelector:"#propertyPanel",
