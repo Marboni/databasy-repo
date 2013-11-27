@@ -7,29 +7,6 @@ databasy.model.core.events.Event = databasy.model.core.serializing.Serializable.
     }
 });
 
-databasy.model.core.events.NodeRegistered = databasy.model.core.events.Event.extend({
-    init:function(node) {
-        this._super();
-        if (node !== undefined) {
-            this.set('node', node.copy())
-        }
-    },
-    fields:function() {
-        return this._super().concat(
-            'node'
-        )
-    },
-    do_action:function() {
-        return databasy.model.core.actions.Register({node: this.val('node')});
-    },
-    undo_action:function() {
-        return databasy.model.core.actions.Unregister({node_id: this.val('node').id()});
-    }
-}, {
-    CODE: 'core.events.NodeRegistered'
-});
-
-
 databasy.model.core.events.NodeUnregistered = databasy.model.core.events.Event.extend({
     init:function(node) {
         this._super();
@@ -50,6 +27,29 @@ databasy.model.core.events.NodeUnregistered = databasy.model.core.events.Event.e
     }
 }, {
     CODE: 'core.events.NodeUnregistered'
+});
+
+
+databasy.model.core.events.NodeRegistered = databasy.model.core.events.Event.extend({
+    init:function(node) {
+        this._super();
+        if (node !== undefined) {
+            this.set('node', node.copy())
+        }
+    },
+    fields:function() {
+        return this._super().concat(
+            'node'
+        )
+    },
+    do_action:function() {
+        return databasy.model.core.actions.Register({node: this.val('node')});
+    },
+    undo_action:function() {
+        return databasy.model.core.actions.Unregister({node_id: this.val('node').id()});
+    }
+}, {
+    CODE: 'core.events.NodeRegistered'
 });
 
 

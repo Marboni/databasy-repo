@@ -31,6 +31,10 @@ databasy.ui.gojs.DiagramModel = Class.extend({
         this.diagram.select(node);
     },
 
+    unselectAll: function() {
+        this.diagram.clearSelection();
+    },
+
     selectedPartKeys: function() {
         var selectedKeys = [];
         var selectionIt = this.diagram.selection.iterator;
@@ -39,6 +43,32 @@ databasy.ui.gojs.DiagramModel = Class.extend({
             selectedKeys.push(part.data.key);
         }
         return selectedKeys;
+    },
+
+    selectedPartCount: function() {
+        return this.selectedPartKeys().length;
+    },
+
+    findPartAt: function(docPosition) {
+        return this.diagram.findPartAt(docPosition, true);
+    },
+
+    findDataPanelAt: function(docPosition) {
+        var obj = this.diagram.findObjectAt(docPosition);
+        while(obj != null && !obj.data) {
+            obj = obj.panel;
+        }
+        return obj;
+    },
+
+    findData: function(obj) {
+        while(obj != null && !obj.data) {
+            obj = obj.panel;
+        }
+        if (obj.data) {
+            return obj.data;
+        }
+        return obj.part.data;
     },
 
     setReadOnly:function (readOnly) {
@@ -65,8 +95,19 @@ databasy.ui.gojs.DiagramModel = Class.extend({
         var table = this.diagram.findNodeForKey(tableReprId);
         if (table) {
             this.diagram.commandHandler.editTextBlock(table.findObject('titleLabel'));
-            $(this.diagram.toolManager.textEditingTool.currentTextEditor).select();
         }
+    },
+
+    startColumnEditing: function(columnId) {
+        try {
+            var tableData = this._findTableDataByColumnElementId(columnId);
+        } catch (e) {
+            return;
+        }
+        var table = this.diagram.findNodeForKey(tableData.key);
+        var columnsPanel = table.findObject('columnsPanel');
+        var columnPanel = columnsPanel.findObject(columnId);
+        this.diagram.commandHandler.editTextBlock(columnPanel.findObject('columnLabel'));
     },
 
     createTable:function (tableReprId, name, width, position) {
@@ -77,7 +118,8 @@ databasy.ui.gojs.DiagramModel = Class.extend({
             width:width,
             hasOpenDiscussions:false,
             columns:[],
-            category:'table'
+            category:'table',
+            entity: 'table'
         };
 
         if (this._dataExists(tableReprId)) {
@@ -99,7 +141,7 @@ databasy.ui.gojs.DiagramModel = Class.extend({
         var that = this;
         if (data.columns) {
             $.each(data.columns, function (i, column) {
-                delete that._tableDataByColumnElementId[column.elementId];
+                delete that._tableDataByColumnElementId[column.key];
             })
         }
         delete this._dataByReprId[tableReprId];
@@ -115,11 +157,12 @@ databasy.ui.gojs.DiagramModel = Class.extend({
         this._validateColumnIcon(icon);
 
         var columnData = {
-            elementId:columnElementId,
+            key:columnElementId,
             icon:icon,
             name:name,
+            type:type,
             hasOpenDiscussions:false,
-            type:type
+            entity: 'column'
         };
 
         var tableData = this._findData(tableReprId);
@@ -167,7 +210,8 @@ databasy.ui.gojs.DiagramModel = Class.extend({
             position:position,
             width:width,
             hasOpenDiscussions:false,
-            category:'view'
+            category:'view',
+            entity: 'view'
         };
 
         if (this._dataExists(viewReprId)) {
@@ -198,7 +242,8 @@ databasy.ui.gojs.DiagramModel = Class.extend({
             to:toTableReprId,
             toCardinality:toCardinality,
             toColumnElementIds:toColumnElementIds,
-            hasOpenDiscussions:false
+            hasOpenDiscussions:false,
+            entity: 'relationship'
         };
 
         if (this._dataExists(relReprId)) {
@@ -249,7 +294,7 @@ databasy.ui.gojs.DiagramModel = Class.extend({
 
     _columnIndex:function (tableData, columnElementId) {
         for (var i = 0; i < tableData.columns.length; i++) {
-            if (tableData.columns[i].elementId == columnElementId) {
+            if (tableData.columns[i].key == columnElementId) {
                 return i;
             }
         }

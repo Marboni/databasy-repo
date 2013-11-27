@@ -104,6 +104,7 @@ databasy.ui.gojs.Templates = Class.extend({
         var that = this;
 
         return mk(go.Panel, 'Table', {
+                name: 'columnPanel',
                 stretch:go.GraphObject.Horizontal,
                 defaultAlignment:go.Spot.Left,
                 background:this.columnBackground,
@@ -118,7 +119,7 @@ databasy.ui.gojs.Templates = Class.extend({
                     panel.background = that.columnBackground;
                 }
             },
-            new go.Binding('name', 'elementId'),
+            new go.Binding('name', 'key'),
             new go.Binding('', 'hasOpenDiscussions', function (hasOpenDiscussions, panel) {
                 panel.getColumnDefinition(2).width = hasOpenDiscussions ? 17 : 0;
             }),
@@ -200,6 +201,7 @@ databasy.ui.gojs.Templates = Class.extend({
                     padding:new go.Margin(0, 0, 0, 4)
                 },
                 mk(go.TextBlock, {
+                        name: 'columnLabel',
                         stroke:this.textColor,
                         font:this.columnFont,
                         editable:true,

@@ -34,5 +34,6 @@ databasy.model.core.elements.Column = databasy.model.core.nodes.Node.extend({
         )
     }
 }, {
-    CODE: 'core.elements.Column'
+    CODE: 'core.elements.Column',
+    DEFAULT_TYPE: 'VARCHAR(255)'
 });

@@ -154,6 +154,7 @@ databasy.model.core.commands.CreateColumn = databasy.model.core.commands.Command
             'table_id',
             'column_id',
             'name',
+            'type',
             'index'
         )
     },
@@ -165,6 +166,7 @@ databasy.model.core.commands.CreateColumn = databasy.model.core.commands.Command
         var column = new core.elements.Column({
             _id: this.val('column_id'),
             name: this.val('name'),
+            type: this.val('type'),
             table: table.ref()
         });
 

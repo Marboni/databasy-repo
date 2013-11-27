@@ -66,9 +66,8 @@ databasy.ui.property.TablePropertyPanel = Class.extend({
 
     onModelChanged:function (event) {
         var modelEvent = event.modelEvent;
-        var eventTypes = databasy.model.core.events;
 
-        if (event.matches(eventTypes.PropertyChanged, {node_id:this.tableId, field:'name'})) {
+        if (event.isNodePropertyChanged(this.tableId, 'name')) {
             // Table name changed.
             this.setName(modelEvent.val('new_value'));
         }

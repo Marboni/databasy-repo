@@ -76,22 +76,36 @@ databasy.gateway.Service = Class.extend({
             table_id:tableId,
             column_id:column_id,
             name:'column',
+            type:databasy.model.core.elements.Column.DEFAULT_TYPE,
             index:index
         });
         databasy.gw.executeCommand(command);
+
+        return column_id;
     },
 
-    renameColumn: function(columnId, name) {
+    updateColumn: function(columnId, values) {
         var column = this.model.node(columnId);
-        if (column.val('name') === name) {
-            return;
-        }
-        var command = new databasy.model.core.commands.UpdateColumn({
-            column_id:columnId,
-            fields: ['name'],
-            name:name
+        var updateRequired = false;
+        $.each(values, function(field, value) {
+            if (column.val(field) !== value) {
+                updateRequired = true;
+                return false;
+            }
+            return true;
         });
-        databasy.gw.executeCommand(command);
+        if (updateRequired) {
+            var commandArgs = {
+                column_id: columnId,
+                fields: []
+            };
+            $.each(values, function(field, value) {
+                commandArgs.fields.push(field);
+                commandArgs[field] = value;
+            });
+            var command = new databasy.model.core.commands.UpdateColumn(commandArgs);
+            databasy.gw.executeCommand(command);
+        }
     },
 
     deleteColumn: function(columnId) {

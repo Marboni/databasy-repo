@@ -236,23 +236,21 @@ databasy.ui.general.SchemaTreePanel = Class.extend({
     },
 
     onModelChanged:function (event) {
+        var model = databasy.gw.model;
         var modelEvent = event.modelEvent;
-        var eventTypes = databasy.model.core.events;
 
-        if (event.matches(eventTypes.ItemInserted, {node_id:null, field:'tables'})) {
+        if (event.isNodeItemInserted(null, 'tables')) {
             // Table inserted to the model.
-            var table = modelEvent.val('item').ref_node(databasy.gw.model);
+            var table = modelEvent.val('item').ref_node(model);
             this.renderTableNode(table);
 
-        } else if (event.matches(eventTypes.PropertyChanged, {field:'name'})) {
-            var node = databasy.gw.model.node(modelEvent.val('node_id'));
-            if (node instanceof databasy.model.core.elements.Table) {
-                // Table name changed.
-                var newName = modelEvent.val('new_value');
-                this.renameNode(node.id(), newName);
-            }
+        } else if (event.isNodeTypePropertyChanged(databasy.model.core.elements.Table, 'name', model)) {
+            // Table renamed.
+            var node = model.node(modelEvent.val('node_id'));
+            var newName = modelEvent.val('new_value');
+            this.renameNode(node.id(), newName);
 
-        } else if (event.matches(eventTypes.ItemDeleted, {node_id:null, field:'tables'})) {
+        } else if (event.isNodeItemDeleted(null, 'tables')) {
             // Table deleted.
             var tableId = modelEvent.val('item').ref_id();
             this.deleteNode(tableId);

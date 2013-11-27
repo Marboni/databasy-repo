@@ -30,6 +30,7 @@ databasy.ui.utils.initContextMenu = function () {
     var clearMenuItems = function () {
         contextMenuItems.empty();
     };
+
     var addMenuItem = function (idPrefix, name, onClick) {
         var item = $('<li id="' + idPrefix + 'CmItem"><a tabindex="-1" href="#">' + name + '</a></li>');
         contextMenuItems.append(item);
@@ -41,8 +42,12 @@ databasy.ui.utils.initContextMenu = function () {
         $('#' + idPrefix + 'CmItem').addClass('disabled');
     };
 
-    var renameMenuItem = function(idPrefix, name) {
+    var renameMenuItem = function (idPrefix, name) {
         $('#' + idPrefix + 'CmItem').find('a').text(name);
+    };
+
+    var addMenuDivider = function () {
+        contextMenuItems.append('<li class="divider"></li>');
     };
 
     var openMenu = function () {
@@ -91,15 +96,59 @@ databasy.ui.utils.initContextMenu = function () {
 
     var openDiagramMenu = function () {
         if (databasy.gw.runtime.isEditor()) {
+            var model = databasy.gw.model;
+            var cursorDocPosition = diagramModel.cursorDocPosition();
+            var selectedPartCount = diagramModel.selectedPartCount();
+            var part = diagramModel.findPartAt(cursorDocPosition);
+            // Repr under cursor.
+            var targetRepr = part != null ? model.node(part.data.key) : null;
+
             clearMenuItems();
-            addMenuItem('createTable', 'Create Table', function () {
-                var cursorDocPosition = diagramModel.cursorDocPosition();
-                var tableInfo = databasy.service.createTable(canvas.canvasId, [cursorDocPosition.x, cursorDocPosition.y]);
-                diagramModel.startTransaction();
-                diagramModel.select(tableInfo.reprId);
-                diagramModel.startTableNameEditing(tableInfo.reprId);
-                diagramModel.commitTransaction();
-            });
+
+            if (targetRepr == null) {
+                // Background context menu.
+
+                diagramModel.unselectAll();
+                selectedPartCount = 0;
+
+                addMenuItem('createTable', 'Create table', function () {
+                    var position = [Math.round(cursorDocPosition.x), Math.round(cursorDocPosition.y)];
+                    var tableInfo = databasy.service.createTable(canvas.canvasId, position);
+                    diagramModel.startTransaction();
+                    diagramModel.select(tableInfo.reprId);
+                    diagramModel.startTableNameEditing(tableInfo.reprId);
+                    diagramModel.commitTransaction();
+                });
+            } else if (selectedPartCount == 1) {
+                // Context menu for single item.
+
+                if (targetRepr instanceof databasy.model.core.reprs.TableRepr) {
+                    var table = targetRepr.val_as_node('table', model);
+                    var index = 0;
+
+                    var column = null;
+                    var dataPanel = diagramModel.findDataPanelAt(cursorDocPosition);
+                    if (dataPanel != null && dataPanel.data.entity == 'column') {
+                        column = model.node(dataPanel.data.key);
+                        index = table.item_index('columns', column) + 1;
+                    }
+
+                    addMenuItem('createColumn', 'Create column', function () {
+                        var columnId = databasy.service.createColumn(table.id(), index);
+                        diagramModel.startTransaction();
+                        diagramModel.startColumnEditing(columnId);
+                        diagramModel.commitTransaction();
+                    });
+
+                    if (column) {
+                        addMenuItem('deleteColumn', 'Delete column "' + column.val('name') + '"', function () {
+                            databasy.service.deleteColumn(column.id());
+                        });
+                    }
+                }
+            }
+
+            // Common context menu.
             addMenuItem('delete', 'Delete', function () {
                 var selectedReprIds = diagramModel.selectedPartKeys();
                 $.each(selectedReprIds, function (i, reprId) {
@@ -110,10 +159,14 @@ databasy.ui.utils.initContextMenu = function () {
                 });
             });
 
-            var selectedPartCount = diagramModel.selectedPartKeys().length;
+            // Menu modifications.
             if (selectedPartCount == 0) {
                 disableMenuItem('delete');
-            } else if (selectedPartCount > 1) {
+            } else if (selectedPartCount == 1) {
+                if (targetRepr instanceof databasy.model.core.reprs.TableRepr) {
+                    renameMenuItem('delete', 'Delete table "' + targetRepr.val_as_node('table', model).val('name') + '"');
+                }
+            } else {
                 renameMenuItem('delete', 'Delete (' + selectedPartCount + ' items)');
             }
 
