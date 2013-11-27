@@ -234,7 +234,11 @@ databasy.ui.gojs.Canvas = Class.extend({
             }
         }, this));
 
+        // Redirect mouse clicks to toolbar to execute actions of currently selected tool..
+        var toolbar = databasy.gw.layout.toolbar;
+        this.diagram.click = $.proxy(toolbar.handleClick, toolbar);
 
+        // Select text in in-place editor on opening.
         $('#canvasWrapper').on('focus', '.start', function () {
             $(this).select();
         })

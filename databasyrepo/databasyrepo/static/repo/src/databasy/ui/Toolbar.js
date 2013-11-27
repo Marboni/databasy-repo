@@ -95,8 +95,23 @@ databasy.ui.Toolbar = Class.extend({
         this.select(this._defaultTool);
     },
 
-    getCurrentTool:function () {
-        return this._currentTool;
+    handleClick: function(e) {
+        var canvas = databasy.gw.layout.canvas;
+        var diagramModel = canvas.diagramModel;
+
+        switch (this._currentTool) {
+            case databasy.ui.Toolbar.CREATE_TABLE: {
+                var position = [Math.round(e.documentPoint.x), Math.round(e.documentPoint.y)];
+                var tableInfo = databasy.service.createTable(canvas.canvasId, position);
+                diagramModel.startTransaction();
+                diagramModel.select(tableInfo.reprId);
+                diagramModel.startTableNameEditing(tableInfo.reprId);
+                diagramModel.commitTransaction();
+
+                this.selectDefault();
+                break;
+            }
+        }
     },
 
     onRuntimeChanged:function (event) {
