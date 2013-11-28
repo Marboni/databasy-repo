@@ -1,9 +1,12 @@
 databasy.ui.Toolbar = Class.extend({
     init:function () {
+        databasy.gw.addListener(this);
+
         this._currentTool = null;
         this._defaultTool = 'pointer';
 
-        databasy.gw.addListener(this);
+        this.canvas = databasy.gw.layout.canvas;
+        this.canvas.diagram.click = $.proxy(this.onDiagramClick, this);
 
         this.createToolbar();
 
@@ -76,33 +79,41 @@ databasy.ui.Toolbar = Class.extend({
             })
             .click(function () {
                 var tool = $(this).data('tool');
-                if (tool === that._currentTool) {
-                    that.selectDefault();
-                } else {
-                    that._currentTool = tool;
-                }
+                that.select(tool);
             });
         return button;
     },
 
     select:function (tool) {
+        if (tool === this._currentTool) {
+            return;
+        }
         this._currentTool = tool;
-        this.controlTools.find('button').removeClass('active');
-        this.controlTools.find('button[data-tool=' + tool + ']').addClass('active');
+        this.toolbar.find('button').removeClass('active');
+        this.toolbar.find('button[data-tool=' + tool + ']').addClass('active');
+        this.onToolSelected(tool);
     },
 
     selectDefault:function () {
         this.select(this._defaultTool);
     },
 
-    handleClick: function(e) {
-        var canvas = databasy.gw.layout.canvas;
-        var diagramModel = canvas.diagramModel;
+    onToolSelected: function(tool) {
+        var diagramModel = this.canvas.diagramModel;
+        if (tool == databasy.ui.Toolbar.MOVE) {
+            diagramModel.setDragPanningMode();
+        } else {
+            diagramModel.setDragSelectingMode();
+        }
+    },
+
+    onDiagramClick: function(e) {
+        var diagramModel = this.canvas.diagramModel;
 
         switch (this._currentTool) {
             case databasy.ui.Toolbar.CREATE_TABLE: {
                 var position = [Math.round(e.documentPoint.x), Math.round(e.documentPoint.y)];
-                var tableInfo = databasy.service.createTable(canvas.canvasId, position);
+                var tableInfo = databasy.service.createTable(this.canvas.canvasId, position);
                 diagramModel.startTransaction();
                 diagramModel.select(tableInfo.reprId);
                 diagramModel.startTableNameEditing(tableInfo.reprId);

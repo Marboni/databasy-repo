@@ -15,8 +15,8 @@ databasy.ui.Layout = Class.extend({
         this.canvasInitialized = false;
         this.schemaTreeInitialized = false;
 
-        this.toolbar = new databasy.ui.Toolbar();
         this.canvas = new databasy.ui.gojs.Canvas('canvasWrapper');
+        this.toolbar = new databasy.ui.Toolbar();
         this.menuPanel = new databasy.ui.MenuPanel();
         this.propertyPanel = new databasy.ui.property.PropertyPanel();
         this.generalPanel = new databasy.ui.general.GeneralPanel();

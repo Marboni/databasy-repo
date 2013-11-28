@@ -23,6 +23,20 @@ databasy.ui.gojs.DiagramModel = Class.extend({
         return this.diagram.transformViewToDoc(this.cursorViewPosition())
     },
 
+    setDragSelectingMode: function() {
+        this.diagram.toolManager.dragSelectingTool.isEnabled = true;
+        this.diagram.toolManager.clickSelectingTool.isEnabled = true;
+        this.diagram.toolManager.draggingTool.isEnabled = true;
+        this.diagram.currentCursor = this.diagram.defaultCursor ='auto';
+    },
+
+    setDragPanningMode: function() {
+        this.diagram.toolManager.dragSelectingTool.isEnabled = false;
+        this.diagram.toolManager.clickSelectingTool.isEnabled = false;
+        this.diagram.toolManager.draggingTool.isEnabled = false;
+        this.diagram.currentCursor = this.diagram.defaultCursor = 'move';
+    },
+
     select: function(reprId) {
         var node = this.diagram.findNodeForKey(reprId);
         if (!node) {
