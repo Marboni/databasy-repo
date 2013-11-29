@@ -39,6 +39,19 @@ databasy.ui.gojs.Templates = Class.extend({
         return templates;
     },
 
+    boxTemplate:function () {
+        return mk(go.Part, {
+                layerName:'Tool'
+            },
+            mk(go.Shape, {
+                name:'SHAPE',
+                fill:null,
+                stroke:'#408ad9',
+                strokeWidth:2
+            })
+        );
+    },
+
     selectionAdornmentTemplate:function () {
         return mk(go.Adornment, "Auto",
             mk(go.Shape, "RoundedRectangle", {
@@ -104,7 +117,7 @@ databasy.ui.gojs.Templates = Class.extend({
         var that = this;
 
         return mk(go.Panel, 'Table', {
-                name: 'columnPanel',
+                name:'columnPanel',
                 stretch:go.GraphObject.Horizontal,
                 defaultAlignment:go.Spot.Left,
                 background:this.columnBackground,
@@ -201,7 +214,7 @@ databasy.ui.gojs.Templates = Class.extend({
                     padding:new go.Margin(0, 0, 0, 4)
                 },
                 mk(go.TextBlock, {
-                        name: 'columnLabel',
+                        name:'columnLabel',
                         stroke:this.textColor,
                         font:this.columnFont,
                         editable:true,
@@ -225,7 +238,7 @@ databasy.ui.gojs.Templates = Class.extend({
                 selectionAdornmentTemplate:this.selectionAdornmentTemplate(),
                 resizeAdornmentTemplate:this.resizeAdornmentTemplate(),
                 resizable:true,
-                contextMenu: this.contextMenuTemplate(),
+                contextMenu:this.contextMenuTemplate(),
                 fromSpot:go.Spot.AllSides,
                 toSpot:go.Spot.AllSides
             },
@@ -258,7 +271,7 @@ databasy.ui.gojs.Templates = Class.extend({
 
                 // Title panel.
                 mk(go.Panel, 'Table', {
-                        name: 'titlePanel',
+                        name:'titlePanel',
                         stretch:go.GraphObject.Horizontal,
                         defaultAlignment:go.Spot.Left,
                         padding:new go.Margin(4, 6, 4, 6)
@@ -282,7 +295,7 @@ databasy.ui.gojs.Templates = Class.extend({
                             column:1
                         },
                         mk(go.TextBlock, {
-                                name: 'titleLabel',
+                                name:'titleLabel',
                                 position:new go.Point(0, 3),
                                 stroke:this.textColor,
                                 font:this.titleFont,
@@ -316,7 +329,7 @@ databasy.ui.gojs.Templates = Class.extend({
                 selectionAdornmentTemplate:this.selectionAdornmentTemplate(),
                 resizeAdornmentTemplate:this.resizeAdornmentTemplate(),
                 resizable:true,
-                contextMenu: this.contextMenuTemplate(),
+                contextMenu:this.contextMenuTemplate(),
             },
 
             new go.Binding('position', 'position', function (pos) {
@@ -344,7 +357,7 @@ databasy.ui.gojs.Templates = Class.extend({
 
                 // Title panel.
                 mk(go.Panel, 'Table', {
-                        name: 'titlePanel',
+                        name:'titlePanel',
                         stretch:go.GraphObject.Horizontal,
                         defaultAlignment:go.Spot.Left,
                         padding:new go.Margin(4, 6, 4, 6)
@@ -368,7 +381,7 @@ databasy.ui.gojs.Templates = Class.extend({
                             column:1
                         },
                         mk(go.TextBlock, {
-                                name: 'titleLabel',
+                                name:'titleLabel',
                                 position:new go.Point(0, 3),
                                 stroke:this.textColor,
                                 font:this.titleFont,
@@ -442,7 +455,7 @@ databasy.ui.gojs.Templates = Class.extend({
         return mk(go.Link, {
                 routing:go.Link.Orthogonal,
                 layerName:'Background',
-                contextMenu: this.contextMenuTemplate(),
+                contextMenu:this.contextMenuTemplate(),
                 selectionAdornmentTemplate:mk(go.Adornment,
                     mk(go.Shape, {
                             isPanelMain:true,
@@ -483,7 +496,7 @@ databasy.ui.gojs.Templates = Class.extend({
             },
             mk(go.Shape, {
                     strokeWidth:1,
-                    contextMenu: this.contextMenuTemplate(),
+                    contextMenu:this.contextMenuTemplate(),
                     mouseEnter:function (e, shape) {
                         shape.strokeWidth = 3;
                         shape.stroke = that.highlightedLinkColor;
