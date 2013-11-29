@@ -150,13 +150,7 @@ databasy.ui.utils.initContextMenu = function () {
 
             // Common context menu.
             addMenuItem('delete', 'Delete', function () {
-                var selectedReprIds = diagramModel.selectedPartKeys();
-                $.each(selectedReprIds, function (i, reprId) {
-                    var selectedNode = databasy.gw.model.node(reprId);
-                    if (selectedNode instanceof databasy.model.core.reprs.TableRepr) {
-                        databasy.service.deleteTable(selectedNode.val('table').ref_id());
-                    }
-                });
+                databasy.service.deleteReprElements(diagramModel.selectedPartKeys());
             });
 
             // Menu modifications.

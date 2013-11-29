@@ -12,17 +12,32 @@ databasy.ui.gojs.Canvas = Class.extend({
 
     initGo:function (domElementId) {
         this.diagram = new go.Diagram(domElementId);
-        this.diagram.initialContentAlignment = go.Spot.Center;
-        this.diagram.padding = 300;
+        this.diagram.padding = 500;
+
+        this.diagram.allowCopy = false;
+        this.diagram.allowDragOut = false;
+        this.diagram.allowGroup = false;
+        this.diagram.allowInsert = false;
+        this.diagram.allowLink = false;
+        this.diagram.allowRelink = false;
+        this.diagram.allowReshape = false;
+        this.diagram.allowRotate = false;
+        this.diagram.allowUndo = false;
+        this.diagram.allowUngroup = false;
+
         this.diagram.toolManager.dragSelectingTool.delay = 0;
         this.diagram.toolManager.dragSelectingTool.isPartialInclusion = true;
+
+        this.diagramModel = new databasy.ui.gojs.DiagramModel(this.diagram);
+
+        this.diagram.commandHandler.deleteSelection = $.proxy(function() {
+            databasy.service.deleteReprElements(this.diagramModel.selectedPartKeys());
+        }, this);
 
         var templates = new databasy.ui.gojs.Templates();
         this.diagram.contextMenu = templates.contextMenuTemplate();
         this.diagram.nodeTemplateMap = templates.createNodeTemplateMap();
         this.diagram.linkTemplateMap = templates.createLinkTemplateMap();
-
-        this.diagramModel = new databasy.ui.gojs.DiagramModel(this.diagram);
 
         this.addDiagramActionHandlers();
     },

@@ -7,6 +7,15 @@ databasy.gateway.Service = Class.extend({
         return databasy.model.utils.uuid();
     },
 
+    deleteReprElements: function(reprIds) {
+        $.each(reprIds, $.proxy(function (i, reprId) {
+            var selectedNode = databasy.gw.model.node(reprId);
+            if (selectedNode instanceof databasy.model.core.reprs.TableRepr) {
+                this.deleteTable(selectedNode.val('table').ref_id());
+            }
+        }, this));
+    },
+
     createTable: function(canvasNodeId, position) {
         var tableId = this.uuid();
         var reprId = this.uuid();
