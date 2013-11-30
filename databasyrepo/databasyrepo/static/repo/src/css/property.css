@@ -48,9 +48,14 @@
 
 #propertyPanel .contentPanel {
     position: absolute;
+    overflow: auto;
     top: 32px;
     bottom: 0;
     width: 100%;
+}
+
+#propertyPanel .contentPanel div {
+    max-height: 100%;
     padding: 0 5px;
 }
 

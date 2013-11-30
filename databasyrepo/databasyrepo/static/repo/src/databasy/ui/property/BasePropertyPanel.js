@@ -1,5 +1,5 @@
 databasy.ui.property.BasePropertyPanel = Class.extend({
-    init:function (elementId) {
+    init:function (elementId, pillIndex) {
         this.propertyPanel = $('#propertyPanel');
         this.propertyPanel.empty();
 
@@ -11,9 +11,7 @@ databasy.ui.property.BasePropertyPanel = Class.extend({
         this.createGeneralPanel();
         this.createContentPanel();
 
-        if (this.navPills) {
-            this.navPills.find('li:first-child a').trigger('click');
-        }
+        this.navPills.find('li').eq(pillIndex).find('a').trigger('click');
 
         this.render();
         this.setReadOnly(!databasy.gw.runtime.isEditor());
@@ -53,19 +51,27 @@ databasy.ui.property.BasePropertyPanel = Class.extend({
 
             for (var itemName in navPillItems) {
                 var itemLink = $('<a href="#">' + itemName + '</a>').click(function() {
-                    var contentPanel = $('#propertyPanel').find('.contentPanel');
-                    contentPanel.empty();
-                    var contentSubPanel = navPillItems[$(this).text()];
-                    contentPanel.append(contentSubPanel);
+                    if ($(this).parent().hasClass('disabled')) {
+                        $(this).blur();
+                    } else {
+                        var contentPanel = $('#propertyPanel').find('.contentPanel');
+                        contentPanel.empty();
+                        var contentSubPanel = navPillItems[$(this).text()];
+                        contentPanel.append(contentSubPanel);
 
-                    $('#propertyNavPills').find('li').removeClass('active');
-                    $(this).parent().addClass('active');
+                        $('#propertyNavPills').find('li').removeClass('active');
+                        $(this).parent().addClass('active');
+                    }
                 });
                 var item = $('<li></li>');
                 item.append(itemLink);
                 this.navPills.append(item);
             }
         }
+    },
+
+    currentPillIndex: function() {
+        return this.navPills.find('li.active').index();
     },
 
     createHistoryPanel:function () {
@@ -101,7 +107,7 @@ databasy.ui.property.BasePropertyPanel = Class.extend({
      * Dict of navigation pill names and associated panels.
      */
     navPillItems: function() {
-        return null;
+        throw new Error('Not implemented');
     },
 
     setReadOnly:function (readOnly) {
@@ -153,6 +159,7 @@ databasy.ui.property.BasePropertyPanel = Class.extend({
         if (event.isNodeUnregistered()) {
             if (event.modelEvent.val('node').id() === this.elementId) {
                 this.setReadOnly(true);
+                this.navPills.find('li').removeClass('active').addClass('disabled');
                 this.showElementHasBeenRemoved();
             }
             this.updateHistoryButtons();

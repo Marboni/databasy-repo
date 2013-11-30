@@ -1,11 +1,11 @@
 databasy.ui.property.TablePropertyPanel = databasy.ui.property.BasePropertyPanel.extend({
-    init: function(elementId) {
+    init: function(elementId, pillIndex) {
         this.createColumnsPanel();
         this.createIndexesPanel();
         this.createForeignKeysPanel();
         this.createExtraQueriesPanel();
 
-        this._super(elementId);
+        this._super(elementId, pillIndex);
     },
 
     createTitlePanel:function () {
@@ -34,7 +34,7 @@ databasy.ui.property.TablePropertyPanel = databasy.ui.property.BasePropertyPanel
     },
 
     createColumnsPanel: function() {
-        this.columnsPanel = $('<div id="columnsPanel">Columns panel</div>');
+        this.columnsPanel = $('<div id="columnsPanel">Columns panel</br>Columns panel</br>Columns panel</br>Columns panel</br>Columns panel</br>Columns panel</br>Columns panel</br>Columns panel</br>Columns panel</br>Columns panel</br>Columns panel</br>Columns panel</br>Columns panel</br>Columns panel</br>Columns panel</br></div>');
     },
 
     createIndexesPanel: function() {
