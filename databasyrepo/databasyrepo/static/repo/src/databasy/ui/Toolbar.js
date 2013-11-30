@@ -120,6 +120,7 @@ databasy.ui.Toolbar = Class.extend({
                 diagramModel.commitTransaction();
 
                 databasy.gw.layout.propertyPanel.show(tableInfo.elementId);
+                databasy.gw.layout.openPropertyPanel();
 
                 this.selectDefault();
                 break;

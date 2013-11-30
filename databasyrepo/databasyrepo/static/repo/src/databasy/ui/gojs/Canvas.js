@@ -259,7 +259,6 @@ databasy.ui.gojs.Canvas = Class.extend({
                 var tableRepr = databasy.gw.model.node(data.key);
                 databasy.gw.layout.propertyPanel.show(tableRepr.val('table').ref_id());
             }
-            databasy.gw.layout.openPropertyPanel();
         }, this));
 
         // Select text in in-place editor on opening.
