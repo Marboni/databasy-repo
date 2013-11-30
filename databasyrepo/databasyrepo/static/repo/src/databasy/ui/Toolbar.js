@@ -108,19 +108,10 @@ databasy.ui.Toolbar = Class.extend({
     },
 
     onDiagramClick: function(e) {
-        var diagramModel = this.canvas.diagramModel;
-
         switch (this._currentTool) {
             case databasy.ui.Toolbar.CREATE_TABLE: {
                 var position = [Math.round(e.documentPoint.x), Math.round(e.documentPoint.y)];
-                var tableInfo = databasy.service.createTable(this.canvas.canvasId, position);
-                diagramModel.startTransaction();
-                diagramModel.select(tableInfo.reprId);
-                diagramModel.startTableNameEditing(tableInfo.reprId);
-                diagramModel.commitTransaction();
-
-                databasy.gw.layout.propertyPanel.show(tableInfo.elementId);
-                databasy.gw.layout.openPropertyPanel();
+                databasy.gw.layout.service.createTable(position);
 
                 this.selectDefault();
                 break;

@@ -5,6 +5,8 @@ databasy.ui.Layout = Class.extend({
     init:function () {
         databasy.gw.addListener(this);
 
+        this.service = new databasy.ui.Service();
+
         this.createHtml();
         this.createLayout();
     },

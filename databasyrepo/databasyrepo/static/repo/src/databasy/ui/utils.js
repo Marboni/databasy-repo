@@ -113,14 +113,7 @@ databasy.ui.utils.initContextMenu = function () {
 
                 addMenuItem('createTable', 'Create table', function () {
                     var position = [Math.round(cursorDocPosition.x), Math.round(cursorDocPosition.y)];
-                    var tableInfo = databasy.service.createTable(canvas.canvasId, position);
-                    diagramModel.startTransaction();
-                    diagramModel.select(tableInfo.reprId);
-                    diagramModel.startTableNameEditing(tableInfo.reprId);
-                    diagramModel.commitTransaction();
-
-                    databasy.gw.layout.propertyPanel.show(tableInfo.elementId);
-                    databasy.gw.layout.openPropertyPanel();
+                    databasy.gw.layout.service.createTable(position);
                 });
             } else if (selectedPartCount == 1) {
                 // Context menu for single item.
@@ -137,10 +130,7 @@ databasy.ui.utils.initContextMenu = function () {
                     }
 
                     addMenuItem('createColumn', 'Create column', function () {
-                        var columnId = databasy.service.createColumn(table.id(), index);
-                        diagramModel.startTransaction();
-                        diagramModel.startColumnEditing(columnId);
-                        diagramModel.commitTransaction();
+                        databasy.gw.layout.service.createColumn(table.id(), index);
                     });
 
                     if (column) {
