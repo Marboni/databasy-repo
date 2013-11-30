@@ -128,7 +128,7 @@ databasy.ui.gojs.Canvas = Class.extend({
         } else if (event.isPropertyChangedByNodeType(databasy.model.core.reprs.TableRepr, 'position', model)) {
             diagramModel.startTransaction();
             diagramModel.updateTable(modelEvent.val('node_id'), {
-                position:modelEvent.val('position')
+                position:modelEvent.val('new_value')
             });
             diagramModel.commitTransaction();
 
