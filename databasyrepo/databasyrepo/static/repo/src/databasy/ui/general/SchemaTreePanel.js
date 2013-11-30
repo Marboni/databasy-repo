@@ -239,18 +239,18 @@ databasy.ui.general.SchemaTreePanel = Class.extend({
         var model = databasy.gw.model;
         var modelEvent = event.modelEvent;
 
-        if (event.isNodeItemInserted(null, 'tables')) {
+        if (event.isItemInsertedByNodeId(null, 'tables')) {
             // Table inserted to the model.
             var table = modelEvent.val('item').ref_node(model);
             this.renderTableNode(table);
 
-        } else if (event.isNodeTypePropertyChanged(databasy.model.core.elements.Table, 'name', model)) {
+        } else if (event.isPropertyChangedByNodeType(databasy.model.core.elements.Table, 'name', model)) {
             // Table renamed.
             var node = model.node(modelEvent.val('node_id'));
             var newName = modelEvent.val('new_value');
             this.renameNode(node.id(), newName);
 
-        } else if (event.isNodeItemDeleted(null, 'tables')) {
+        } else if (event.isItemDeletedByNodeId(null, 'tables')) {
             // Table deleted.
             var tableId = modelEvent.val('item').ref_id();
             this.deleteNode(tableId);

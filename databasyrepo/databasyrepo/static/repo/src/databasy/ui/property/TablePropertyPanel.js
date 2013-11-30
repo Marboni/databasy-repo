@@ -1,79 +1,77 @@
-databasy.ui.property.TablePropertyPanel = Class.extend({
-    init:function (tableId) {
-        this.tableId = tableId;
+databasy.ui.property.TablePropertyPanel = databasy.ui.property.BasePropertyPanel.extend({
+    init: function(elementId) {
+        this.createColumnsPanel();
+        this.createIndexesPanel();
+        this.createForeignKeysPanel();
+        this.createExtraQueriesPanel();
 
-        this.createPanel();
-
-        databasy.gw.addListener(this);
-
-        this.setEditable(databasy.gw.runtime.isEditor());
-    },
-
-    createPanel:function () {
-        this.panel = $('<div class="tableProperties"></div>');
-        this.createTitlePanel();
-
-        $('#propertyPanel').append(this.panel);
-
-        this.render();
-    },
-
-    render: function() {
-        var table = databasy.gw.model.node(this.tableId);
-        this.setName(table.val('name'));
+        this._super(elementId);
     },
 
     createTitlePanel:function () {
-        this.titlePanel = $('<div class="titlePanel"></div>');
-        this.panel.append(this.titlePanel);
+        this._super();
 
-        this.name = $('<span class="name"></span>');
-        var that = this;
-        this.bindEditor(this.name, function (value) {
-            databasy.service.renameTable(that.tableId, value);
+        var icon = $('<i class="icon-table16"></i>').css({
+            float:'left',
+            margin:'8px 0'
         });
-        this.titlePanel.append(this.name);
+        this.titlePanel.append(icon);
+
+        var that = this;
+        this.tableLabel = $('<input type="text"></input>').css({
+                fontWeight:'bold'
+            }
+        ).keyup(function (e) {
+                if (e.keyCode == 13) {
+                    $(this).blur();
+                }
+            }
+        ).blur(function () {
+                databasy.service.renameTable(that.elementId, $(this).val())
+            }
+        );
+        this.titlePanel.append(this.tableLabel);
     },
 
-    bindEditor:function (domNode, callback) {
-        domNode.addClass('editable');
-        domNode.editable(function (value, settings) {
-            callback(value);
-        }, {
-            width:'100px',
-            select: true
-        })
+    createColumnsPanel: function() {
+        this.columnsPanel = $('<div id="columnsPanel">Columns panel</div>');
     },
 
-    setName: function(name) {
-        this.name.text(name);
+    createIndexesPanel: function() {
+        this.indexesPanel = $('<div id="indexesPanel">Indexes panel</div>');
     },
 
-    setEditable:function (editable) {
-        if (editable) {
-            this.panel.removeClass('readonly');
-            this.name.editable('enable');
-        } else {
-            this.panel.addClass('readonly');
-            this.name.editable('disable');
-        }
+    createForeignKeysPanel: function() {
+        this.foreignKeysPanel = $('<div id="foreignKeysPanel">Foreign keys panel</div>');
     },
 
-    onRuntimeChanged:function (event) {
-        var editable = event.runtime.isEditor();
-        this.setEditable(editable);
+    createExtraQueriesPanel: function() {
+        this.extraQueriesPanel = $('<div id="extraQueriesPanel">Extra queries panel</div>');
+    },
+
+    render:function () {
+        var table = databasy.gw.model.node(this.elementId);
+        this.tableLabel.val(table.val('name'));
+    },
+
+    navPillItems:function () {
+        return {
+            'Columns':this.columnsPanel,
+            'Indexes':this.indexesPanel,
+            'Foreign Keys':this.foreignKeysPanel,
+            'Extra Queries':this.extraQueriesPanel
+        };
     },
 
     onModelChanged:function (event) {
+        this._super(event);
+
         var modelEvent = event.modelEvent;
 
-        if (event.isNodePropertyChanged(this.tableId, 'name')) {
-            // Table name changed.
-            this.setName(modelEvent.val('new_value'));
+        if (event.isPropertyChangedByNodeId(this.elementId, 'name')) {
+            // Table renamed.
+            var newName = modelEvent.val('new_value');
+            this.tableLabel.val(newName);
         }
-    },
-
-    destroy:function () {
-        databasy.gw.removeListener(this);
     }
 });

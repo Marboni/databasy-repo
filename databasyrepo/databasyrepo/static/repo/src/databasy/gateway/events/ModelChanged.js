@@ -8,37 +8,59 @@ databasy.gateway.events.ModelChanged = databasy.utils.events.Event.extend({
         return this.modelEvent instanceof type;
     },
 
-    isNodePropertyChanged: function(nodeId, field) {
+    isNodeRegistered: function() {
+        return this.isType(databasy.model.core.events.NodeRegistered);
+    },
+
+    isNodeUnregistered: function() {
+        return this.isType(databasy.model.core.events.NodeUnregistered);
+    },
+
+    isPropertyChangedByNodeId: function(nodeId, field) {
         return this.isType(databasy.model.core.events.PropertyChanged)
             && this.hasFieldValue('node_id', nodeId)
             && this.hasFieldValue('field', field);
     },
 
-    isNodeTypePropertyChanged: function(type, field, model) {
+    isPropertyChangedByNodeType: function(type, field, model) {
         return this.isType(databasy.model.core.events.PropertyChanged)
             && this.hasIdFieldType('node_id', type, model)
             && this.hasFieldValue('field', field);
     },
 
-    isNodeItemInserted: function(nodeId, field) {
+    isItemInsertedByNodeId: function(nodeId, field) {
         return this.isType(databasy.model.core.events.ItemInserted)
             && this.hasFieldValue('node_id', nodeId)
             && this.hasFieldValue('field', field);
     },
 
-    isNodeTypeItemInserted: function(nodeType, field, model) {
+    isItemInsertedByNodeType: function(nodeType, field, model) {
         return this.isType(databasy.model.core.events.ItemInserted)
             && this.hasIdFieldType('node_id', nodeType, model)
             && this.hasFieldValue('field', field);
     },
 
-    isNodeItemDeleted: function(nodeId, field) {
+    isItemDeletedByNodeId: function(nodeId, field) {
         return this.isType(databasy.model.core.events.ItemDeleted)
             && this.hasFieldValue('node_id', nodeId)
             && this.hasFieldValue('field', field);
     },
 
-    isNodeTypeItemDeleted: function(nodeType, field, model) {
+    isItemDeletedByNodeIdAndItemId: function(nodeId, field, itemId) {
+        if (!this.isItemDeletedByNodeId(nodeId, field)) {
+            return false;
+        }
+        var item = this.modelEvent.val('item');
+        if (item instanceof databasy.model.core.nodes.NodeRef) {
+            return item.ref_id() === itemId;
+        } else if (item instanceof databasy.model.core.nodes.Node) {
+            return item.id() === itemId;
+        } else {
+            throw new Error('Item is not Node or NodeRef.');
+        }
+    },
+
+    isItemDeletedByNodeType: function(nodeType, field, model) {
         return this.isType(databasy.model.core.events.ItemDeleted)
             && this.hasIdFieldType('node_id', nodeType, model)
             && this.hasFieldValue('field', field);

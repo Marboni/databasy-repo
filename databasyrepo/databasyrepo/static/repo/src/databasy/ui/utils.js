@@ -118,6 +118,8 @@ databasy.ui.utils.initContextMenu = function () {
                     diagramModel.select(tableInfo.reprId);
                     diagramModel.startTableNameEditing(tableInfo.reprId);
                     diagramModel.commitTransaction();
+
+                    databasy.gw.layout.propertyPanel.show(tableInfo.elementId);
                 });
             } else if (selectedPartCount == 1) {
                 // Context menu for single item.

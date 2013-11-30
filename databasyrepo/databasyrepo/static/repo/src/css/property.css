@@ -1,23 +1,60 @@
-#propertyPanel.ui-layout-pane {
+#propertyPanel {
     padding: 0 !important;
-    font-size: 12pt;
+    font-size: 14px;
 }
 
-#propertyPanel .editable {
-    border-bottom: 1px dotted #292929;
+#propertyPanel input {
+    margin: 5px;
+    padding: 2px 3px;
+    height: 16px;
+    line-height: 16px;
+    font-size: 14px;
 }
 
-#propertyPanel .readonly .editable {
-    border-bottom: none;
+#propertyPanel .nav-pills {
+    display: inline-block;
+    margin: 0;
 }
 
-#propertyPanel .tableProperties .titlePanel {
-    margin: 0.5em;
-    border-bottom: 1px solid #292929;
-    line-height: 1.5em;
+#propertyPanel .nav-pills a {
+    padding: 7px 8px;
+    font-size: 12px;
 }
 
-#propertyPanel .tableProperties .title {
-    font-weight: bold;
+#propertyPanel .generalPanel {
+    position: absolute;
+    height: 32px;
+    width: 100%;
+    border-bottom: 1px solid #ccc;
+    overflow: hidden;
+}
+
+#propertyPanel .wrapper {
+    position: relative;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+#propertyPanel .wrapper .left {
+    padding: 0 5px;
+    float: left;
+}
+
+#propertyPanel .wrapper .right {
+    padding: 0 5px;
+    float: right;
+}
+
+#propertyPanel .contentPanel {
+    position: absolute;
+    top: 32px;
+    bottom: 0;
+    width: 100%;
+    padding: 0 5px;
+}
+
+#historyToolbar {
+    margin: 5px 0;
 }
 

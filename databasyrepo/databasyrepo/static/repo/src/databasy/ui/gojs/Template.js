@@ -271,7 +271,7 @@ databasy.ui.gojs.Templates = Class.extend({
 
                 // Title panel.
                 mk(go.Panel, 'Table', {
-                        name:'titlePanel',
+                        name:'generalPanel',
                         stretch:go.GraphObject.Horizontal,
                         defaultAlignment:go.Spot.Left,
                         padding:new go.Margin(4, 6, 4, 6)
@@ -357,7 +357,7 @@ databasy.ui.gojs.Templates = Class.extend({
 
                 // Title panel.
                 mk(go.Panel, 'Table', {
-                        name:'titlePanel',
+                        name:'generalPanel',
                         stretch:go.GraphObject.Horizontal,
                         defaultAlignment:go.Spot.Left,
                         padding:new go.Margin(4, 6, 4, 6)

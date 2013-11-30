@@ -1,4 +1,4 @@
-.icon-database16, .icon-pointer24, .icon-minus14, .icon-plus14, .icon-column16, .icon-column24, .icon-folder16, .icon-move24, .icon-rel16, .icon-rel24, .icon-table16, .icon-table24, .icon-view16, .icon-view24, .icon-discussion24 {
+.icon-database16, .icon-pointer24, .icon-minus14, .icon-plus14, .icon-column16, .icon-column24, .icon-folder16, .icon-move24, .icon-rel16, .icon-rel24, .icon-table16, .icon-table24, .icon-view16, .icon-view24, .icon-discussion24, .icon-forward14, .icon-back14 {
     background: url(../img/sprites.png) no-repeat;
 }
 
@@ -90,4 +90,16 @@
     background-position: -15px -363px;
     width: 24px;
     height: 24px;
+}
+
+.icon-back14{
+    background-position: -68px -416px ;
+    width: 14px;
+    height: 14px;
+}
+
+.icon-forward14{
+    background-position: -69px -364px ;
+    width: 14px;
+    height: 14px;
 }

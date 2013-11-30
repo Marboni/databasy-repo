@@ -94,7 +94,8 @@ databasy.ui.Layout = Class.extend({
                     },
                     south:{
                         paneSelector:"#propertyPanel",
-                        size:150,
+                        size:200,
+                        resizable:true,
                         initClosed:true,
                         closable:true
                     }

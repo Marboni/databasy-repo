@@ -115,24 +115,24 @@ databasy.ui.gojs.Canvas = Class.extend({
         var modelEvent = event.modelEvent;
         var model = databasy.gw.model;
 
-        if (event.isNodeItemInserted(this.canvasId, 'reprs')) {
+        if (event.isItemInsertedByNodeId(this.canvasId, 'reprs')) {
             this.renderFigure(modelEvent.val('item').ref_node(model));
 
-        } else if (event.isNodeTypePropertyChanged(databasy.model.core.reprs.TableRepr, 'width', model)) {
+        } else if (event.isPropertyChangedByNodeType(databasy.model.core.reprs.TableRepr, 'width', model)) {
             diagramModel.startTransaction();
             diagramModel.updateTable(modelEvent.val('node_id'), {
                 width:modelEvent.val('new_value')
             });
             diagramModel.commitTransaction();
 
-        } else if (event.isNodeTypePropertyChanged(databasy.model.core.reprs.TableRepr, 'position', model)) {
+        } else if (event.isPropertyChangedByNodeType(databasy.model.core.reprs.TableRepr, 'position', model)) {
             diagramModel.startTransaction();
             diagramModel.updateTable(modelEvent.val('node_id'), {
                 position:modelEvent.val('position')
             });
             diagramModel.commitTransaction();
 
-        } else if (event.isNodeTypePropertyChanged(databasy.model.core.elements.Table, 'name', model)) {
+        } else if (event.isPropertyChangedByNodeType(databasy.model.core.elements.Table, 'name', model)) {
             //noinspection JSDuplicatedDeclaration
             var tableRepr = this.findTableRepr(modelEvent.val('node_id'));
             if (tableRepr == null) {
@@ -142,7 +142,7 @@ databasy.ui.gojs.Canvas = Class.extend({
             diagramModel.updateTable(tableRepr.id(), {name:modelEvent.val('new_value')});
             diagramModel.commitTransaction();
 
-        } else if (event.isNodeItemDeleted(this.canvasId, 'reprs')) {
+        } else if (event.isItemDeletedByNodeId(this.canvasId, 'reprs')) {
             var reprRef = modelEvent.val('item');
             diagramModel.startTransaction();
             if (reprRef.ref_code() == databasy.model.core.reprs.TableRepr.CODE) {
@@ -150,7 +150,7 @@ databasy.ui.gojs.Canvas = Class.extend({
             }
             diagramModel.commitTransaction();
 
-        } else if (event.isNodeTypeItemInserted(databasy.model.core.elements.Table, 'columns', model)) {
+        } else if (event.isItemInsertedByNodeType(databasy.model.core.elements.Table, 'columns', model)) {
             var tableReprId = this.findTableRepr(modelEvent.val('node_id')).id();
             var column = modelEvent.val('item').ref_node(model);
             var index = modelEvent.val('index');
@@ -158,17 +158,17 @@ databasy.ui.gojs.Canvas = Class.extend({
             diagramModel.insertColumn(tableReprId, index, column.id(), 'null', column.val('name'), column.val('type'));
             diagramModel.commitTransaction();
 
-        } else if (event.isNodeTypePropertyChanged(databasy.model.core.elements.Column, 'name', model)) {
+        } else if (event.isPropertyChangedByNodeType(databasy.model.core.elements.Column, 'name', model)) {
             diagramModel.startTransaction();
             diagramModel.updateColumn(modelEvent.val('node_id'), {name:modelEvent.val('new_value')});
             diagramModel.commitTransaction();
 
-        } else if (event.isNodeTypePropertyChanged(databasy.model.core.elements.Column, 'type', model)) {
+        } else if (event.isPropertyChangedByNodeType(databasy.model.core.elements.Column, 'type', model)) {
             diagramModel.startTransaction();
             diagramModel.updateColumn(modelEvent.val('node_id'), {type:modelEvent.val('new_value')});
             diagramModel.commitTransaction();
 
-        } else if (event.isNodeTypeItemDeleted(databasy.model.core.elements.Table, 'columns', model)) {
+        } else if (event.isItemDeletedByNodeType(databasy.model.core.elements.Table, 'columns', model)) {
             var tableId = modelEvent.val('node_id');
             //noinspection JSDuplicatedDeclaration
             var tableRepr = this.findTableRepr(tableId);
@@ -251,6 +251,15 @@ databasy.ui.gojs.Canvas = Class.extend({
                     }
                 }
             }
+        }, this));
+
+        this.diagram.addDiagramListener('ObjectSingleClicked', $.proxy(function(e) {
+            var data = e.subject.part.data;
+            if (data.entity == 'table') {
+                var tableRepr = databasy.gw.model.node(data.key);
+                databasy.gw.layout.propertyPanel.show(tableRepr.val('table').ref_id());
+            }
+            databasy.gw.layout.openPropertyPanel();
         }, this));
 
         // Select text in in-place editor on opening.

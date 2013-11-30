@@ -119,6 +119,8 @@ databasy.ui.Toolbar = Class.extend({
                 diagramModel.startTableNameEditing(tableInfo.reprId);
                 diagramModel.commitTransaction();
 
+                databasy.gw.layout.propertyPanel.show(tableInfo.elementId);
+
                 this.selectDefault();
                 break;
             }
