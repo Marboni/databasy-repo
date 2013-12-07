@@ -9,6 +9,7 @@ __author__ = 'Marboni'
 
 config = config_by_mode('testing')
 
+
 class ODMTest(TestCase):
     def create_app(self):
         os.environ['ODM_API_ENV'] = 'testing'
@@ -28,6 +29,7 @@ class ODMTest(TestCase):
     def auth_header(self, auth_token_hex):
         return [('AUTH_TOKEN', auth_token_hex)]
 
+
 class Fixtures(object):
     def __init__(self, db):
         super(Fixtures, self).__init__()
@@ -46,6 +48,7 @@ class Fixtures(object):
                     return cl
             raise ValueError('Collection %s not exists.', name)
 
+
 class CollectionLoader(object):
     def __init__(self, db, cls):
         super(CollectionLoader, self).__init__()
@@ -58,6 +61,7 @@ class CollectionLoader(object):
                 obj[field_name] = field_value
             obj.save()
         super(CollectionLoader, self).__setattr__(name, value)
+
 
 def load_fixtures(db, *fixtures):
     from databasyrepo.testing import Fixtures

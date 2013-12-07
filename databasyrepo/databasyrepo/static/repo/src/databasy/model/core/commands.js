@@ -155,7 +155,7 @@ databasy.model.core.commands.CreateColumn = databasy.model.core.commands.Command
             'column_id',
             'name',
             'type',
-            'index'
+            'position'
         )
     },
     do:function (executor) {
@@ -171,7 +171,7 @@ databasy.model.core.commands.CreateColumn = databasy.model.core.commands.Command
         });
 
         executor.execute(new core.actions.Register({node:column}));
-        executor.execute(new core.actions.InsertItem({node_id:table.id(), field:'columns', index:this.val('index'), item:column}));
+        executor.execute(new core.actions.InsertItem({node_id:table.id(), field:'columns', index:this.val('position'), item:column}));
     }
 }, {
     CODE:'core.commands.CreateColumn'

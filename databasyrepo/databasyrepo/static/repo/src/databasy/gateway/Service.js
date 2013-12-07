@@ -79,14 +79,14 @@ databasy.gateway.Service = Class.extend({
         databasy.gw.executeCommand(command);
     },
 
-    createColumn: function(tableId, index) {
+    createColumn: function(tableId, position) {
         var column_id = this.uuid();
         var command = new databasy.model.core.commands.CreateColumn({
             table_id:tableId,
             column_id:column_id,
             name:'column',
             type:databasy.model.core.elements.Column.DEFAULT_TYPE,
-            index:index
+            position:position
         });
         databasy.gw.executeCommand(command);
 

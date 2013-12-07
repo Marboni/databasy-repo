@@ -1,3 +1,4 @@
+from databasyrepo.models.core.nodes import NodeRef, Node
 from databasyrepo.utils.validators import FieldValidator, InvalidStateError, Integer
 
 __author__ = 'Marboni'
@@ -22,11 +23,20 @@ class NodeClass(FieldValidator):
         self.clazz = clazz
 
     def __call__(self, field, field_values):
-        id = self.get(field, field_values)
+        id_or_node = self.get(field, field_values)
+        if isinstance(id_or_node, basestring):
+            node_id = id_or_node
+        elif isinstance(id_or_node, NodeRef):
+            node_id = id_or_node.ref_id
+        elif isinstance(id_or_node, Node):
+            node_id = id_or_node.id
+        else:
+            raise InvalidStateError('Value must be Node, NodeRef or node ID, but it\'s %s.' + id_or_node)
         try:
-            self.model.node(id, self.clazz)
+            self.model.node(node_id, self.clazz)
         except ValueError, e:
             raise InvalidStateError(e)
+
 
 class UniqueID(FieldValidator):
     def __init__(self, model):

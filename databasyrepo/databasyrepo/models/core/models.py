@@ -60,6 +60,14 @@ class Model(Node):
             UpdateColumn,
             DeleteColumn,
 
+            CreateIndex,
+            UpdateIndex,
+            DeleteIndex,
+
+            CreateIndexColumn,
+            UpdateIndexColumn,
+            DeleteIndexColumn,
+
             CreateTableRepr,
             UpdateTableRepr,
             DeleteTableRepr,

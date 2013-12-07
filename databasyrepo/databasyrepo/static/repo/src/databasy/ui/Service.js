@@ -14,10 +14,10 @@ databasy.ui.Service = Class.extend({
         databasy.gw.layout.openPropertyPanel();
     },
 
-    createColumn: function(tableId, index) {
+    createColumn: function(tableId, position) {
         var diagramModel = databasy.gw.layout.canvas.diagramModel;
 
-        var columnId = databasy.service.createColumn(tableId, index);
+        var columnId = databasy.service.createColumn(tableId, position);
         diagramModel.startTransaction();
         diagramModel.startColumnEditing(columnId);
         diagramModel.commitTransaction();

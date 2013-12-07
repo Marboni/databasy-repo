@@ -7,7 +7,7 @@ from databasyrepo.models.register import register
 
 __author__ = 'Marboni'
 
-class BasicTests(TestCase):
+class BasicTest(TestCase):
     def test_register(self):
         model_class = register.get(Model.code())
         self.assertEqual(Model, model_class)

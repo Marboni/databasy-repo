@@ -120,17 +120,17 @@ databasy.ui.utils.initContextMenu = function () {
 
                 if (targetRepr instanceof databasy.model.core.reprs.TableRepr) {
                     var table = targetRepr.val_as_node('table', model);
-                    var index = 0;
+                    var position = 0;
 
                     var column = null;
                     var dataPanel = diagramModel.findDataPanelAt(cursorDocPosition);
                     if (dataPanel != null && dataPanel.data.entity == 'column') {
                         column = model.node(dataPanel.data.key);
-                        index = table.item_index('columns', column) + 1;
+                        position = table.item_index('columns', column) + 1;
                     }
 
                     addMenuItem('createColumn', 'Create column', function () {
-                        databasy.gw.layout.service.createColumn(table.id(), index);
+                        databasy.gw.layout.service.createColumn(table.id(), position);
                     });
 
                     if (column) {
