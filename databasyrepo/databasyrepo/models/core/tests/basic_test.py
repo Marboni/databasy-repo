@@ -9,13 +9,13 @@ __author__ = 'Marboni'
 
 class BasicTest(TestCase):
     def test_register(self):
-        model_class = register.get(Model.code())
+        model_class = register.by_key(Model.code())
         self.assertEqual(Model, model_class)
 
         with self.assertRaises(ValueError):
-            register.get('non.existent.class')
+            register.by_key('non.existent.class')
         with self.assertRaises(ValueError):
-            register.get(Model.code(), Canvas)
+            register.by_key(Model.code(), Canvas)
 
     def test_serialization(self):
         model = Model.create(1L, 1L)

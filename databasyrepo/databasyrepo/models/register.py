@@ -24,7 +24,7 @@ class Register(object):
 
         self._superclasses_and_classes = {}
 
-    def get(self, code, superclass=None):
+    def by_key(self, code, superclass=None):
         try:
             clazz = self._codes_and_classes[code]
         except KeyError:

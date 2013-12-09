@@ -1,5 +1,5 @@
 databasy.model.core.serializing.Serializable = Class.extend({
-        init:function (params) {
+        init: function (params) {
             this.f = {};
             this.f['_code'] = this.constructor.CODE;
             var fields = this.fields();
@@ -9,25 +9,25 @@ databasy.model.core.serializing.Serializable = Class.extend({
             if (params !== undefined) {
                 for (var key in params) {
                     if (params.hasOwnProperty(key)) {
-                        this.set(key, params[key])
+                        this.set(key, params[key]);
                     }
                 }
             }
         },
-        code:function() {
+        code: function () {
             return this.constructor.CODE;
         },
-        fields:function () {
+        fields: function () {
             return [];
         },
-        type:function() {
+        type: function () {
             return this.val('_code');
         },
-        val:function (key) {
+        val: function (key) {
             return this.f[key];
         },
-        val_as_node: function(key, model) {
-            var ref_or_obj = function(value, model) {
+        val_as_node: function (key, model) {
+            var ref_or_obj = function (value, model) {
                 if (value instanceof databasy.model.core.nodes.NodeRef) {
                     return value.ref_node(model);
                 }
@@ -46,21 +46,21 @@ databasy.model.core.serializing.Serializable = Class.extend({
                 return ref_or_obj(value, model);
             }
         },
-        set:function (f_name, f_value) {
+        set: function (f_name, f_value) {
             var setter_name = 'set_' + f_name;
-            if (this[setter_name] === undefined) {
-                this.f[f_name] = f_value;
-            } else {
+            if (this[setter_name]) {
                 this[setter_name](f_value);
+            } else {
+                this.f[f_name] = f_value;
             }
         },
-        _serialized_value:function(value) {
+        _serialized_value: function (value) {
             if (value instanceof databasy.model.core.serializing.Serializable) {
                 value = value.serialize();
             }
             return value;
         },
-        serialize:function() {
+        serialize: function () {
             var serialized = {};
             var fields = this.f;
             for (var field in fields) {
@@ -68,7 +68,7 @@ databasy.model.core.serializing.Serializable = Class.extend({
                     var value = this._serialized_value(fields[field]);
                     if (Object.prototype.toString.call(value) === '[object Array]') {
                         var list_value = [];
-                        for (var i=0; i < value.length; i++) {
+                        for (var i = 0; i < value.length; i++) {
                             var item = this._serialized_value(value[i]);
                             list_value.push(item);
                         }
@@ -79,7 +79,7 @@ databasy.model.core.serializing.Serializable = Class.extend({
             }
             return serialized;
         },
-        deserialize:function (serialized_object) {
+        deserialize: function (serialized_object) {
             for (var field in this.f) {
                 if (this.f.hasOwnProperty(field)) {
                     var val = databasy.model.core.serializing.Serializable.deserialize(serialized_object[field]);
@@ -87,15 +87,15 @@ databasy.model.core.serializing.Serializable = Class.extend({
                 }
             }
         },
-        copy:function() {
+        copy: function () {
             return databasy.model.core.serializing.Serializable.deserialize(this);
         },
-        toString:function() {
+        toString: function () {
             return JSON.stringify(this.serialize());
         }
     },
     {
-        deserialize:function (value) {
+        deserialize: function (value) {
             var deserializeValue = function (value) {
                 if (value instanceof Object && value.hasOwnProperty('_code')) {
                     // Value is object.

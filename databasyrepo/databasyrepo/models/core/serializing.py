@@ -134,7 +134,7 @@ class Serializable(dict):
                 return True
             elif isinstance(element, NodeRef):
                 try:
-                    register.get(element.val('ref_code'), type)
+                    register.by_key(element.val('ref_code'), type)
                     return True
                 except ValueError:
                     return False
@@ -162,7 +162,7 @@ def deserialize(serialized_object, superclass=None):
     type = raw_value(serialized_object, '_code')
     try:
         from databasyrepo.models.register import register
-        obj_class = register.get(type, superclass)
+        obj_class = register.by_key(type, superclass)
     except ValueError, e:
         raise DeserializationException(e.message)
     node = obj_class()

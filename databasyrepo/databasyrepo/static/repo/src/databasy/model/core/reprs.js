@@ -1,4 +1,11 @@
 databasy.model.core.reprs.Canvas = databasy.model.core.nodes.Node.extend({
+    init: function(params) {
+        this._super(params);
+        if (this.val('reprs') === null) {
+            this.set('reprs', []);
+        }
+    },
+
     fields:function() {
         return this._super().concat(
             'name',

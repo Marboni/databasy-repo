@@ -1,6 +1,11 @@
 databasy.model.core.models.Model = databasy.model.core.nodes.Node.extend({
     init:function () {
         this._super();
+
+        this.set('nodes', []);
+        this.set('canvases', []);
+        this.set('tables', []);
+
         this._node_register = {};
     },
     fields:function () {
@@ -85,6 +90,32 @@ databasy.model.core.models.Model = databasy.model.core.nodes.Node.extend({
         this._super(serialized_object);
         this.revision_stack().inject_model(this);
     }
+}, {
+    CODE:"core.models.Model",
+    createModel: function(model_id) {
+        if (model_id === undefined) {
+            throw new Error('model_id undefined.')
+        }
+
+        var model = new databasy.model.core.models.Model();
+
+        model.set('model_id', model_id);
+
+        model.set('version', 0);
+
+        var revision_stack = new databasy.model.core.models.RevisionStack();
+        revision_stack.inject_model(model);
+        model.set('revision_stack', revision_stack);
+
+        var canvas = new databasy.model.core.reprs.Canvas();
+        canvas.set('name', 'Default');
+        model.register(canvas);
+        model.append_item('canvases', canvas.ref());
+
+        model.set('version', 1);
+
+        return model
+    }
 });
 
 databasy.model.core.models.Revision = databasy.model.core.serializing.Serializable.extend({
@@ -101,6 +132,11 @@ databasy.model.core.models.Revision = databasy.model.core.serializing.Serializab
 databasy.model.core.models.RevisionStack = databasy.model.core.serializing.Serializable.extend({
         init:function (params) {
             this._super(params);
+
+            this.set('revisions', []);
+            this.set('undoable', []);
+            this.set('redoable', []);
+
             this.versions_and_revisions = {};
         },
         fields:function () {

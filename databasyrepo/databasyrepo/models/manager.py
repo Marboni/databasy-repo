@@ -90,7 +90,7 @@ class ModelManager(object):
         self.model_id = model_id
 
         serial = self.code_by_id(model_id)
-        model_class = register.get(serial, Model)
+        model_class = register.by_key(serial, Model)
         if not model_class:
             raise Exception('No model found for serial code %s.' % serial)
         self._model = model_class.create(model_id, user_id)

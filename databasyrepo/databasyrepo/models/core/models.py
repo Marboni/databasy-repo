@@ -100,7 +100,7 @@ class Model(Node):
         model.set('modifier_uid', user_id)
 
         model.set('model_id', model_id)
-        # Pre-initializing version. Will be used to calculate unique IDs of the predefined objects.
+
         model.set('version', 0L)
 
         revision_stack = RevisionStack()
