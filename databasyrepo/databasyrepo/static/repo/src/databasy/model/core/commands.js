@@ -127,6 +127,7 @@ databasy.model.core.commands.DeleteTable = databasy.model.core.commands.Command.
         var table_id = this.val('table_id');
         var table = model.node(table_id);
 
+        // Delete table reprs.
         var canvases = model.val_as_node('canvases', model);
         $.each(canvases, function (index, canvas) {
             var reprs = canvas.val_as_node('reprs', model);
@@ -141,12 +142,20 @@ databasy.model.core.commands.DeleteTable = databasy.model.core.commands.Command.
             });
         });
 
+        // Delete columns.
+        $.each(table.val('columns'), function(i, column_ref) {
+            new databasy.model.core.commands.DeleteColumn({
+                column_id: column_ref.ref_id()
+            }).do(executor);
+        });
+
         executor.execute(new core.actions.FindAndDeleteItem({field:'tables', item:table}));
         executor.execute(new core.actions.Unregister({node_id:table_id}));
     }
 }, {
     CODE:'core.commands.DeleteTable'
 });
+
 
 databasy.model.core.commands.CreateColumn = databasy.model.core.commands.Command.extend({
     fields:function () {

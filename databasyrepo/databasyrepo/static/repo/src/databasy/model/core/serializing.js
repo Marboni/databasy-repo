@@ -24,7 +24,15 @@ databasy.model.core.serializing.Serializable = Class.extend({
             return this.val('_code');
         },
         val: function (key) {
-            return this.f[key];
+            var value = this.f[key];
+            if (value === undefined) {
+                var code = this.code();
+                if (!code) {
+                    code = 'N/A';
+                }
+                throw new ReferenceError('Field ' + key + ' not exists in object of type ' + code);
+            }
+            return  value;
         },
         val_as_node: function (key, model) {
             var ref_or_obj = function (value, model) {

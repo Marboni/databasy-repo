@@ -1,6 +1,9 @@
 databasy.model.core.nodes.Node = databasy.model.core.serializing.Serializable.extend({
     init:function (params) {
         this._super(params);
+        if (!params || !params._id) {
+            this.set('_id', databasy.model.utils.uuid())
+        }
     },
     fields:function () {
         return this._super().concat(

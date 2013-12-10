@@ -1,5 +1,3 @@
-__author__ = 'Marboni'
-
 from databasyrepo.models.core.tests.utils import *
 from databasyrepo.testing import ODMTest
 
