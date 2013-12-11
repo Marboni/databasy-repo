@@ -3,6 +3,9 @@ var testutils = {
     MODEL_ID: 10,
 
     execute_command: function (model, command_cls, params) {
+        if (!params) {
+            params = {};
+        }
         if (params.source_version === undefined) {
             params.source_version = model.version;
         }

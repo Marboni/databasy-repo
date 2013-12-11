@@ -9,7 +9,7 @@ test('basic_tests : test_register', function() {
 });
 
 test('basic_tests : test_serialization', function() {
-    var model = databasy.model.core.models.Model.createModel(1, 10);
+    var model = databasy.model.core.models.Model.createModel(1);
     var serialized_model = model.serialize();
     var deserialized_model = databasy.model.core.serializing.Serializable.deserialize(serialized_model);
 

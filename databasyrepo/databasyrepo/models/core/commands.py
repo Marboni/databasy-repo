@@ -132,11 +132,11 @@ class HistoryCommand(Command):
 
     def pre_validation(self, model):
         super(HistoryCommand, self).pre_validation(model)
-        client_version = self.val('source_version')
-        server_version = model.version
-        if client_version != server_version:
+        command_version = self.val('source_version')
+        model_version = model.version
+        if command_version != model_version:
             raise IllegalCommand(
-                'Client model version %s not equals to server model version %s.' % (client_version, server_version))
+                'Command model version %s not equals to current model version %s.' % (command_version, model_version))
 
 
 class Undo(HistoryCommand):

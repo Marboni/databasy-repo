@@ -3,21 +3,16 @@ from databasyrepo.testing import ODMTest
 
 __author__ = 'Marboni'
 
+
 class HistoryTest(ODMTest):
     def test_undo_redo(self):
         model = create_model()
-        # v1 - Empty model.
-        canvas = default_canvas(model)
 
+        # v1 - Empty model.
         nodes_v1 = model.copy().val('nodes')
 
-        execute_command(model, CreateTable,
-            table_id=str(uuid4()),
-            default_table_repr_id=str(uuid4()),
-            name='Table',
-            canvas_id=canvas.id,
-            position=[1, 2]
-        )
+        create_table(model)
+
         # v2 - Model with table.
         nodes_v2 = model.copy().val('nodes')
 

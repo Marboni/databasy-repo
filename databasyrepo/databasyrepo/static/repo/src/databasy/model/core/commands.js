@@ -1,12 +1,4 @@
 databasy.model.core.commands.Command = databasy.model.core.serializing.Serializable.extend({
-    init:function (values) {
-        this._super();
-        for (var field in values) {
-            if (values.hasOwnProperty(field)) {
-                this.set(field, values[field]);
-            }
-        }
-    },
     fields:function () {
         return this._super().concat(
             'source_version'
@@ -14,7 +6,11 @@ databasy.model.core.commands.Command = databasy.model.core.serializing.Serializa
     },
     pre_validation:function (model) {
         if ($.inArray(this.constructor, model.commands()) == -1) {
-            throw new Error('Command ' + this.code() + ' can not be executed on model ' + model.code() + '.')
+            var code = this.code();
+            if (!code) {
+                code = 'N/A';
+            }
+            throw new Error('Command ' + code + ' can not be executed on model ' + model.code() + '.')
         }
     },
     do:function (executor) {
@@ -63,6 +59,62 @@ databasy.model.core.commands.UpdateCommand = databasy.model.core.commands.Comman
             executor.execute(new databasy.model.core.actions.Set({node_id:obj_id, field:field, value:value}));
         }
     }
+});
+
+
+databasy.model.core.commands.HistoryCommand = databasy.model.core.commands.Command.extend({
+    require_checks:function () {
+        return false;
+    },
+
+    pre_validation: function(model) {
+        this._super(model);
+
+        var command_version = this.val('source_version');
+        var model_version = model.version();
+
+        if (command_version !== model_version) {
+            throw new Error('Command version ' + command_version + ' not equals to current model version ' + model_version + '.');
+        }
+    }
+});
+
+databasy.model.core.commands.Undo = databasy.model.core.commands.Command.extend({
+    pre_validation: function(model) {
+        this._super(model);
+
+        if (!model.revision_stack().can_undo()) {
+            throw new Error('Nothing to undo.');
+        }
+    },
+
+    do: function(executor) {
+        var actions = executor.model.revision_stack().undo();
+        $.each(actions, function(i, action) {
+            executor.execute(action);
+        })
+    }
+}, {
+    CODE:'core.commands.Undo'
+});
+
+databasy.model.core.commands.Redo = databasy.model.core.commands.Command.extend({
+    pre_validation: function(model) {
+        this._super(model);
+
+        if (!model.revision_stack().can_redo()) {
+            throw new Error('Nothing to redo.');
+        }
+    },
+
+    do: function(executor) {
+        var actions = executor.model.revision_stack().redo();
+        $.each(actions, function(i, action) {
+            executor.execute(action);
+        })
+    }
+}, {
+    CODE:'core.commands.Redo'
 });
 
 databasy.model.core.commands.CreateTable = databasy.model.core.commands.Command.extend({
