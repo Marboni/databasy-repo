@@ -233,8 +233,8 @@ databasy.ui.gojs.Templates = Class.extend({
 
     tableTemplate:function () {
         return mk(go.Node, 'Auto', {
-                width:databasy.model.core.reprs.TableRepr.REPR_DEFAULT_WIDTH,
-                minSize:new go.Size(databasy.model.core.reprs.TableRepr.REPR_MIN_WIDTH, 30),
+                width:databasy.model.core.reprs.TableRepr.DEFAULT_REPR_WIDTH,
+                minSize:new go.Size(databasy.model.core.reprs.TableRepr.MIN_REPR_WIDTH, 30),
                 selectionAdornmentTemplate:this.selectionAdornmentTemplate(),
                 resizeAdornmentTemplate:this.resizeAdornmentTemplate(),
                 resizable:true,
@@ -324,8 +324,8 @@ databasy.ui.gojs.Templates = Class.extend({
 
     viewTemplate:function () {
         return mk(go.Node, 'Auto', {
-                width:databasy.model.core.reprs.TableRepr.REPR_DEFAULT_WIDTH, // TODO Replace with view's constants.
-                minSize:new go.Size(databasy.model.core.reprs.TableRepr.REPR_MIN_WIDTH, 30), // TODO Replace with view's constants.
+                width:databasy.model.core.reprs.TableRepr.DEFAULT_REPR_WIDTH, // TODO Replace with view's constants.
+                minSize:new go.Size(databasy.model.core.reprs.TableRepr.MIN_REPR_WIDTH, 30), // TODO Replace with view's constants.
                 selectionAdornmentTemplate:this.selectionAdornmentTemplate(),
                 resizeAdornmentTemplate:this.resizeAdornmentTemplate(),
                 resizable:true,
