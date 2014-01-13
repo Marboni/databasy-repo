@@ -68,7 +68,7 @@ class IndexColumnTest(ODMTest):
 
         execute_command(model, DeleteIndexColumn, index_column_id=index_column.id)
 
-        self.assertEqual(0, len(index.val('index_columns')))
+        self.assertEqual(0, index.items_count('index_columns'))
         self.assertFalse(model.exists(index_column.id))
 
     def test_affect(self):

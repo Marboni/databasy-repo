@@ -79,31 +79,35 @@ var testutils = {
         });
 
         return model.node(column_id);
+    },
+
+    create_index: function(model, table, name, type) {
+        var index_id = databasy.model.utils.uuid();
+
+        this.execute_command(model, databasy.model.core.commands.CreateIndex, {
+            table_id: table.id(),
+            index_id: index_id,
+            name: name,
+            type: type
+        });
+
+        return model.node(index_id);
+    },
+
+    create_index_column: function(model, index, column, order) {
+        if (!order) {
+            order = 'ASC';
+        }
+
+        var index_column_id = databasy.model.utils.uuid();
+
+        this.execute_command(model, databasy.model.core.commands.CreateIndexColumn, {
+            index_column_id: index_column_id,
+            index_id: index.id(),
+            column_id:column.id(),
+            order:order
+        });
+
+        return model.node(index_column_id);
     }
 };
-
-//def create_index(model, table, name, type):
-//    index_id = str(uuid4())
-//
-//    execute_command(model, CreateIndex,
-//                    table_id=table.id,
-//                    index_id=index_id,
-//                    name=name,
-//                    type=type
-//    )
-//
-//    return model.node(index_id)
-//
-//
-//def create_index_column(model, index, column, order='ASC'):
-//    index_column_id = str(uuid4())
-//
-//    execute_command(model, CreateIndexColumn,
-//                    index_column_id=index_column_id,
-//                    index_id=index.id,
-//                    column_id=column.id,
-//                    order=order
-//    )
-//
-//    return model.node(index_column_id)
-

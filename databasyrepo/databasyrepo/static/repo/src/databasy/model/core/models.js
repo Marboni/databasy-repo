@@ -20,25 +20,6 @@ databasy.model.core.models.Model = databasy.model.core.nodes.Node.extend({
             'revision_stack'
         )
     },
-    commands: function () {
-        var coreCommands = databasy.model.core.commands;
-        return [
-            coreCommands.Undo,
-            coreCommands.Redo,
-
-            coreCommands.CreateTable,
-            coreCommands.RenameTable,
-            coreCommands.DeleteTable,
-
-            coreCommands.CreateColumn,
-            coreCommands.UpdateColumn,
-            coreCommands.DeleteColumn,
-
-            coreCommands.CreateTableRepr,
-            coreCommands.UpdateTableRepr,
-            coreCommands.DeleteTableRepr
-        ]
-    },
     checkers: function () {
         return [
         ]

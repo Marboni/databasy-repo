@@ -341,8 +341,8 @@ class DeleteColumn(Command):
 
         table = column.val_as_node('table', executor.model)
         for index in table.val_as_node('indexes', executor.model):
-            for column_index_ref in index.val('index_columns'):
-                DeleteIndexColumn(index_column_id=column_index_ref.ref_id).do(executor)
+            for index_column_ref in index.val('index_columns'):
+                DeleteIndexColumn(index_column_id=index_column_ref.ref_id).do(executor)
 
         executor.execute(FindAndDeleteItem(node_id=column.val('table').ref_id, field='columns', item=column))
         executor.execute(Unregister(node_id=column_id))
