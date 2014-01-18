@@ -25,8 +25,8 @@ databasy.ui.property.BasePropertyPanel = Class.extend({
         this.propertyWrapper.append(this.generalPanel);
 
         this.createTitlePanel();
-        this.createNavPanel();
         this.createHistoryPanel();
+        this.createNavPanel();
     },
 
     createContentPanel:function () {
@@ -40,7 +40,7 @@ databasy.ui.property.BasePropertyPanel = Class.extend({
     },
 
     createNavPanel: function() {
-        this.navPanel = $('<div class="left"></div>');
+        this.navPanel = $('<div class="right"></div>');
         this.generalPanel.append(this.navPanel);
 
         var navPillItems = this.navPillItems();
@@ -75,7 +75,7 @@ databasy.ui.property.BasePropertyPanel = Class.extend({
     },
 
     createHistoryPanel:function () {
-        this.historyPanel = $('<div class="right"></div>');
+        this.historyPanel = $('<div class="left"></div>');
         this.generalPanel.append(this.historyPanel);
 
         var historyBtnPanel = $('' +
